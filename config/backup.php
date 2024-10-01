@@ -37,6 +37,9 @@ return [
         'encryption' => 'default',
         'tries' => 1,
         'retry_delay' => 0,
+    
+        'database_dump_filename_base' => env('BACKUP_DATABASE_DUMP_FILENAME_BASE', 'backup'),
+        'database_dump_file_extension' => env('BACKUP_DATABASE_DUMP_FILE_EXTENSION', 'sql'),
     ],
 
     'notifications' => [
