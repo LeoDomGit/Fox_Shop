@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permissions;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 use Inertia\Inertia;
@@ -55,9 +56,20 @@ class PermissionController extends BaseCrudController
      */
     protected function validateRequest(Request $request)
     {
-        return $request->validate([
-            'name' => 'required|string|unique:permissions,name',
-        ]);
+        $rules = [
+            'name' => 'required|string|max:255',
+        ];
+    
+        $validator = \Validator::make($request->all(), $rules);
+    
+        if ($validator->fails()) {
+            throw new HttpResponseException(response()->json([
+                'check' => false,
+                'msg' => $validator->errors()->first(),
+            ], 200));
+        }
+    
+        return $validator->validated();
     }
     /**
      * Remove the specified resource from storage.

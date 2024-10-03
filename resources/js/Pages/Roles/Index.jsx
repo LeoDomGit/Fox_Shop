@@ -79,13 +79,19 @@ function Index({ roles }) {
         setData(res.data.data);
         setShow(false);
         setRole('')
-      }else if(res.data.check==true){
+      }else if(res.data.check==false){
         notyf.open({
-          type: "success",
+          type: "error",
           message: res.data.msg,
         });
       }
-    })
+    }).catch((err) => {
+      // Optional: Handle other errors like network issues
+      notyf.open({
+        type: "error",
+        message: "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      });
+    });
   }
   const resetCreate = () => {
     setRole('');

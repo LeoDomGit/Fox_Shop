@@ -93,9 +93,9 @@ function Index({ permissions }) {
                     setData(res.data.data);
                     setShow(false);
                     setPermission("");
-                } else if (res.data.check == true) {
+                } else if (res.data.check == false) {
                     notyf.open({
-                        type: "success",
+                        type: "error",
                         message: res.data.msg,
                     });
                 }
