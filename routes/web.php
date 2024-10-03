@@ -8,5 +8,7 @@ use App\Http\Controllers\PermissionController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('/roles', RolesController::class);
-Route::resource('/permissions', PermissionController::class);
+Route::prefix('admin')->group(function () { 
+    Route::resource('/roles', RolesController::class);
+    Route::resource('/permissions', PermissionController::class);
+});

@@ -33,46 +33,46 @@ function Layout({ children }) {
 							<h2>Admin</h2>
 						</MenuItem>
 						<SubMenu label="Tài khoản" icon={<GroupIcon />}>
-							<a href={"/permissions"}>
+							<a href={"/admin/permissions"}>
 								<MenuItem icon={<GroupIcon />}>Quyền tài khoản</MenuItem>
 							</a>
-							<a href={"/roles"}>
+							<a href={"/admin/roles"}>
 								<MenuItem icon={<GroupIcon />}>Loại tài khoản</MenuItem>
 							</a>
-							<a href={"/users"}>
+							<a href={"/admin/users"}>
 								<MenuItem icon={<GroupIcon />}>Tài khoản</MenuItem>
 							</a>
 						</SubMenu>
-						<SubMenu label="Sản phẩm" icon={<BrandingWatermarkIcon />}>
-							<a href={"/categories"}>
+						{/* <SubMenu label="Sản phẩm" icon={<BrandingWatermarkIcon />}>
+							<a href={"/admin/categories"}>
 								<MenuItem icon={<CategoryIcon />}>Loại sản phẩm</MenuItem>
 							</a>
-							<a href={"/brands"}>
+							<a href={"/admin/brands"}>
 								<MenuItem icon={<BrandingWatermarkIcon />}>Thương hiệu</MenuItem>
 							</a>
-							<a href={"/products"}>
+							<a href={"/admin/products"}>
 								<MenuItem icon={<InventoryIcon />}>Sản phẩm</MenuItem>
 							</a>
 						</SubMenu>
-						<a href={"/contacts"}>
+						<a href={"/admin/contacts"}>
 							<MenuItem icon={<DialerSipIcon />}>Liên hệ</MenuItem>
 						</a>
-						<a href={"/bookings"}>
+						<a href={"/admin/bookings"}>
 							<MenuItem icon={<CalendarMonthIcon />}>Đặt lịch</MenuItem>
 						</a>
-						<a href={"/slides"}>
+						<a href={"/admin/slides"}>
 							<MenuItem icon={<DriveFileMoveIcon />}>Slides</MenuItem>
 						</a>
-						<a href={"/sitemap"}>
+						<a href={"/admin/sitemap"}>
 							<MenuItem icon={<MapIcon />}>Sitemap</MenuItem>
 						</a>
-						<a href={"/posts"}>
+						<a href={"/admin/posts"}>
 							<MenuItem icon={<BookIcon />}>Bài viết</MenuItem>
 						</a>
-						<a href={"/comments"}>
+						<a href={"/admin/comments"}>
 							<MenuItem icon={<CommentIcon />}>Bình luận</MenuItem>
 						</a>
-						<a href={"/bills"}>
+						<a href={"/admin/bills"}>
 							<MenuItem icon={<CardTravelIcon />}>Hoá đơn</MenuItem>
 						</a>
 						<SubMenu label="Hóa Đơn dịch vụ" icon={<BrandingWatermarkIcon />}>
@@ -90,7 +90,7 @@ function Layout({ children }) {
 							<a href={"/services"}>
 								<MenuItem icon={<DesignServicesTwoToneIcon />}>Dịch vụ </MenuItem>
 							</a>
-						</SubMenu>
+						</SubMenu> */}
 						<a href={"/logout"}>
 							<MenuItem icon={<LogoutIcon />}>Log out</MenuItem>
 						</a>

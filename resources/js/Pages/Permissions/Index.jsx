@@ -68,7 +68,7 @@ function Index({ permissions }) {
         },
         {
             field: "name",
-            headerName: "Loại tài khoản",
+            headerName: "Quyền tài khoản",
             width: 200,
             editable: true,
         },
