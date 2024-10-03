@@ -68,7 +68,7 @@ function Index({ roles }) {
     }
   ];
   const submitRole = () => {
-    axios.post('/roles', {
+    axios.post('/admin/roles', {
       name: role
     }).then((res) => {
       if (res.data.check == true) {
@@ -103,7 +103,7 @@ function Index({ roles }) {
       }).then((result) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
-          axios.delete('/roles/'+id).then((res)=>{
+          axios.delete('/admin/roles/'+id).then((res)=>{
             if(res.data.check==true){
               notyf.success("Đã xóa thành công");
               setData(res.data.data)
@@ -115,7 +115,7 @@ function Index({ roles }) {
     }else{
       axios
       .put(
-        `/roles/${id}`,
+        `/admin/roles/${id}`,
         {
           name: value,
         },

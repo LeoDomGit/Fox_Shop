@@ -81,7 +81,7 @@ function Index({ permissions }) {
     ];
     const submitPermission = () => {
         axios
-            .post("/permissions", {
+            .post("/admin/permissions", {
                 name: permission,
             })
             .then((res) => {
@@ -117,7 +117,7 @@ function Index({ permissions }) {
             }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
-                    axios.delete("/permissions/" + id).then((res) => {
+                    axios.delete("/admin/permissions/" + id).then((res) => {
                         if (res.data.check == true) {
                             notyf.success("Đã xóa thành công");
                             setData(res.data.data);
@@ -129,7 +129,7 @@ function Index({ permissions }) {
         } else {
             axios
                 .put(
-                    `/permissions/${id}`,
+                    `/admin/permissions/${id}`,
                     {
                         name: value,
                     }
