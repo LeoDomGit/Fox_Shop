@@ -47,16 +47,8 @@ class RolesController extends BaseCrudController
      */
     public function edit(Roles $roles)
     {
-        //
+    
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Roles $roles,$id)
     {
         $role  = Roles::find($id);
