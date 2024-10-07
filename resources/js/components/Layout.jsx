@@ -43,6 +43,17 @@ function Layout({ children }) {
 								<MenuItem icon={<GroupIcon />}>Tài khoản</MenuItem>
 							</a>
 						</SubMenu>
+						<SubMenu label="Sản phẩm" icon={<GroupIcon />}>
+							<a href={"/admin/categories"}>
+								<MenuItem icon={<GroupIcon />}>Danh mục sản phẩm</MenuItem>
+							</a>
+							{/* <a href={"/admin/roles"}>
+								<MenuItem icon={<GroupIcon />}></MenuItem>
+							</a>
+							<a href={"/admin/users"}>
+								<MenuItem icon={<GroupIcon />}>Tài khoản</MenuItem>
+							</a> */}
+						</SubMenu>
 						{/* <SubMenu label="Sản phẩm" icon={<BrandingWatermarkIcon />}>
 							<a href={"/admin/categories"}>
 								<MenuItem icon={<CategoryIcon />}>Loại sản phẩm</MenuItem>
