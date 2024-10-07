@@ -42,7 +42,6 @@ class RolesController extends BaseCrudController
     {
         $roles= Roles::all();
         return Inertia::render('Roles/Index', ['roles'=>$roles]);
-        // compact
     }
 
     /**
