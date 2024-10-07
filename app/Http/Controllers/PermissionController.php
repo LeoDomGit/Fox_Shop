@@ -6,10 +6,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class PermissionController extends Controller
-{
-
-
 class PermissionController extends BaseCrudController
 {
     public function __construct()
@@ -57,13 +53,6 @@ class PermissionController extends BaseCrudController
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Permission $permission)
-    {
-        //
-    }
 /**
      * Update the specified resource in storage.
      */
