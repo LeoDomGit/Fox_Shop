@@ -53,13 +53,6 @@ class PermissionController extends BaseCrudController
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Permission $permission)
-    {
-        //
-    }
 /**
      * Update the specified resource in storage.
      */
