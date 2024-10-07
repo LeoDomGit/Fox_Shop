@@ -6,10 +6,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class PermissionController extends Controller
-{
-
-
 class PermissionController extends BaseCrudController
 {
     public function __construct()
