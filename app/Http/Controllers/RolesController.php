@@ -30,27 +30,16 @@ class RolesController extends BaseCrudController
     {
         $roles= Roles::all();
         return Inertia::render('Roles/Index', ['roles'=>$roles]);
-        // compact
+        
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Roles $roles)
     {
-        //
+        
     }
 
     /**

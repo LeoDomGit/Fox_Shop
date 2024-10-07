@@ -80,6 +80,7 @@ function Index({ permissions }) {
         },
     ];
     const submitPermission = () => {
+        // xử lý về push API
         axios
             .post("/permissions", {
                 name: permission,

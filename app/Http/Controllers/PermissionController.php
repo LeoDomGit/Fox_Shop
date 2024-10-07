@@ -6,11 +6,19 @@ use App\Models\Permissions;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class PermissionController extends Controller
+class PermissionController extends  BaseCrudController
+
 {
-    /**
-     * Display a listing of the resource.
-     */
+        public function __construct()
+    {
+        $this->model = Permissions::class;
+    }
+        protected function validateRequest(Request $request)
+    {
+        return $request->validate([
+            'name' => 'required|string|unique:permissions,name',
+        ]);
+    }
     public function index()
     {
         // echo "Here";
@@ -26,17 +34,6 @@ class PermissionController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Permission $permission)
     {
         //
@@ -47,22 +44,16 @@ class PermissionController extends Controller
      */
     public function edit(Permission $permission)
     {
-        //
+        
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Permission $permission)
+ public function destroy(Permissions $permissions,$id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Permission $permission)
-    {
-        //
+        $role  = Permissions::find($id);
+        if(!$role){
+            return response()->json(['check'=>false,'msg'=>'Không tìm thấy mã loại người dùng']);
+        }
+        $role->delete();
+        return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
 }

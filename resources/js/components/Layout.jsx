@@ -33,7 +33,7 @@ function Layout({ children }) {
 							<h2>Admin</h2>
 						</MenuItem>
 						<SubMenu label="Tài khoản" icon={<GroupIcon />}>
-							<a href={"/permissions"}>
+							<a className="text-decoration-none" href={"/permissions"}>
 								<MenuItem icon={<GroupIcon />}>Quyền tài khoản</MenuItem>
 							</a>
 							<a href={"/roles"}>
