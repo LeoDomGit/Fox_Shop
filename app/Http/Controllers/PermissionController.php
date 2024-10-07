@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Permissions;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
-
 use Inertia\Inertia;
+
+class PermissionController extends Controller
+{
+
 
 class PermissionController extends BaseCrudController
 {
@@ -34,6 +36,10 @@ class PermissionController extends BaseCrudController
     /**
      * Store a newly created resource in storage.
      */
+    public function store(Request $request)
+    {
+        //
+    }
 
     /**
      * Display the specified resource.
@@ -52,6 +58,13 @@ class PermissionController extends BaseCrudController
     }
 
     /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Permission $permission)
+    {
+        //
+    }
+/**
      * Update the specified resource in storage.
      */
     protected function validateRequest(Request $request)
@@ -83,5 +96,4 @@ class PermissionController extends BaseCrudController
         $role->delete();
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
-    
 }
