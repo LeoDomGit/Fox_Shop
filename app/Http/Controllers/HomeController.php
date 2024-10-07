@@ -34,13 +34,8 @@ class HomeController extends BaseCrudController
     {
         //
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Home $home)
     {
-        //
     }
 
     public function destroy(Home $home)
