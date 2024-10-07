@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Roles;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -19,9 +20,20 @@ class RolesController extends BaseCrudController
 
     protected function validateRequest(Request $request)
     {
-        return $request->validate([
-            'name' => 'required|string|unique:roles,name',
-        ]);
+        $rules = [
+            'name' => 'required|string|max:255',
+        ];
+    
+        $validator = \Validator::make($request->all(), $rules);
+    
+        if ($validator->fails()) {
+            throw new HttpResponseException(response()->json([
+                'check' => false,
+                'msg' => $validator->errors()->first(),
+            ], 200));
+        }
+    
+        return $validator->validated();
     }
     /**
      * Display a listing of the resource.
@@ -30,6 +42,7 @@ class RolesController extends BaseCrudController
     {
         $roles= Roles::all();
         return Inertia::render('Roles/Index', ['roles'=>$roles]);
+        // compact
     }
 
     /**

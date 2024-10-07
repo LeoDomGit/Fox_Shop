@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 class BaseCrudController extends Controller
@@ -39,9 +40,19 @@ class BaseCrudController extends Controller
      */
     protected function validateRequest(Request $request)
     {
-        // Default validation logic (you can customize per child controller)
-        return $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
-        ]);
+        ];
+    
+        $validator = \Validator::make($request->all(), $rules);
+    
+        if ($validator->fails()) {
+            throw new HttpResponseException(response()->json([
+                'check' => false,
+                'msg' => $validator->errors()->first(),
+            ], 200));
+        }
+    
+        return $validator->validated();
     }
 }

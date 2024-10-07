@@ -4,7 +4,11 @@ use App\Http\Controllers\RolesController;
 use App\Models\Roles;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\PermissionController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('/roles', RolesController::class);
+Route::prefix('admin')->group(function () { 
+    Route::resource('/roles', RolesController::class);
+    Route::resource('/permissions', PermissionController::class);
+});

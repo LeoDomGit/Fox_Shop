@@ -68,7 +68,7 @@ function Index({ roles }) {
     }
   ];
   const submitRole = () => {
-    axios.post('/roles', {
+    axios.post('/admin/roles', {
       name: role
     }).then((res) => {
       if (res.data.check == true) {
@@ -79,13 +79,19 @@ function Index({ roles }) {
         setData(res.data.data);
         setShow(false);
         setRole('')
-      }else if(res.data.check==true){
+      }else if(res.data.check==false){
         notyf.open({
-          type: "success",
+          type: "error",
           message: res.data.msg,
         });
       }
-    })
+    }).catch((err) => {
+      // Optional: Handle other errors like network issues
+      notyf.open({
+        type: "error",
+        message: "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      });
+    });
   }
   const resetCreate = () => {
     setRole('');
@@ -103,7 +109,7 @@ function Index({ roles }) {
       }).then((result) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
-          axios.delete('/roles/'+id).then((res)=>{
+          axios.delete('/admin/roles/'+id).then((res)=>{
             if(res.data.check==true){
               notyf.success("Đã xóa thành công");
               setData(res.data.data)
@@ -115,7 +121,7 @@ function Index({ roles }) {
     }else{
       axios
       .put(
-        `/roles/${id}`,
+        `/admin/roles/${id}`,
         {
           name: value,
         },
