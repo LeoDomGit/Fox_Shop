@@ -28,8 +28,8 @@ class BaseCrudController extends Controller
         $resource->update($validated);
         $result = $this->model::all();
         return response()->json([
-           'check'=>true,
-           'data'=>$result,
+            'check'=>true,
+            'data'=>$result,
         ], 200);
     }
 

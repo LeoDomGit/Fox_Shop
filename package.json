@@ -11,9 +11,12 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^43.2.0",
+        "@ckeditor/ckeditor5-react": "^9.3.0",
         "@dropzone-ui/react": "github:dropzone-ui/react",
         "@emotion/react": "^11.11.4",
         "@emotion/styled": "^11.11.5",
+        "@files-ui/react": "^1.2.4",
         "@inertiajs/inertia-react": "^0.8.1",
         "@inertiajs/react": "^1.2.0",
         "@mui/icons-material": "^5.15.20",
