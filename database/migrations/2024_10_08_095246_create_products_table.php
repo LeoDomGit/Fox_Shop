@@ -23,16 +23,14 @@ return new class extends Migration
             $table->unsignedBigInteger('id_brand');
             $table->timestamps();
         });
-        if(Schema::hasTable('categories ')){
-            Schema::create('product_categories', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('id_product');
-                $table->unsignedBigInteger('id_categories');
-                $table->timestamps();
-                $table->foreign('id_product')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('id_categories')->references('id')->on('categories')->onDelete('cascade');
-            });
-        }
+        Schema::create('product_categories', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('id_product');
+            $table->unsignedBigInteger('id_categories');
+            $table->timestamps();
+            $table->foreign('id_product')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('id_categories')->references('id')->on('categories')->onDelete('cascade');
+        });
 
     }
 
