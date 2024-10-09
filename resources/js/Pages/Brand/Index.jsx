@@ -81,7 +81,7 @@ function Index({ brands }) {
     ];
     const submitBrand = () => {
         axios
-            .post("/admin/brand", {
+            .post("/admin/brands", {
                 name: brand,
             })
             .then((res) => {
@@ -125,7 +125,7 @@ function Index({ brands }) {
                 denyButtonText: `Không`,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.delete("/admin/brand/" + id).then((res) => {
+                    axios.delete("/admin/brands/" + id).then((res) => {
                         if (res.data.check == true) {
                             notyf.success("Đã xóa thành công");
                             setData(res.data.data);
@@ -137,7 +137,7 @@ function Index({ brands }) {
         } else {
             axios
                 .put(
-                    `/admin/brand/${id}`,
+                    `/admin/brands/${id}`,
                     {
                         [field]: value,
                     }

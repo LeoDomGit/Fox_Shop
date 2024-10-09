@@ -19,7 +19,26 @@ class Products extends Model
         'discount',
         'content',
         'id_brand',
+        'in_stock',
         'created_at',
         'updated_at',
     ];
+    // public function categories()
+    // {
+    //     return $this->belongsTo(Categories::class, 'idCate');
+    // }
+
+    public function brands()
+    {
+        return $this->belongsTo(Brand::class, 'id_brand');
+    }
+
+    public function gallery()
+    {
+        return $this->hasMany(Gallery::class, 'id_parent');
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
 }

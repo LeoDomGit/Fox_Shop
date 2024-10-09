@@ -50,12 +50,15 @@ function Layout({ children }) {
 							<a href={"/admin/brands"}>
 								<MenuItem icon={<GroupIcon />}>Thương hiệu</MenuItem>
 							</a>
-							{/* <a href={"/admin/roles"}>
-								<MenuItem icon={<GroupIcon />}></MenuItem>
+							<SubMenu label="Quản lý sản phẩm" icon={<GroupIcon />}>
+							<a href={"/admin/products/create"}>
+								<MenuItem icon={<GroupIcon />}>Thêm sản phẩm</MenuItem>
 							</a>
-							<a href={"/admin/users"}>
-								<MenuItem icon={<GroupIcon />}>Tài khoản</MenuItem>
-							</a> */}
+							<a href={"/admin/brands"}>
+								<MenuItem icon={<GroupIcon />}>Thương hiệu</MenuItem>
+							</a>
+
+						</SubMenu>
 						</SubMenu>
 						{/* <SubMenu label="Sản phẩm" icon={<BrandingWatermarkIcon />}>
 							<a href={"/admin/categories"}>
