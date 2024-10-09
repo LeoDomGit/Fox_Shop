@@ -57,13 +57,13 @@ class BrandController extends BaseCrudController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Brand $brand)
+    public function destroy($id)
     {
          $brand  = Brand::find($id);
         if(!$brand){
             return response()->json(['check'=>false,'msg'=>'Không tìm thấy mã thương hiệu']);
         }
-        Brand::find($id)->delete();
+        $brand->delete();
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
 }
