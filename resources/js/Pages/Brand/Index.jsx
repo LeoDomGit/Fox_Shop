@@ -14,7 +14,6 @@ function Index({ brands }) {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const [position, setPosition] = useState(0);
     const api = "http://localhost:8000/api/";
     const app = "http://localhost:8000/";
     const formatCreatedAt = (dateString) => {
