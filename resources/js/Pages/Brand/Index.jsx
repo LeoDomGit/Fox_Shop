@@ -124,7 +124,6 @@ function Index({ brands }) {
                 confirmButtonText: "Đúng",
                 denyButtonText: `Không`,
             }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
                     axios.delete("/admin/brand/" + id).then((res) => {
                         if (res.data.check == true) {
