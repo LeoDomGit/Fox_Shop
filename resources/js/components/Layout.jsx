@@ -47,6 +47,9 @@ function Layout({ children }) {
 							<a href={"/admin/categories"}>
 								<MenuItem icon={<GroupIcon />}>Danh mục sản phẩm</MenuItem>
 							</a>
+							<a href={"/admin/brands"}>
+								<MenuItem icon={<GroupIcon />}>Thương hiệu</MenuItem>
+							</a>
 							{/* <a href={"/admin/roles"}>
 								<MenuItem icon={<GroupIcon />}></MenuItem>
 							</a>
