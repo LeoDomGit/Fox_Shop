@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Gallery;
+use App\Models\ProductCategory;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -105,12 +106,13 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:products,name',
             'price' => 'required|numeric',
-            'idCate' => 'required|exists:categories,id',
             'idBrand' => 'required|exists:brands,id',
             'content' => 'required',
             'files' => 'required|array',
             'files.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'in_stock' => 'required|min:0',
+            'categories'=>'required|array',
+            'categories.*'=>'exists:categories,id'
         ]);
         if ($validator->fails()) {
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
@@ -127,7 +129,9 @@ class ProductController extends Controller
         $data['in_stock'] = $request->in_stock;
         $data['created_at'] = now();
         $id = $this->model::insertGetId($data);
-
+        foreach ($request->categories as $key => $value) {
+           ProductCategory::create(['id_product'=>$id,'id_categories'=>$value,'created_at'=>now()]);
+        }
         foreach ($request->file('files') as $file) {
 
             $imageName = $file->getClientOriginalName();
@@ -157,11 +161,8 @@ class ProductController extends Controller
 
 
     public function show($identifier)
-
     {
-
-        $result = $this->showTraits($this->model, $identifier);
-
+        $result = $this->model::with('brands','categories')->find($identifier);
         $oldImages = Gallery::where('id_parent', $identifier)->pluck('image')->toArray();
 
         $gallery = [];
@@ -292,10 +293,9 @@ class ProductController extends Controller
     public function update(Request $request, $identifier)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'unique:products,name',
             'price' => 'numeric|min:0',
             'discount' => 'numeric|min:0',
-            'idCate' => 'exists:categories,id'
+            'categories.*' => 'exists:categories,id'
         ]);
         if ($validator->fails()) {
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
@@ -303,6 +303,13 @@ class ProductController extends Controller
         $data = $request->all();
         if ($request->name != '') {
             $data['slug'] = Str::slug($request->name);
+        }
+        if($request->has('categories')){
+            unset($data['categories']);
+            ProductCategory::where('id_product',$identifier)->delete();
+            foreach ($request->categories as $key => $value) {
+                ProductCategory::create(['id_product'=>$identifier,'id_categories'=>$value,'created_at'=>now()]);
+            }
         }
         $result = $this->updateTraits($this->model, $identifier, $data);
         if ($request->hasFile('file')) {
@@ -315,6 +322,7 @@ class ProductController extends Controller
                 'status' => 0,
             ]);
         }
+
         $result = $this->model::with('categories', 'brands')->get();
         return response()->json(['check' => true, 'data' => $result]);
     }
@@ -327,10 +335,10 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(['check' => false, 'msg' => 'Không tìm thấy sản phẩm']);
         }
-        $bill = Bill_Detail::where('id_product', $identifier)->first();
-        if ($bill) {
-            return response()->json(['check' => false, 'msg' => 'Không thể xóa sản phẩm vì có tồn tại LSMH']);
-        }
+        // $bill = Bill_Detail::where('id_product', $identifier)->first();
+        // if ($bill) {
+        //     return response()->json(['check' => false, 'msg' => 'Không thể xóa sản phẩm vì có tồn tại LSMH']);
+        // }
         $images = Gallery::where('id_parent', $identifier)->select('image')->get();
         foreach ($images as $image) {
             $filePath = "public/products/{$image->image}";

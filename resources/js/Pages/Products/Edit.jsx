@@ -9,25 +9,42 @@ import Modal from 'react-bootstrap/Modal';
 import 'notyf/notyf.min.css';
 import CKEditor from "../../components/CKEditor";
 import Swal from 'sweetalert2';
-
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { useTheme } from '@mui/material/styles';
+import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
     const [id,setId]= useState(dataId)
     const [show, setShow] = useState(false);
     const [categories, setCategories] = useState(dataCate);
+    const [category,setCategory]= useState([]);
     const [brands, setBrands] = useState(dataBrand);
     const [gallery, setGallery] = useState(datagallery);
     const [image,setImage]= useState(dataimage);
     const [product, setProduct] = useState(dataproduct);
     const [files, setFiles] = React.useState([]);
-    const REACT_APP_API_IMG_URL= ''
+    const REACT_APP_API_IMG_URL= '';
+    useEffect(()=>{
+        var arr=[];
+        dataproduct.categories.forEach(el => {
+            arr.push(el.id);
+        });
+        setCategory(arr);
+    },[])
+    const handleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setCategory(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
     const updateFiles = (incommingFiles) => {
 
         setFiles(incommingFiles);
     };
-
     const config = {
         height: '400px',
-
     }
     const notyf = new Notyf({
         duration: 1000,
@@ -149,7 +166,10 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
     }
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setProduct({ [name]: value });
+        setProduct((prevProduct) => ({
+            ...prevProduct, 
+            [name]: value, 
+        }));
         
     };
     const handleDelete = (e)=>{
@@ -182,14 +202,18 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
     }
 
     const handleSubmit = () => {
-        axios.put(`/admin/products/${id}`, product,{
+        const updatedProduct = {
+            ...product,
+            categories: category,
+        };
+        axios.put(`/admin/products/${id}`, updatedProduct,{
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 Accept: "application/json",
             },
         }).then((res)=>{
             if(res.data.check==true){
-                window.location.replace('/products');
+                window.location.replace('/admin/products');
             }else if(res.data.check==false){
                 if(res.data.msg){
                     notyf.open({
@@ -243,13 +267,32 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
                     </div>
                     <div className="row mt-2">
                         <div className="col-md-3">
-                            <label>Category:</label>
+                            {/* <label>Category:</label>
                             <select name="categoryId" className="form-control" value={product.idCate} onChange={handleInputChange}>
                                 <option value="0" disabled>Choose a category</option>
                                 {categories.map((category) => (
                                     <option key={category.id} value={category.id}>{category.name}</option>
                                 ))}
-                            </select>
+                            </select> */}
+                            <InputLabel id="demo-multiple-name-label">Danh mục sản phầm</InputLabel>
+                                                    <Select
+                                                        labelId="demo-multiple-name-label"
+                                                        id="demo-multiple-name"
+                                                        multiple
+                                                        value={category}
+                                                        onChange={handleChange}
+                                                        className="form-control"
+                                                        input={<OutlinedInput label="Name" />}
+                                                    >
+                                                        {categories.map((item) => (
+                                                            <MenuItem
+                                                                key={item.id}
+                                                                value={item.id}
+                                                            >
+                                                                {item.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
                         </div>
                         <div className="col-md-3">
                             <label>Brands:</label>

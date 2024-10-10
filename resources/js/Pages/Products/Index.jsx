@@ -7,6 +7,9 @@ import { Box, Switch, Typography } from "@mui/material";
 import "notyf/notyf.min.css";
 import CKEditor from "../../components/CKEditor";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { useTheme } from '@mui/material/styles';
+import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 function Index({ dataproducts, databrands, datacategories }) {
     const [create, setCreate] = useState(false);
     const [categories, setCategories] = useState(datacategories);
@@ -51,6 +54,8 @@ function Index({ dataproducts, databrands, datacategories }) {
                 });
             });
     };
+    const ITEM_HEIGHT =15;
+    const ITEM_PADDING_TOP =0;
     const notyf = new Notyf({
         duration: 1000,
         position: {
@@ -207,7 +212,9 @@ function Index({ dataproducts, databrands, datacategories }) {
     const [idBrand, setIdBrand] = useState(0);
     const [inStock, setInstock] = useState(0);
     const [content, setContent] = useState("");
+    const [cate,setCate]= useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const theme = useTheme();
     const [filePreviews, setFilePreviews] = useState([]);
     const ChangeCreate = () => {
         if (create == false) {
@@ -231,32 +238,32 @@ function Index({ dataproducts, databrands, datacategories }) {
         if (name == "") {
             notyf.open({
                 type: "error",
-                message: "Product name is required",
+                message: "Vui lòng nhập tên sản phẩm",
             });
         } else if (price == 0) {
             notyf.open({
                 type: "error",
-                message: "Product price is required",
+                message: "Vui lòng nhập giá sản phẩm",
             });
-        } else if (idCate == 0) {
+        } else if (categories.length == 0) {
             notyf.open({
                 type: "error",
-                message: "Product category is required",
+                message: "Vui lòng chọn danh mục cho sản phẩm",
             });
         } else if (idBrand == 0) {
             notyf.open({
                 type: "error",
-                message: "Product brand is required",
+                message: "Vui lòng chọn thương hiệu sản phẩm",
             });
         } else if (content == "") {
             notyf.open({
                 type: "error",
-                message: "Product detail is required",
+                message: "Vui lòng nhập mô tả sản phẩm",
             });
         } else if (selectedFiles.length == 0) {
             notyf.open({
                 type: "error",
-                message: "Product Gallery is required",
+                message: "Vui lòng up hình ảnh sản phẩm",
             });
         } else {
             var formData = new FormData();
@@ -269,6 +276,9 @@ function Index({ dataproducts, databrands, datacategories }) {
             formData.append("in_stock", inStock);
             selectedFiles.forEach((file) => {
                 formData.append("files[]", file);
+            }); 
+            cate.forEach(el => {
+                formData.append("categories[]",el);
             });
         }
         axios
@@ -295,7 +305,15 @@ function Index({ dataproducts, databrands, datacategories }) {
         updatedPreviews.splice(index, 1);
         setFilePreviews(updatedPreviews);
     };
-
+    const handleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setCate(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         setSelectedFiles(files);
@@ -319,177 +337,178 @@ function Index({ dataproducts, databrands, datacategories }) {
                                 </button>
                             </div>
                             <div className="col-md"></div>
-                            <div className="col-md-2">
-                                {create == true && (
+                        </div>
+                        {create == true && (
+                            <>
+                                <div className="col-md-8">
+                                    <div class="card border-0 ps-2 shadow">
+                                        <div class="card-body">
+                                            <div className="row">
+                                                <div className="col-md-3">
+                                                    <label>Name:</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        onChange={(e) =>
+                                                            setName(e.target.value)
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <label>Price:</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        onChange={(e) =>
+                                                            setPrice(e.target.value)
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <label>Discount:</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        onChange={(e) =>
+                                                            setDiscount(e.target.value)
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <label>Tồn kho :</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        onChange={(e) =>
+                                                            setInstock(e.target.value)
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="row mt-2">
+                                                <div className="col-md-3">
+                                                    <InputLabel id="demo-multiple-name-label">Danh mục sản phầm</InputLabel>
+                                                    <Select
+                                                        labelId="demo-multiple-name-label"
+                                                        id="demo-multiple-name"
+                                                        multiple
+                                                        value={cate}
+                                                        onChange={handleChange}
+                                                        className="form-control"
+                                                        input={<OutlinedInput label="Name" />}
+                                                    >
+                                                        {categories.map((item) => (
+                                                            <MenuItem
+                                                                key={item.id}
+                                                                value={item.id}
+                                                            >
+                                                                {item.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <label>Brands:</label>
+                                                    <select
+                                                        name="brandId"
+                                                        defaultValue={0}
+                                                        className="form-control"
+                                                        value={idBrand}
+                                                        onChange={(e) =>
+                                                            setIdBrand(e.target.value)
+                                                        }
+                                                    >
+                                                        <option value="0" disabled>
+                                                            Chọn thương hiệu
+                                                        </option>
+                                                        {brands.map((brand) => (
+                                                            <option
+                                                                key={brand.id}
+                                                                value={brand.id}
+                                                            >
+                                                                {brand.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="row mb-2 mt-2">
+                                                <div className="col-md-3">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        onChange={handleImageChange}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="row mt-3">
+                                               <div className="col-md">
+                                               <CKEditor
+                                                    value={content}
+                                                    onBlur={setContent}
+                                                />
+                                               </div>
+                                            </div>
+
+                                            <div className="row mt-3">
+                                                <div
+                                                    className="col-md"
+                                                    style={{
+                                                        display: "grid",
+                                                        gridTemplateColumns:
+                                                            "repeat(auto-fill, minmax(100px, 1fr))",
+                                                        gap: "10px",
+                                                    }}
+                                                >
+                                                    {filePreviews.map((image, index) => (
+                                                        <div
+                                                            key={index}
+                                                            style={{
+                                                                display: "flex",
+                                                                flexDirection: "column",
+                                                                alignItems: "center",
+                                                                marginTop: "10px",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={image}
+                                                                alt={`Preview ${index}`}
+                                                                style={{
+                                                                    width: "100px",
+                                                                    height: "100px",
+                                                                    marginBottom: "5px",
+                                                                }}
+                                                            />
+                                                            <button
+                                                                className="btn btn-danger btn-sm w-100"
+                                                                onClick={() =>
+                                                                    handleRemoveImage(index)
+                                                                }
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-md-2">
+                                                {create == true && (
                                     <button
-                                        className="btn btn-sm btn-primary"
+                                        className="btn w-100  btn-primary"
                                         onClick={(e) => SubmitProduct()}
                                     >
                                         Store
                                     </button>
                                 )}
-                            </div>
-                        </div>
-                        {create == true && (
-                            <>
-                            <div className="col-md-8">
-                            <div class="card border-0 ps-2 shadow">
-                                    <div class="card-body">
-                                    <div className="row">
-                                    <div className="col-md-3">
-                                        <label>Name:</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            onChange={(e) =>
-                                                setName(e.target.value)
-                                            }
-                                        />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="col-md-3">
-                                        <label>Price:</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            onChange={(e) =>
-                                                setPrice(e.target.value)
-                                            }
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label>Discount:</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            onChange={(e) =>
-                                                setDiscount(e.target.value)
-                                            }
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label>Tồn kho :</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            onChange={(e) =>
-                                                setInstock(e.target.value)
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mt-2">
-                                    <div className="col-md-3">
-                                        <label>Category:</label>
-                                        <select
-                                            name="categoryId"
-                                            className="form-control"
-                                            defaultValue={0}
-                                            value={idCate}
-                                            onChange={(e) =>
-                                                setIdCate(e.target.value)
-                                            }
-                                        >
-                                            <option value="0" disabled>
-                                                Chọn loại sản phẩm
-                                            </option>
-                                            {categories.map((category) => (
-                                                <option
-                                                    key={category.id}
-                                                    value={category.id}
-                                                >
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label>Brands:</label>
-                                        <select
-                                            name="brandId"
-                                            defaultValue={0}
-                                            className="form-control"
-                                            value={idBrand}
-                                            onChange={(e) =>
-                                                setIdBrand(e.target.value)
-                                            }
-                                        >
-                                            <option value="0" disabled>
-                                                Chọn thương hiệu
-                                            </option>
-                                            {brands.map((brand) => (
-                                                <option
-                                                    key={brand.id}
-                                                    value={brand.id}
-                                                >
-                                                    {brand.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="row mb-2 mt-2">
-                                    <div className="col-md-3">
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                            onChange={handleImageChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mt-3">
-                                    <CKEditor
-                                        value={content}
-                                        onBlur={setContent}
-                                    />
                                 </div>
 
-                                <div className="row mt-3">
-                                    <div
-                                        className="col-md"
-                                        style={{
-                                            display: "grid",
-                                            gridTemplateColumns:
-                                                "repeat(auto-fill, minmax(100px, 1fr))",
-                                            gap: "10px",
-                                        }}
-                                    >
-                                        {filePreviews.map((image, index) => (
-                                            <div
-                                                key={index}
-                                                style={{
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    alignItems: "center",
-                                                    marginTop: "10px",
-                                                }}
-                                            >
-                                                <img
-                                                    src={image}
-                                                    alt={`Preview ${index}`}
-                                                    style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        marginBottom: "5px",
-                                                    }}
-                                                />
-                                                <button
-                                                    className="btn btn-danger btn-sm w-100"
-                                                    onClick={() =>
-                                                        handleRemoveImage(index)
-                                                    }
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                    </div>
-                                </div>
-                            </div>
-                               
-                                
+
                             </>
                         )}
                         {create == false && products && products.length > 0 && (
