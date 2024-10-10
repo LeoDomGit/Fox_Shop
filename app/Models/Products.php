@@ -41,4 +41,8 @@ class Products extends Model
     {
         return $query->where('status', 1);
     }
+    public function categories()
+    {
+        return $this->belongsToMany(Categories::class, 'product_categories', 'id_product', 'id_categories');
+    }
 }

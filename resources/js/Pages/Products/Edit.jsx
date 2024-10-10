@@ -74,7 +74,7 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
        const imageName = path[3]; 
        const check = window.confirm('Delete this image');
        if(check){
-            axios.delete('/products/drop-image/'+id+'/'+imageName,{
+            axios.delete('/admin/products/drop-image/'+id+'/'+imageName,{
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                     Accept: "application/json",
@@ -95,7 +95,7 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
         files.forEach(file => {
             formData.append('files[]', file.file);
         });
-        axios.post('/products/upload-images/' + id, formData,{
+        axios.post('/admin/products/upload-images/' + id, formData,{
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 Accept: "application/json",
@@ -126,7 +126,7 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
     const handleSetProductImage = (index)=>{
         const path=gallery[index].split('/');
         const imageName = path[3]; 
-        axios.post('/products/set-image/' + id + '/' + imageName, {}, {
+        axios.post('/admin/products/set-image/' + id + '/' + imageName, {}, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
               Accept: "application/json",
@@ -163,7 +163,7 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
           }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                axios.delete('/products/'+dataId).then((res)=>{
+                axios.delete('/admin/products/'+dataId).then((res)=>{
                     if(res.data.check==true){
                         setTimeout(() => {
                             notyf.success('Đã xóa thành công');
@@ -182,7 +182,7 @@ function Edit({dataId,dataBrand,dataCate,dataproduct,datagallery,dataimage}) {
     }
 
     const handleSubmit = () => {
-        axios.put(`/products/${id}`, product,{
+        axios.put(`/admin/products/${id}`, product,{
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
                 Accept: "application/json",
