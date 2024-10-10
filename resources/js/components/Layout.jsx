@@ -51,7 +51,7 @@ function Layout({ children }) {
 								<MenuItem icon={<GroupIcon />}>Thương hiệu</MenuItem>
 							</a>
 							<SubMenu label="Quản lý sản phẩm" icon={<GroupIcon />}>
-							<a href={"/admin/products/create"}>
+							<a href={"/admin/products"}>
 								<MenuItem icon={<GroupIcon />}>Thêm sản phẩm</MenuItem>
 							</a>
 							<a href={"/admin/brands"}>
