@@ -407,21 +407,28 @@ class ProductController extends Controller
             return response()->json([]);
         }
         $medias = Gallery::where('id_parent', $result->id)->pluck('image');
+        $result=ProductCategory::where('id_product',$result->id)->first();
+        $id_cate=$result->id_categories;
         $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
         ->join('gallery', 'products.id', '=', 'gallery.id_parent')
         ->where('products.status', 1)
-        ->where('product_categories.id_categories', $result->idCate)
+        ->where('product_categories.id_categories', $id_cate)
         ->where('gallery.status', 1)
         ->select('products.*', 'gallery.image as image')
-        ->take(4)
-        ->get();
+        ->take(4);
         $brand_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
             ->where('products.status', 1)
             ->where('products.id_brand', $result->idBrand)
             ->where('gallery.status', 1)
             ->select('products.*', 'gallery.image as image')
             ->take(4);
-        $links = $cate_products->union($brand_products)->get();
+        if ($brand_products->exists() && $cate_products->exists()) {
+            $links = $cate_products->union($brand_products)->get();
+        } elseif (!$brand_products->exists()) {
+            $links = $cate_products->get();
+        } else {
+            $links = $brand_products->get();
+        }
         return response()->json(['product' => $result, 'medias' => $medias, 'links' => $links]);
     }
 
