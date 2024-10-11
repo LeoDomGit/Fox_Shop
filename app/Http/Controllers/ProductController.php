@@ -399,8 +399,10 @@ class ProductController extends Controller
     // --------------------------------------
     public function api_single_product($slug)
     {
-        $result = Products::with(['brands', 'categories', 'comments'])->where('products.slug', $slug)->where('products.status', 1)->select('products.*')
+        $result = Products::with(['brands', 'categories'])->where('products.slug', $slug)->where('products.status', 1)->select('products.*')
             ->first();
+        // $result = Products::with(['brands', 'categories', 'comments'])->where('products.slug', $slug)->where('products.status', 1)->select('products.*')
+        //     ->first();
         if (!$result) {
             return response()->json([]);
         }
