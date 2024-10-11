@@ -407,12 +407,14 @@ class ProductController extends Controller
             return response()->json([]);
         }
         $medias = Gallery::where('id_parent', $result->id)->pluck('image');
-        $cate_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->where('products.status', 1)
-            ->where('products.idCate', $result->idCate)
-            ->where('gallery.status', 1)
-            ->select('products.*', 'gallery.image as image')
-            ->take(4);
+        $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+        ->join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('products.status', 1)
+        ->where('product_categories.id_categories', $result->idCate)
+        ->where('gallery.status', 1)
+        ->select('products.*', 'gallery.image as image')
+        ->take(4)
+        ->get();
         $brand_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
             ->where('products.status', 1)
             ->where('products.id_brand', $result->idBrand)
