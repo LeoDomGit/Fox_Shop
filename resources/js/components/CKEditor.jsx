@@ -1,25 +1,28 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 const CKEditor = ({ onBlur, value }) => {
     const editorRef = useRef(null);
+    console.warn = function () {};
 
     useEffect(() => {
         if (window.CKEDITOR) {
             const options = {
-                filebrowserImageBrowseUrl: '/laravel-filemanager?type=Images',
-                filebrowserImageUploadUrl: '/laravel-filemanager/upload?type=Images&_token=',
-                filebrowserBrowseUrl: '/laravel-filemanager?type=Files',
-                filebrowserUploadUrl: '/laravel-filemanager/upload?type=Files&_token='
+                filebrowserImageBrowseUrl: "/laravel-filemanager?type=Images",
+                filebrowserImageUploadUrl:
+                    "/laravel-filemanager/upload?type=Images&_token=",
+                filebrowserBrowseUrl: "/laravel-filemanager?type=Files",
+                filebrowserUploadUrl:
+                    "/laravel-filemanager/upload?type=Files&_token=",
             };
 
-            editorRef.current = window.CKEDITOR.replace('editor', options);
+            editorRef.current = window.CKEDITOR.replace("editor", options);
             editorRef.current.config.height = 300;
 
             // Set initial value
             editorRef.current.setData(value);
 
             // Handle change events
-            editorRef.current.on('blur', () => {
+            editorRef.current.on("blur", () => {
                 const data = editorRef.current.getData();
                 if (onBlur) {
                     onBlur(data);
