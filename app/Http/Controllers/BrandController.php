@@ -66,4 +66,11 @@ class BrandController extends BaseCrudController
         $brand->delete();
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
+    public function api_brands(Request $request)
+    {
+        $brands=Brand::
+        where('status',1)
+        ->get();
+        return response()->json($brands);
+    }
 }

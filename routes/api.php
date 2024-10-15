@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\BrandController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,4 +21,7 @@ Route::prefix('categories')->name('categories.')->group(function () {
     Route::get('/',[CategoriesController::class,'api_categories']);
     Route::get('/with-products',[CategoriesController::class,'api_categories_with_products']);
     Route::get('/{id}',[CategoriesController::class,'api_paginate_products_by_category']);
+});
+Route::prefix('brands')->name('brands.')->group(function () {
+    Route::get('/',[BrandController::class,'api_brands']);
 });
