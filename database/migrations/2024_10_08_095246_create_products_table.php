@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name',255);
             $table->string('slug',255);
+            $table->string('color',100);
             $table->longText('attribute')->nullable();
             $table->unsignedBigInteger('price');            
             $table->unsignedBigInteger('compare_price');

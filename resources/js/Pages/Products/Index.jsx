@@ -6,9 +6,9 @@ import { Notyf } from "notyf";
 import { Box, Switch, Typography } from "@mui/material";
 import "notyf/notyf.min.css";
 import CKEditor from "../../components/CKEditor";
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import { useTheme } from '@mui/material/styles';
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import { useTheme } from "@mui/material/styles";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 function Index({ dataproducts, databrands, datacategories }) {
     const [create, setCreate] = useState(false);
@@ -54,8 +54,8 @@ function Index({ dataproducts, databrands, datacategories }) {
                 });
             });
     };
-    const ITEM_HEIGHT =15;
-    const ITEM_PADDING_TOP =0;
+    const ITEM_HEIGHT = 15;
+    const ITEM_PADDING_TOP = 0;
     const notyf = new Notyf({
         duration: 1000,
         position: {
@@ -139,7 +139,12 @@ function Index({ dataproducts, databrands, datacategories }) {
     }
     const columns = [
         { field: "id", headerName: "#", width: 100 },
-        { field: "name", headerName: "Tên sản phẩm", width: 200, editable: true },
+        {
+            field: "name",
+            headerName: "Tên sản phẩm",
+            width: 200,
+            editable: true,
+        },
         { field: "slug", headerName: "Slug", width: 200, editable: false },
         {
             field: "price",
@@ -155,12 +160,13 @@ function Index({ dataproducts, databrands, datacategories }) {
             editable: true,
             valueFormatter: formatDiscount,
         },
+        { field: "color", headerName: "Màu sắch", width: 200, editable: true },
         {
             field: "brandName",
             headerName: "Thương hiệu",
             sortable: false,
             width: 200,
-            renderCell: (params) => (params.row.brands.name),
+            renderCell: (params) => params.row.brands.name,
         },
         // {
         //     field:"cateName",
@@ -208,11 +214,12 @@ function Index({ dataproducts, databrands, datacategories }) {
     const [name, setName] = useState("");
     const [price, setPrice] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [color, setColor] = useState("");
     const [idCate, setIdCate] = useState(0);
     const [idBrand, setIdBrand] = useState(0);
     const [inStock, setInstock] = useState(0);
     const [content, setContent] = useState("");
-    const [cate,setCate]= useState([]);
+    const [cate, setCate] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const theme = useTheme();
     const [filePreviews, setFilePreviews] = useState([]);
@@ -225,6 +232,7 @@ function Index({ dataproducts, databrands, datacategories }) {
     };
     const resetCreate = () => {
         setName("");
+        setColor("");
         setPrice(0);
         setDiscount(0);
         setIdCate(0);
@@ -239,6 +247,11 @@ function Index({ dataproducts, databrands, datacategories }) {
             notyf.open({
                 type: "error",
                 message: "Vui lòng nhập tên sản phẩm",
+            });
+        } else if (color == "") {
+            notyf.open({
+                type: "error",
+                message: "Vui lòng nhập màu sắc cho sản phẩm",
             });
         } else if (price == 0) {
             notyf.open({
@@ -268,6 +281,7 @@ function Index({ dataproducts, databrands, datacategories }) {
         } else {
             var formData = new FormData();
             formData.append("name", name);
+            formData.append("color", color);
             formData.append("price", price);
             formData.append("discount", discount);
             formData.append("idCate", idCate);
@@ -276,9 +290,9 @@ function Index({ dataproducts, databrands, datacategories }) {
             formData.append("in_stock", inStock);
             selectedFiles.forEach((file) => {
                 formData.append("files[]", file);
-            }); 
-            cate.forEach(el => {
-                formData.append("categories[]",el);
+            });
+            cate.forEach((el) => {
+                formData.append("categories[]", el);
             });
         }
         axios
@@ -311,7 +325,7 @@ function Index({ dataproducts, databrands, datacategories }) {
         } = event;
         setCate(
             // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
+            typeof value === "string" ? value.split(",") : value
         );
     };
     const handleImageChange = (e) => {
@@ -344,50 +358,72 @@ function Index({ dataproducts, databrands, datacategories }) {
                                     <div class="card border-0 ps-2 shadow">
                                         <div class="card-body">
                                             <div className="row">
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
                                                     <label>Name:</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
                                                         onChange={(e) =>
-                                                            setName(e.target.value)
+                                                            setName(
+                                                                e.target.value
+                                                            )
                                                         }
                                                     />
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
                                                     <label>Price:</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
                                                         onChange={(e) =>
-                                                            setPrice(e.target.value)
+                                                            setPrice(
+                                                                e.target.value
+                                                            )
                                                         }
                                                     />
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
                                                     <label>Discount:</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
                                                         onChange={(e) =>
-                                                            setDiscount(e.target.value)
+                                                            setDiscount(
+                                                                e.target.value
+                                                            )
                                                         }
                                                     />
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
+                                                    <label>Màu sắc:</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        onChange={(e) =>
+                                                            setColor(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="col-md-4">
                                                     <label>Tồn kho :</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
                                                         onChange={(e) =>
-                                                            setInstock(e.target.value)
+                                                            setInstock(
+                                                                e.target.value
+                                                            )
                                                         }
                                                     />
                                                 </div>
                                             </div>
                                             <div className="row mt-2">
                                                 <div className="col-md-3">
-                                                    <InputLabel id="demo-multiple-name-label">Danh mục sản phầm</InputLabel>
+                                                    <InputLabel id="demo-multiple-name-label">
+                                                        Danh mục sản phầm
+                                                    </InputLabel>
                                                     <Select
                                                         labelId="demo-multiple-name-label"
                                                         id="demo-multiple-name"
@@ -395,16 +431,24 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                         value={cate}
                                                         onChange={handleChange}
                                                         className="form-control"
-                                                        input={<OutlinedInput label="Name" />}
+                                                        input={
+                                                            <OutlinedInput label="Name" />
+                                                        }
                                                     >
-                                                        {categories.map((item) => (
-                                                            <MenuItem
-                                                                key={item.id}
-                                                                value={item.id}
-                                                            >
-                                                                {item.name}
-                                                            </MenuItem>
-                                                        ))}
+                                                        {categories.map(
+                                                            (item) => (
+                                                                <MenuItem
+                                                                    key={
+                                                                        item.id
+                                                                    }
+                                                                    value={
+                                                                        item.id
+                                                                    }
+                                                                >
+                                                                    {item.name}
+                                                                </MenuItem>
+                                                            )
+                                                        )}
                                                     </Select>
                                                 </div>
                                                 <div className="col-md-3">
@@ -415,10 +459,15 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                         className="form-control"
                                                         value={idBrand}
                                                         onChange={(e) =>
-                                                            setIdBrand(e.target.value)
+                                                            setIdBrand(
+                                                                e.target.value
+                                                            )
                                                         }
                                                     >
-                                                        <option value="0" disabled>
+                                                        <option
+                                                            value="0"
+                                                            disabled
+                                                        >
                                                             Chọn thương hiệu
                                                         </option>
                                                         {brands.map((brand) => (
@@ -438,17 +487,19 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                         type="file"
                                                         accept="image/*"
                                                         multiple
-                                                        onChange={handleImageChange}
+                                                        onChange={
+                                                            handleImageChange
+                                                        }
                                                     />
                                                 </div>
                                             </div>
                                             <div className="row mt-3">
-                                               <div className="col-md">
-                                               <CKEditor
-                                                    value={content}
-                                                    onBlur={setContent}
-                                                />
-                                               </div>
+                                                <div className="col-md">
+                                                    <CKEditor
+                                                        value={content}
+                                                        onBlur={setContent}
+                                                    />
+                                                </div>
                                             </div>
 
                                             <div className="row mt-3">
@@ -461,54 +512,63 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                         gap: "10px",
                                                     }}
                                                 >
-                                                    {filePreviews.map((image, index) => (
-                                                        <div
-                                                            key={index}
-                                                            style={{
-                                                                display: "flex",
-                                                                flexDirection: "column",
-                                                                alignItems: "center",
-                                                                marginTop: "10px",
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={image}
-                                                                alt={`Preview ${index}`}
+                                                    {filePreviews.map(
+                                                        (image, index) => (
+                                                            <div
+                                                                key={index}
                                                                 style={{
-                                                                    width: "100px",
-                                                                    height: "100px",
-                                                                    marginBottom: "5px",
+                                                                    display:
+                                                                        "flex",
+                                                                    flexDirection:
+                                                                        "column",
+                                                                    alignItems:
+                                                                        "center",
+                                                                    marginTop:
+                                                                        "10px",
                                                                 }}
-                                                            />
-                                                            <button
-                                                                className="btn btn-danger btn-sm w-100"
-                                                                onClick={() =>
-                                                                    handleRemoveImage(index)
-                                                                }
                                                             >
-                                                                Remove
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                                                <img
+                                                                    src={image}
+                                                                    alt={`Preview ${index}`}
+                                                                    style={{
+                                                                        width: "100px",
+                                                                        height: "100px",
+                                                                        marginBottom:
+                                                                            "5px",
+                                                                    }}
+                                                                />
+                                                                <button
+                                                                    className="btn btn-danger btn-sm w-100"
+                                                                    onClick={() =>
+                                                                        handleRemoveImage(
+                                                                            index
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Remove
+                                                                </button>
+                                                            </div>
+                                                        )
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="row">
                                                 <div className="col-md-2">
-                                                {create == true && (
-                                    <button
-                                        className="btn w-100  btn-primary"
-                                        onClick={(e) => SubmitProduct()}
-                                    >
-                                        Store
-                                    </button>
-                                )}
+                                                    {create == true && (
+                                                        <button
+                                                            className="btn w-100  btn-primary"
+                                                            onClick={(e) =>
+                                                                SubmitProduct()
+                                                            }
+                                                        >
+                                                            Store
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-
                             </>
                         )}
                         {create == false && products && products.length > 0 && (

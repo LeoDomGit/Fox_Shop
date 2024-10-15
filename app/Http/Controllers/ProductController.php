@@ -106,6 +106,7 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:products,name',
             'price' => 'required|numeric',
+            'color' => 'required',
             'idBrand' => 'required|exists:brands,id',
             'content' => 'required',
             'files' => 'required|array',
@@ -123,6 +124,7 @@ class ProductController extends Controller
         $data['slug'] = $slug;
         $data['compare_price'] = $request->price;
         $data['id_brand'] = $request->idBrand;
+        $data['color'] = $request->color;
         $data['price'] = $request->discount;
         $data['content'] = $request->content;
         $data['discount']=0;

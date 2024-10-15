@@ -17,6 +17,7 @@ class Products extends Model
         'price',
         'compare_price',
         'discount',
+        'color',
         'content',
         'id_brand',
         'in_stock',
