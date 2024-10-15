@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use App\Models\Products;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -109,4 +110,33 @@ class CategoriesController extends BaseCrudController
         // Categories::find($id)->delete();
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
+    public function api_categories_with_products(Request $request)
+    {
+        // Lấy tất cả các danh mục có sản phẩm với trạng thái = 1
+        $categories = Categories::with(['products' => function ($query) {
+            $query->where('status', 1);
+        }])->get();
+
+        return response()->json($categories);
+    }
+    public function api_paginate_products_by_category($id, Request $request)
+{
+    
+    $limit = $request->has('limit') ? $request->limit : 10;
+    $products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+        ->join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('product_categories.id_categories', $id) 
+        ->where('products.status', 1) 
+        ->where('gallery.status', 1) 
+        ->select('products.*', 'gallery.image as image') 
+        ->paginate($limit);
+    if ($products->isEmpty()) {
+        return response()->json(['message' => 'No products found in this category'], 404);
+    }
+
+    // Trả về kết quả danh sách sản phẩm được phân trang
+    return response()->json($products);
+}
+
+
 }

@@ -14,5 +14,9 @@ class Categories extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 1);
-    }   
+    } 
+    public function products()
+    {
+        return $this->belongsToMany(Products::class, 'product_categories', 'id_categories', 'id_product');
+    }  
 }

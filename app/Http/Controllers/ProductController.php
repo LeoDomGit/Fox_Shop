@@ -377,7 +377,7 @@ class ProductController extends Controller
             $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
                 ->where('products.status', 1)
                 ->where('gallery.status', 1)->select('products.*', 'gallery.image as image')
-                ->paginate(4);
+                ->paginate(10);
             return response()->json($result);
         }
     }
