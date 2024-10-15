@@ -438,6 +438,20 @@ class ProductController extends Controller
         return response()->json(['product' => $result, 'medias' => $medias, 'links' => $links]);
     }
 
+    public function api_gallery_by_product_id(Request $request, $productId)
+    {
+        $product = Products::find($productId);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        $images = Gallery::where('id_parent', $productId)
+            ->where('status', 1)
+            ->pluck('image');
+        return response()->json(['images' => $images]);
+    }
+
     public function api_load_cart_product(Request $request)
     {
         $validator = Validator::make($request->all(), [
