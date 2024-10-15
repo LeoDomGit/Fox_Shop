@@ -110,15 +110,32 @@ class CategoriesController extends BaseCrudController
         // Categories::find($id)->delete();
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
-    public function api_categories_with_products(Request $request)
+    public function api_categories(Request $request)
     {
-        // Lấy tất cả các danh mục có sản phẩm với trạng thái = 1
-        $categories = Categories::with(['products' => function ($query) {
-            $query->where('status', 1);
-        }])->get();
-
+        $categories = Categories::
+        where('status', 1)->get();
         return response()->json($categories);
     }
+    public function api_categories_with_products(Request $request)
+{
+    $categories = Categories::where('status', 1)->get();
+    $categories_with_products = [];
+    foreach ($categories as $category) {
+        $products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+            ->where('product_categories.id_categories', $category->id)
+            ->where('products.status', 1)
+            ->select('products.*')
+            ->get();
+        $categories_with_products[] = [
+            'category' => $category,
+            'products' => $products,
+        ];
+    }
+
+    // Trả về kết quả dưới dạng JSON
+    return response()->json($categories_with_products);
+}
+
     public function api_paginate_products_by_category($id, Request $request)
 {
     

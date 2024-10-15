@@ -16,6 +16,7 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::post('/loadCart',[ProductController::class,'api_load_cart_product']);
 });
 Route::prefix('categories')->name('categories.')->group(function () {
-    Route::get('/',[CategoriesController::class,'api_categories_with_products']);
+    Route::get('/',[CategoriesController::class,'api_categories']);
+    Route::get('/with-products',[CategoriesController::class,'api_categories_with_products']);
     Route::get('/{id}',[CategoriesController::class,'api_paginate_products_by_category']);
 });

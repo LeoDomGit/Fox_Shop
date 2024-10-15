@@ -401,14 +401,18 @@ class ProductController extends Controller
     // --------------------------------------
     public function api_single_product($slug)
     {
-        $result = Products::with(['brands', 'categories'])->where('products.slug', $slug)->where('products.status', 1)->select('products.*')
+        $result = Products::with(['brands', 'categories'])
+        ->where('products.slug', $slug)
+        ->where('products.status', 1)
+        ->select('products.*')
             ->first();
         // $result = Products::with(['brands', 'categories', 'comments'])->where('products.slug', $slug)->where('products.status', 1)->select('products.*')
         //     ->first();
         if (!$result) {
             return response()->json([]);
         }
-        $medias = Gallery::where('id_parent', $result->id)->pluck('image');
+        $medias = Gallery::where('id_parent', $result->id)
+        ->pluck('image');
         $result=ProductCategory::where('id_product',$result->id)->first();
         $id_cate=$result->id_categories;
         $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
