@@ -160,12 +160,12 @@ function Index({ dataproducts, databrands, datacategories }) {
             editable: true,
             valueFormatter: formatDiscount,
         },
-        { field: "color", headerName: "Màu sắch", width: 200, editable: true },
+        { field: "color", headerName: "Màu sắch", width: 100, editable: true },
         {
             field: "brandName",
             headerName: "Thương hiệu",
             sortable: false,
-            width: 200,
+            width: 100,
             renderCell: (params) => params.row.brands.name,
         },
         // {

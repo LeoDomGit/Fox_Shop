@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from "react";
 
 const CKEditor = ({ onBlur, value }) => {
     const editorRef = useRef(null);
-    console.warn = function () {};
-
     useEffect(() => {
         if (window.CKEDITOR) {
             const options = {
