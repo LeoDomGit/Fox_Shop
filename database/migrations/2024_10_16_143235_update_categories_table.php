@@ -14,7 +14,7 @@ return new class extends Migration
       if (Schema::hasTable('categories')) {
         Schema::table('categories', function (Blueprint $table) {
             if(!Schema::hasColumn('categories','images')){
-                $table->string('images',255)->after('slug');
+                $table->string('images',255)->after('slug')->nullable();
             }
         });
       }
