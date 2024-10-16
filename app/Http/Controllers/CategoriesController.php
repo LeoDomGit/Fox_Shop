@@ -35,10 +35,49 @@ class CategoriesController extends BaseCrudController
     /**
      * Store a newly created resource in storage.
      */
+    public function UploadImages(Request $request){
+        if (!request()->has('images')) {
+             $images = $request->file('images');
+             $imageName = $images->getClientOriginalName();
+
+             $extractTo = storage_path('app/public/categories/');
+             $images->move($extractTo, $imageName);
+             $result[] = Storage::url('categories/' . $imageName);
+              Categories::create([
+                'images' => $imageName
+            ]);
+             return response()->json(['check' => true, 'result' => $result]);
+
+        }
+        $images = $request->images;
+        $extractTo = storage_path('app/public/categories/');
+        $images->move($extractTo, $imageName);
+
+        $result[] = Storage::url('categories/' . $imageName);
+        Categories::create([
+            'images' => $imageName
+        ]);
+        return response()->json(['check' => true, 'result' => $result]);
+
+    }
+    
+
     public function store(Request $request){
         $validated = $this->validateRequest($request);
         $data=$validated;
         $data['slug']=Str::slug($validated['name']);
+        if ($request->hasFile('images')) {
+        $images = [];
+        foreach ($request->file('images') as $image) {
+            // Kiểm tra xem file có hợp lệ hay không
+            if ($image->isValid()) {
+                // Lưu ảnh vào thư mục public/categories
+                $path =  $image->store('public/categories');
+                $images[] = basename($path); 
+            }
+        }
+        $data['images'] = json_encode($images);
+    }
         $this->model::create($data);
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }

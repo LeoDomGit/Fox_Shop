@@ -15,6 +15,8 @@ Route::prefix('admin')->group(function () {
     Route::resource('/permissions', PermissionController::class);
     Route::resource('/users', UserController::class);
     Route::resource('/categories', CategoriesController::class);
+    Route::post('categories/uploadImages', [CategoriesController::class, 'UploadImages']);
+
     Route::resource('/brands', BrandController::class);
     Route::resource('/products', ProductController::class);
 
