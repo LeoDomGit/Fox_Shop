@@ -213,7 +213,7 @@ function Index({ categories }) {
                         />
                         {images.length > 0 && (
                             <div>
-                                <h5>Hình ảnh đã chọn:</h5>
+                                <>Hình ảnh đã chọn:</>
                                 <div className="d-flex">
                                     {images.map((image, index) => (
                                         <img
@@ -229,7 +229,6 @@ function Index({ categories }) {
                             </div>
                         )}
                     </Modal.Body>
-
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>
                             Đóng
