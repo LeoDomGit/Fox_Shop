@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\AttributeController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -25,4 +26,5 @@ Route::prefix('admin')->group(function () {
     Route::post('/products/set-image/{id}/{imageName}', [ProductController::class, 'setImage']);
     Route::post('/products/set-image/{id}/{imageName}', [ProductController::class, 'setImage']);
     Route::post('/products/upload-images/{id}', [ProductController::class, 'UploadImages']);
+    Route::resource('/attributes', AttributeController::class);
 });

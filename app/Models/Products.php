@@ -15,12 +15,8 @@ class Products extends Model
         'slug',
         'attribute',
         'price',
-        'compare_price',
-        'discount',
-        'color',
         'content',
         'id_brand',
-        'in_stock',
         'created_at',
         'updated_at',
     ];
@@ -46,4 +42,13 @@ class Products extends Model
     {
         return $this->belongsToMany(Categories::class, 'product_categories', 'id_product', 'id_categories');
     }
+    public function attributes()
+    {
+        return $this->belongsToMany(Attribute::class, 'products_attribute', 'product_id', 'attribute_id');
+    }
+    public function products_attribute()
+    {
+        return $this->belongsToMany(ProductsAttribute::class, 'id_product');
+    }
+    
 }
