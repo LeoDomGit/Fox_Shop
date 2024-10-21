@@ -4,3 +4,9 @@
 a {
     text-decoration: none !important;
 }
+.notyf-success{
+    background-color: green !important;
+}
+.notyf-error{
+    background-color: red !important;
+}

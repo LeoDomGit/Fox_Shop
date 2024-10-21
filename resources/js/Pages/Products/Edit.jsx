@@ -12,6 +12,8 @@ import Swal from "sweetalert2";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { useTheme } from "@mui/material/styles";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+
 function Edit({
     dataId,
     dataBrand,
@@ -19,16 +21,25 @@ function Edit({
     dataproduct,
     datagallery,
     dataimage,
+    dataColor,
+    dataSize,
+    dataQuantity,
+    selectedAttributes,
 }) {
     const [id, setId] = useState(dataId);
     const [show, setShow] = useState(false);
     const [categories, setCategories] = useState(dataCate);
     const [category, setCategory] = useState([]);
+    const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedSizes, setSelectedSizes] = useState([]);
     const [brands, setBrands] = useState(dataBrand);
     const [gallery, setGallery] = useState(datagallery);
     const [image, setImage] = useState(dataimage);
     const [product, setProduct] = useState(dataproduct);
     const [files, setFiles] = React.useState([]);
+    const [color, setColor] = useState(dataColor);
+    const [size, setSize] = useState(dataSize);
+
     const REACT_APP_API_IMG_URL = "";
     useEffect(() => {
         var arr = [];
@@ -36,6 +47,18 @@ function Edit({
             arr.push(el.id);
         });
         setCategory(arr);
+        var colorsArr = [];
+        var sizesArr = [];
+        console.log("dataproduct", dataproduct);
+        dataproduct.attributes.forEach((attribute) => {
+            if (attribute.name === "color") {
+                colorsArr.push(attribute.id);
+            } else if (attribute.name === "size") {
+                sizesArr.push(attribute.id);
+            }
+        });
+        setSelectedColors(colorsArr);
+        setSelectedSizes(sizesArr);
     }, []);
     const handleChange = (event) => {
         const {
@@ -44,6 +67,24 @@ function Edit({
         setCategory(
             // On autofill we get a stringified value.
             typeof value === "string" ? value.split(",") : value
+        );
+    };
+    const handleColorChange = (event) => {
+        const value = parseInt(event.target.value);
+        setSelectedColors((prev) =>
+            prev.includes(value)
+                ? prev.filter((item) => item !== value)
+                : [...prev, value]
+        );
+    };
+
+    // Hàm xử lý khi chọn size
+    const handleSizeChange = (event) => {
+        const value = parseInt(event.target.value);
+        setSelectedSizes((prev) =>
+            prev.includes(value)
+                ? prev.filter((item) => item !== value)
+                : [...prev, value]
         );
     };
     const updateFiles = (incommingFiles) => {
@@ -219,6 +260,8 @@ function Edit({
         const updatedProduct = {
             ...product,
             categories: category,
+            color: selectedColors,
+            size: selectedSizes,
         };
         axios
             .put(`/admin/products/${id}`, updatedProduct, {
@@ -270,7 +313,7 @@ function Edit({
                                 >
                                     <img
                                         src={REACT_APP_API_IMG_URL + item}
-                                        alt={`Preview ${index}`}
+                                        alt={`Prevtretreiew ${index}`}
                                         style={{
                                             width: "100px",
                                             height: "100px",
@@ -301,7 +344,7 @@ function Edit({
             <div className="row">
                 <div className="col-md-9">
                     <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <label>Name:</label>
                             <input
                                 type="text"
@@ -311,7 +354,7 @@ function Edit({
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <label>Price:</label>
                             <input
                                 type="number"
@@ -321,7 +364,7 @@ function Edit({
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <label>Discount:</label>
                             <input
                                 type="number"
@@ -331,15 +374,55 @@ function Edit({
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div className="col-md-4">
-                            <label>Color:</label>
+                        <div className="col-md-3">
+                            <label>Tồn kho:</label>
                             <input
-                                type="text"
+                                type="number"
                                 className="form-control"
-                                name="color"
-                                value={product.color}
+                                name="quantity"
+                                value={product.in_stock}
                                 onChange={handleInputChange}
                             />
+                        </div>
+                        <div className="col-md-4">
+                            <label>Color:</label>
+                            <FormGroup>
+                                {dataColor.map((color) => (
+                                    <FormControlLabel
+                                        key={color.id}
+                                        control={
+                                            <Checkbox
+                                                value={color.id}
+                                                checked={selectedColors.includes(
+                                                    color.id
+                                                )}
+                                                onChange={handleColorChange}
+                                            />
+                                        }
+                                        label={color.type}
+                                    />
+                                ))}
+                            </FormGroup>
+                        </div>
+                        <div className="col-md-4">
+                            <label>Size:</label>
+                            <FormGroup>
+                                {dataSize.map((size) => (
+                                    <FormControlLabel
+                                        key={size.id}
+                                        control={
+                                            <Checkbox
+                                                value={size.id}
+                                                checked={selectedSizes.includes(
+                                                    size.id
+                                                )}
+                                                onChange={handleSizeChange}
+                                            />
+                                        }
+                                        label={size.type}
+                                    />
+                                ))}
+                            </FormGroup>
                         </div>
                     </div>
                     <div className="row mt-2">

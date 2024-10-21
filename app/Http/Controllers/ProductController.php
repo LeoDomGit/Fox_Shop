@@ -6,6 +6,8 @@ use App\Models\Brand;
 use App\Models\Gallery;
 use App\Models\ProductCategory;
 use App\Models\Products;
+use App\Models\Attribute;
+use App\Models\ProductsAttribute;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
@@ -31,7 +33,10 @@ class ProductController extends Controller
         $result = $this->model::with('categories', 'brands')->get();
         $categories = \App\Models\Categories::active()->get();
         $brands = Brand::active()->get();
-        return Inertia::render('Products/Index', ['dataproducts' => $result, 'databrands' => $brands, 'datacategories' => $categories]);
+        $colors = Attribute::where('name', 'color')->get()->toArray();
+        $sizes = Attribute::where('name', 'size')->get()->toArray();
+        return Inertia::render('Products/Index', ['dataproducts' => $result, 'databrands' => $brands,
+         'datacategories' => $categories, 'datacolor' => $colors, 'datasize' => $sizes]);
     }
     public function Active()
     {
@@ -102,72 +107,88 @@ class ProductController extends Controller
 
 
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:products,name',
-            'price' => 'required|numeric',
-            'color' => 'required',
-            'idBrand' => 'required|exists:brands,id',
-            'content' => 'required',
-            'files' => 'required|array',
-            'files.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'in_stock' => 'required|min:0',
-            'categories'=>'required|array',
-            'categories.*'=>'exists:categories,id'
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
-        }
-        $data = [];
-        $data['name'] = $request->name;
-        $slug = Str::slug($data['name']);
-        $data['slug'] = $slug;
-        $data['compare_price'] = $request->price;
-        $data['id_brand'] = $request->idBrand;
-        $data['color'] = $request->color;
-        $data['price'] = $request->discount;
-        $data['content'] = $request->content;
-        $data['discount']=0;
-        $data['in_stock'] = $request->in_stock;
-        $data['created_at'] = now();
-        $id = $this->model::insertGetId($data);
-        foreach ($request->categories as $key => $value) {
-           ProductCategory::create(['id_product'=>$id,'id_categories'=>$value,'created_at'=>now()]);
-        }
-        foreach ($request->file('files') as $file) {
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|unique:products,name',
+        'price' => 'required|numeric',
+        'idBrand' => 'required|exists:brands,id',
+        'content' => 'required',
+        'files' => 'required|array',
+        'files.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'categories' => 'required|array',
+        'quantity' => 'nullable|numeric',
+        'discount' => 'nullable|numeric'
+    ]);
 
-            $imageName = $file->getClientOriginalName();
-
-            $extractTo = storage_path('app/public/products/');
-
-            $file->move($extractTo, $imageName);
-
-            Gallery::create([
-
-                'id_parent' => $id,
-
-                'image' => $imageName,
-
-                'status' => 0
-
-            ]);
-
-            $result[] = Storage::url('products/' . $imageName);
-        }
-
-        $result = $this->model::with('categories', 'brands')->get();
-
-        return response()->json(['check' => true, 'data' => $result]);
+    if ($validator->fails()) {
+        return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
     }
+
+    $data = [];
+    $data['name'] = $request->name;
+    $data['slug'] = Str::slug($data['name']);
+    $data['price'] = $request->price;
+    $data['discount'] = $request->discount;
+    $data['id_brand'] = $request->idBrand;
+    $data['content'] = $request->content;
+    $data['in_stock'] = $request->quantity;
+    $data['created_at'] = now();
+
+    // Thêm sản phẩm mới và lấy id
+    $id = $this->model::insertGetId($data);
+
+    // Lưu danh mục cho sản phẩm
+    foreach ($request->categories as $value) {
+        ProductCategory::create(['id_product' => $id, 'id_categories' => $value, 'created_at' => now()]);
+    }
+
+    // Xử lý hình ảnh
+    foreach ($request->file('files') as $file) {
+        $imageName = $file->getClientOriginalName();
+        $extractTo = storage_path('app/public/products/');
+        $file->move($extractTo, $imageName);
+
+        Gallery::create([
+            'id_parent' => $id,
+            'image' => $imageName,
+            'status' => 0
+        ]);
+    }
+    foreach ($request->input('colors')   as $colorId) {
+            ProductsAttribute::create([
+                'product_id' => $id,
+                'attribute_id' => $colorId, // Lưu color vào attribute_id
+            ]);
+    }
+
+    foreach ($request->input('sizes') as $sizeId) {
+            // Lưu size vào attribute_id
+            ProductsAttribute::create([
+                'product_id' => $id,
+                'attribute_id' => $sizeId, // Lưu size vào attribute_id
+            ]);
+    }
+
+
+
+    $result = $this->model::with('categories', 'brands')->find($id);
+
+    return response()->json(['check' => true, 'data' => $result]);
+}
+
+
 
 
 
     public function show($identifier)
     {
-        $result = $this->model::with('brands','categories')->find($identifier);
+        $result = $this->model::with('brands','categories','attributes')->find($identifier);
         $oldImages = Gallery::where('id_parent', $identifier)->pluck('image')->toArray();
+        $allColors = Attribute::where('name', 'color')->get();
+        $allSizes = Attribute::where('name', 'size')->get();
 
-        $gallery = [];
+        $selectedAttributes = ProductsAttribute::where('product_id', $identifier)->pluck('attribute_id')->toArray();
+            $gallery = [];
 
         foreach ($oldImages as  $value) {
 
@@ -179,9 +200,9 @@ class ProductController extends Controller
         $image = Gallery::where('id_parent', $identifier)->where('status', 1)->value("image");
 
         if ($image) {
-            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
+            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes, 'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
         } else {
-            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
+            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes,'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
         }
     }
 
@@ -297,7 +318,11 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'price' => 'numeric|min:0',
             'discount' => 'numeric|min:0',
-            'categories.*' => 'exists:categories,id'
+            'quantity' => 'nullable|numeric',
+            'categories.*' => 'exists:categories,id',
+            'color.*' => 'exists:attribute,id',
+            'size.*' => 'exists:attribute,id' 
+
         ]);
         if ($validator->fails()) {
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
@@ -313,17 +338,18 @@ class ProductController extends Controller
                 ProductCategory::create(['id_product'=>$identifier,'id_categories'=>$value,'created_at'=>now()]);
             }
         }
-        $result = $this->updateTraits($this->model, $identifier, $data);
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $fileName = $file->getClientOriginalName();
-            $file->storeAs('gallery', $fileName);
-            Gallery::create([
-                'image' => $fileName,
-                'id_parent' => $result->id,
-                'status' => 0,
-            ]);
-        }
+        if ($request->has('color') || $request->has('size')) {
+    unset($data['color'], $data['size']);
+    ProductsAttribute::where('product_id', $identifier)->delete();
+    
+    $attributes = $request->color ?? [];
+    $attributes = array_merge($attributes, $request->size ?? []);
+    
+    foreach ($attributes as $value) {
+        ProductsAttribute::create(['product_id' => $identifier, 'attribute_id' => $value, 'created_at' => now()]);
+    }
+}
+
 
         $result = $this->model::with('categories', 'brands')->get();
         return response()->json(['check' => true, 'data' => $result]);

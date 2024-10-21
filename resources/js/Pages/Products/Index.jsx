@@ -10,11 +10,18 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { useTheme } from "@mui/material/styles";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-function Index({ dataproducts, databrands, datacategories }) {
+function Index({
+    dataproducts,
+    databrands,
+    datacategories,
+    datacolor,
+    datasize,
+}) {
     const [create, setCreate] = useState(false);
     const [categories, setCategories] = useState(datacategories);
     const [brands, setBrands] = useState(databrands);
     const [products, setProducts] = useState(dataproducts);
+
     const handleCellEditStop = (id, field, value) => {
         axios
             .put(
@@ -62,10 +69,12 @@ function Index({ dataproducts, databrands, datacategories }) {
             x: "right",
             y: "top",
         },
+        zIndex: 1000,
         types: [
             {
                 type: "warning",
                 background: "orange",
+                duration: 2000,
                 icon: {
                     className: "material-icons",
                     tagName: "i",
@@ -77,6 +86,7 @@ function Index({ dataproducts, databrands, datacategories }) {
                 background: "indianred",
                 duration: 2000,
                 dismissible: true,
+                className: "notyf-error",
             },
             {
                 type: "success",
@@ -84,6 +94,7 @@ function Index({ dataproducts, databrands, datacategories }) {
                 color: "white",
                 duration: 2000,
                 dismissible: true,
+                className: "notyf-success",
             },
             {
                 type: "info",
@@ -95,6 +106,7 @@ function Index({ dataproducts, databrands, datacategories }) {
             },
         ],
     });
+
     const formatCreatedAt = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString();
@@ -154,27 +166,12 @@ function Index({ dataproducts, databrands, datacategories }) {
             valueFormatter: formatPrice,
         },
         {
-            field: "discount",
-            headerName: "Discount",
-            width: 100,
-            editable: true,
-            valueFormatter: formatDiscount,
-        },
-        { field: "color", headerName: "Màu sắch", width: 100, editable: true },
-        {
             field: "brandName",
             headerName: "Thương hiệu",
             sortable: false,
             width: 100,
             renderCell: (params) => params.row.brands.name,
         },
-        // {
-        //     field:"cateName",
-        //     headerName: "Loại sản phẩm",
-        //     sortable: false,
-        //     width: 200,
-        //     renderCell: (params) => (params.row.categories.name),
-        // },
         {
             field: "created_at",
             headerName: "Created at",
@@ -213,15 +210,18 @@ function Index({ dataproducts, databrands, datacategories }) {
     ];
     const [name, setName] = useState("");
     const [price, setPrice] = useState(0);
+    const [quantity, setQuantity] = useState(0);
     const [discount, setDiscount] = useState(0);
-    const [color, setColor] = useState("");
     const [idCate, setIdCate] = useState(0);
     const [idBrand, setIdBrand] = useState(0);
-    const [inStock, setInstock] = useState(0);
     const [content, setContent] = useState("");
     const [cate, setCate] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const theme = useTheme();
+    const [colors, setColor] = useState(datacolor);
+    const [sizes, setSize] = useState(datasize);
+    const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedSize, setSelectedSize] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const ChangeCreate = () => {
         if (create == false) {
@@ -230,10 +230,27 @@ function Index({ dataproducts, databrands, datacategories }) {
             setCreate(false);
         }
     };
+    const handleColorChange = (e, colorId) => {
+        if (e.target.checked) {
+            setSelectedColors([...selectedColors, colorId]);
+        } else {
+            setSelectedColors(selectedColors.filter((id) => id !== colorId));
+        }
+    };
+    const handleSizeChange = (e, sizeId) => {
+        if (e.target.checked) {
+            setSelectedSize([...selectedSize, sizeId]);
+        } else {
+            setSelectedSize(selectedSize.filter((id) => id !== sizeId));
+        }
+    };
+
     const resetCreate = () => {
         setName("");
         setColor("");
+        setSize("");
         setPrice(0);
+        setQuantity(0);
         setDiscount(0);
         setIdCate(0);
         setIdBrand(0);
@@ -241,73 +258,138 @@ function Index({ dataproducts, databrands, datacategories }) {
         setSelectedFiles([]);
         setFilePreviews([]);
         setCreate(false);
+        setSelectedColors([]);
+        setSelectedSize([]);
     };
+
     const SubmitProduct = () => {
-        if (name == "") {
+        if (name === "") {
             notyf.open({
                 type: "error",
-                message: "Vui lòng nhập tên sản phẩm",
+                message: "Vui lòng nhập tên sản phẩm",
             });
-        } else if (color == "") {
+        } else if (selectedColors.length === 0) {
             notyf.open({
                 type: "error",
-                message: "Vui lòng nhập màu sắc cho sản phẩm",
+                message: "Vui lòng chọn màu sắc cho sản phẩm",
             });
-        } else if (price == 0) {
+        } else if (price === 0) {
             notyf.open({
                 type: "error",
-                message: "Vui lòng nhập giá sản phẩm",
+                message: "Vui lòng nhập giá sản phẩm",
             });
-        } else if (categories.length == 0) {
+        } else if (quantity === 0) {
             notyf.open({
                 type: "error",
-                message: "Vui lòng chọn danh mục cho sản phẩm",
+                message: "Vui lòng nhập số lượng sản phẩm",
             });
-        } else if (idBrand == 0) {
+        } else if (categories.length === 0) {
             notyf.open({
                 type: "error",
-                message: "Vui lòng chọn thương hiệu sản phẩm",
+                message: "Vui lòng chọn danh mục cho sản phẩm",
             });
-        } else if (content == "") {
+        } else if (idBrand === 0) {
             notyf.open({
                 type: "error",
-                message: "Vui lòng nhập mô tả sản phẩm",
+                message: "Vui lòng chọn thương hiệu sản phẩm",
             });
-        } else if (selectedFiles.length == 0) {
+        } else if (content === "") {
             notyf.open({
                 type: "error",
-                message: "Vui lòng up hình ảnh sản phẩm",
+                message: "Vui lòng nhập mô tả sản phẩm",
+            });
+        } else if (selectedFiles.length === 0) {
+            notyf.open({
+                type: "error",
+                message: "Vui lòng upload hình ảnh sản phẩm",
             });
         } else {
             var formData = new FormData();
             formData.append("name", name);
-            formData.append("color", color);
-            formData.append("price", price);
-            formData.append("discount", discount);
             formData.append("idCate", idCate);
             formData.append("idBrand", idBrand);
             formData.append("content", content);
-            formData.append("in_stock", inStock);
+            formData.append("discount", discount);
+            formData.append("price", price);
+            formData.append("quantity", quantity);
+            console.log(selectedColors);
+            // Kiểm tra selectedColors
+            if (Array.isArray(selectedColors) && selectedColors.length > 0) {
+                selectedColors.forEach((color) => {
+                    if (color) {
+                        formData.append("colors[]", color);
+                    } else {
+                        console.error("Màu sắc không hợp lệ:", color);
+                    }
+                });
+            } else {
+                console.error(
+                    "selectedColors không phải là một mảng hợp lệ hoặc rỗng."
+                );
+            }
+
+            console.log(selectedSize);
+            if (Array.isArray(selectedSize) && selectedSize.length > 0) {
+                selectedSize.forEach((size) => {
+                    if (size) {
+                        formData.append("sizes[]", size); // Thêm kích thước vào formData
+                    } else {
+                        console.error("Kích thước không hợp lệ:", size);
+                    }
+                });
+            } else {
+                console.error(
+                    "selectedSize không phải là một mảng hợp lệ hoặc rỗng."
+                );
+            }
+
             selectedFiles.forEach((file) => {
                 formData.append("files[]", file);
             });
-            cate.forEach((el) => {
-                formData.append("categories[]", el);
-            });
+            if (Array.isArray(categories) && categories.length > 0) {
+                categories.forEach((category) => {
+                    if (category && category.id) {
+                        formData.append("categories[]", category.id);
+                    } else {
+                        console.error(
+                            "Category không hợp lệ hoặc thiếu thuộc tính id:",
+                            category
+                        );
+                    }
+                });
+            } else {
+                console.error(
+                    "Categories không phải là một mảng hợp lệ hoặc rỗng."
+                );
+            }
+
+            axios
+                .post("/admin/products", formData, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
+                        Accept: "application/json",
+                    },
+                })
+                .then((res) => {
+                    if (res.data.check === true) {
+                        notyf.open({
+                            type: "success",
+                            message: "Them san pham thanh cong!",
+                        });
+                        setProducts(res.data.data);
+                        resetCreate();
+                        window.location.replace("/admin/products");
+                    }
+                })
+                .catch((error) => {
+                    notyf.open({
+                        type: "error",
+                        message: "Đã có lỗi xảy ra, vui lòng thử lại!",
+                    });
+                });
         }
-        axios
-            .post("/admin/products", formData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    Accept: "application/json",
-                },
-            })
-            .then((res) => {
-                if (res.data.check == true) {
-                    setProducts(res.data.data);
-                    resetCreate();
-                }
-            });
     };
 
     const handleRemoveImage = (index) => {
@@ -334,6 +416,9 @@ function Index({ dataproducts, databrands, datacategories }) {
 
         const previews = files.map((file) => URL.createObjectURL(file));
         setFilePreviews(previews);
+    };
+    const handleChangeSize = (event) => {
+        setSelectedSize(event.target.value); // Cập nhật state với giá trị đã chọn
     };
 
     return (
@@ -395,24 +480,12 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                     />
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Màu sắc:</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        onChange={(e) =>
-                                                            setColor(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                </div>
-                                                <div className="col-md-4">
                                                     <label>Tồn kho :</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
                                                         onChange={(e) =>
-                                                            setInstock(
+                                                            setQuantity(
                                                                 e.target.value
                                                             )
                                                         }
@@ -420,7 +493,7 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                 </div>
                                             </div>
                                             <div className="row mt-2">
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
                                                     <InputLabel id="demo-multiple-name-label">
                                                         Danh mục sản phầm
                                                     </InputLabel>
@@ -451,7 +524,7 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                         )}
                                                     </Select>
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
                                                     <label>Brands:</label>
                                                     <select
                                                         name="brandId"
@@ -479,6 +552,82 @@ function Index({ dataproducts, databrands, datacategories }) {
                                                             </option>
                                                         ))}
                                                     </select>
+                                                </div>
+                                            </div>
+                                            <div className="row mt-2">
+                                                <div className="col-md-4">
+                                                    <div className="form-group">
+                                                        <label htmlFor="">
+                                                            Size:
+                                                        </label>
+                                                        <br />
+                                                        <div className="checkbox">
+                                                            {sizes.map(
+                                                                (size) => (
+                                                                    <label
+                                                                        key={
+                                                                            size.id
+                                                                        }
+                                                                    >
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            value={
+                                                                                size.id
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                handleSizeChange(
+                                                                                    e,
+                                                                                    size.id
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                        {
+                                                                            size.type
+                                                                        }
+                                                                    </label>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <div className="form-group">
+                                                        <label htmlFor="">
+                                                            Color:
+                                                        </label>
+                                                        <br />
+                                                        <div className="checkbox">
+                                                            {colors.map(
+                                                                (color) => (
+                                                                    <label
+                                                                        key={
+                                                                            color.id
+                                                                        }
+                                                                    >
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            value={
+                                                                                color.id
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                handleColorChange(
+                                                                                    e,
+                                                                                    color.id
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                        {
+                                                                            color.type
+                                                                        }
+                                                                    </label>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="row mb-2 mt-2">
