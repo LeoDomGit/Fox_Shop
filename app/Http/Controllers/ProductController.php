@@ -316,9 +316,10 @@ class ProductController extends Controller
     public function update(Request $request, $identifier)
     {
         $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255',
             'price' => 'numeric|min:0',
             'discount' => 'numeric|min:0',
-            'quantity' => 'nullable|numeric',
+            'in_stock' => 'nullable|numeric',
             'categories.*' => 'exists:categories,id',
             'color.*' => 'exists:attribute,id',
             'size.*' => 'exists:attribute,id' 
@@ -331,6 +332,18 @@ class ProductController extends Controller
         if ($request->name != '') {
             $data['slug'] = Str::slug($request->name);
         }
+        $product = Products::find($identifier);
+        if (!$product) {
+        return response()->json(['check' => false, 'msg' => 'Product not found']);
+        }
+        if ($product) {
+        $product->name = $request->name ?? $product->name;
+        $product->price = $request->price ?? $product->price;
+        $product->discount = floatval($request->discount); // Chuyển đổi discount sang kiểu số
+        $product->in_stock = intval($request->in_stock); // Chuyển đổi in_stock sang kiểu số
+        $product->content = $request->content;
+        $product->save();
+        }
         if($request->has('categories')){
             unset($data['categories']);
             ProductCategory::where('id_product',$identifier)->delete();
@@ -339,20 +352,18 @@ class ProductController extends Controller
             }
         }
         if ($request->has('color') || $request->has('size')) {
-    unset($data['color'], $data['size']);
-    ProductsAttribute::where('product_id', $identifier)->delete();
-    
-    $attributes = $request->color ?? [];
-    $attributes = array_merge($attributes, $request->size ?? []);
-    
-    foreach ($attributes as $value) {
-        ProductsAttribute::create(['product_id' => $identifier, 'attribute_id' => $value, 'created_at' => now()]);
-    }
-}
- 
-
-        $result = $this->model::with('categories', 'brands')->get();
-        return response()->json(['check' => true, 'data' => $result]);
+                unset($data['color'], $data['size']);
+                ProductsAttribute::where('product_id', $identifier)->delete();
+                
+                $attributes = $request->color ?? [];
+                $attributes = array_merge($attributes, $request->size ?? []);
+                
+                foreach ($attributes as $value) {
+                    ProductsAttribute::create(['product_id' => $identifier, 'attribute_id' => $value, 'created_at' => now()]);
+                }
+            }
+                    $result = $this->model::with('categories', 'brands')->get();
+                    return response()->json(['check' => true, 'data' => $result]);
     }
 
 
@@ -363,10 +374,6 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(['check' => false, 'msg' => 'Không tìm thấy sản phẩm']);
         }
-        // $bill = Bill_Detail::where('id_product', $identifier)->first();
-        // if ($bill) {
-        //     return response()->json(['check' => false, 'msg' => 'Không thể xóa sản phẩm vì có tồn tại LSMH']);
-        // }
         $images = Gallery::where('id_parent', $identifier)->select('image')->get();
         foreach ($images as $image) {
             $filePath = "public/products/{$image->image}";
