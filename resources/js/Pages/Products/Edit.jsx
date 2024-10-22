@@ -49,7 +49,6 @@ function Edit({
         setCategory(arr);
         var colorsArr = [];
         var sizesArr = [];
-        console.log("dataproduct", dataproduct);
         dataproduct.attributes.forEach((attribute) => {
             if (attribute.name === "color") {
                 colorsArr.push(attribute.id);
@@ -87,6 +86,13 @@ function Edit({
                 : [...prev, value]
         );
     };
+   const handleInputChange = (e) => {
+       const { name, value } = e.target;
+       setProduct((prevProduct) => ({
+           ...prevProduct,
+           [name]: value, // Đảm bảo cập nhật đúng theo name
+       }));
+   };
     const updateFiles = (incommingFiles) => {
         setFiles(incommingFiles);
     };
@@ -221,13 +227,7 @@ function Edit({
                 });
             });
     };
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            [name]: value,
-        }));
-    };
+
     const handleDelete = (e) => {
         Swal.fire({
             icon: "question",
@@ -263,6 +263,7 @@ function Edit({
             color: selectedColors,
             size: selectedSizes,
         };
+        console.log("updatedProduct", updatedProduct);
         axios
             .put(`/admin/products/${id}`, updatedProduct, {
                 headers: {
@@ -379,7 +380,7 @@ function Edit({
                             <input
                                 type="number"
                                 className="form-control"
-                                name="quantity"
+                                name="in_stock"
                                 value={product.in_stock}
                                 onChange={handleInputChange}
                             />
