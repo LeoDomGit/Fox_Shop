@@ -50,5 +50,9 @@ class Products extends Model
     {
         return $this->belongsToMany(ProductsAttribute::class, 'id_product');
     }
+    public function product_categories()
+    {
+        return $this->belongsToMany(ProductCategory::class, 'id_product');
+    }
     
 }
