@@ -139,60 +139,60 @@ class UserController extends BaseCrudController
 
         return response()->json(['error' => 'Unauthorized'], 401);
     }
-    // public function info()
-    // {
-    //    return Inertia::render('User/Info');
-    // }
+    public function info()
+    {
+       return Inertia::render('User/Info');
+    }
     // public function logout(Request $request)
     // {
     //     $request->user()->currentAccessToken()->delete();
     //     return response()->json(['message' => 'Logout successfully!'], 200);
     // }
+    public function forgotPassForm()
+    {
+        return Inertia::render('User/Forgot');
+    }
 
-    // public function forgotPassword(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|string|email',
-    //     ]);
+    public function resetPassForm()
+    {
+        return Inertia::render('User/ResetPass');
+    }
 
-    //     if ($validator->fails()) {
-    //         return response()->json($validator->errors(), 422);
-    //     }
+    public function sendResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
 
-    //     // Gửi email đặt lại mật khẩu
-    //     Password::sendResetLink($request->only('email'));
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
 
-    //     return response()->json(['message' => 'Password reset link sent!'], 200);
-    // }
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['status' => 'Link reset mật khẩu đã được gửi đến email.'])
+            : response()->json(['email' => 'Không tìm thấy email.'], 404);
+    }
 
-    // // Xử lý đặt lại mật khẩu
-    // public function resetPassword(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'token' => 'required',
-    //         'email' => 'required|string|email',
-    //         'password' => 'required|string|min:8|confirmed',
-    //     ]);
+    // Đặt lại password
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return response()->json($validator->errors(), 422);
-    //     }
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+            }
+        );
 
-    //     $resetPasswordStatus = Password::reset(
-    //         $request->only('email', 'password', 'password_confirmation', 'token'),
-    //         function ($user, $password) {
-    //             $user->password = Hash::make($password);
-    //             $user->save();
-    //         }
-    //     );
-
-    //     return $resetPasswordStatus == Password::PASSWORD_RESET
-    //         ? response()->json(['message' => 'Password reset successfully!'], 200)
-    //         : response()->json(['error' => 'Failed to reset password.'], 400);
-    // }
-    /**
-     * Display the specified resource.
-     */
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['status' => 'Mật khẩu đã được đặt lại thành công.'])
+            : response()->json(['email' => 'Link reset không hợp lệ hoặc đã hết hạn.'], 404);
+    }
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [

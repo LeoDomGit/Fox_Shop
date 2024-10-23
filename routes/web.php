@@ -12,17 +12,19 @@ use App\Http\Controllers\AttributeController;
 Route::get('/', function () {
     return view('welcome');
 });
-// Route::get('/registerform', [UserController::class, 'registerForm']);
-// Route::get('/loginform', [UserController::class, 'loginForm']);
-// Route::get('/info', [UserController::class, 'info']);
+Route::get('/registerform', [UserController::class, 'registerForm']);
+Route::get('/loginform', [UserController::class, 'loginForm']);
+Route::get('/info', [UserController::class, 'info']);
+Route::get('/forgot', [UserController::class, 'forgotPassForm']);
+Route::get('/reset-password', [UserController::class, 'resetPassForm']);
+Route::post('/users/register', [UserController::class, 'register']);
+Route::post('/users/login', [UserController::class, 'login']);
 Route::prefix('admin')->group(function () {
     Route::resource('/roles', RolesController::class);
     Route::resource('/permissions', PermissionController::class);
     Route::resource('/users', UserController::class);
-    Route::post('/users/register', [UserController::class, 'register']);
-    Route::post('/users/login', [UserController::class, 'login']);
-    Route::post('/users/forgot-password', [UserController::class, 'forgotPassword']);
-    Route::post('/users/reset-password', [UserController::class, 'resetPassword']);
+    Route::post('/users/forgot', [UserController::class, 'sendResetLink']);
+    Route::post('/users/reset', [UserController::class, 'resetPassword']);
     Route::post('/users/change-password', [UserController::class, 'changePassword']);
     Route::post('/users/update-profile', [UserController::class, 'updateProfile']);
 
