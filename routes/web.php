@@ -8,13 +8,24 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\AttributeController;
+
 Route::get('/', function () {
     return view('welcome');
 });
+// Route::get('/registerform', [UserController::class, 'registerForm']);
+// Route::get('/loginform', [UserController::class, 'loginForm']);
+// Route::get('/info', [UserController::class, 'info']);
 Route::prefix('admin')->group(function () {
     Route::resource('/roles', RolesController::class);
     Route::resource('/permissions', PermissionController::class);
     Route::resource('/users', UserController::class);
+    Route::post('/users/register', [UserController::class, 'register']);
+    Route::post('/users/login', [UserController::class, 'login']);
+    Route::post('/users/forgot-password', [UserController::class, 'forgotPassword']);
+    Route::post('/users/reset-password', [UserController::class, 'resetPassword']);
+    Route::post('/users/change-password', [UserController::class, 'changePassword']);
+    Route::post('/users/update-profile', [UserController::class, 'updateProfile']);
+
     Route::resource('/categories', CategoriesController::class);
     Route::post('categories/uploadImages', [CategoriesController::class, 'UploadImages']);
 
