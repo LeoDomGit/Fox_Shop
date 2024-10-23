@@ -1,26 +1,27 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { usePage } from "@inertiajs/react";
 
 const ResetPassword = () => {
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [message, setMessage] = useState("");
-    const { token } = useParams(); // Lấy token từ URL
-
+    const { token, email } = usePage().props;
+    console.log("Token:", token);
     const handleResetPassword = async (e) => {
         e.preventDefault();
-
         try {
-            const response = await axios.post("/password/reset", {
+            const response = await axios.post("/resetPassword", {
                 token,
+                email,
                 password,
                 password_confirmation: passwordConfirmation,
             });
             setMessage(response.data.status);
         } catch (error) {
             setMessage(
-                error.response.data.email || "Có lỗi xảy ra. Vui lòng thử lại."
+                error.response.data.message ||
+                    "Có lỗi xảy ra. Vui lòng thử lại."
             );
         }
     };

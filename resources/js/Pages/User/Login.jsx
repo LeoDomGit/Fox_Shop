@@ -9,18 +9,21 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault(); // Ngăn không cho trang bị load lại
         try {
-            const response = await axios.post("/admin/users/login", {
+            const response = await axios.post("/login", {
                 email,
                 password,
             });
-
+            console.log("Response from login:", response.data);
             if (response.status === 200) {
                 // Lưu token vào localStorage
                 const { token, user } = response.data;
-                 localStorage.setItem("token", token);
-                localStorage.setItem("user", JSON.stringify(user));
-                alert("Đăng nhập thành công!");
-                window.location.href = "/info";
+                if (user) {
+                   localStorage.setItem("token", token);
+                   localStorage.setItem("user", JSON.stringify(user));
+                   window.location.href = "/info";
+               } else {
+                   console.error("User data is invalid or undefined.");
+               }
             }
         } catch (err) {
             setError("Đăng nhập không thành công. Vui lòng kiểm tra lại!");
@@ -51,7 +54,8 @@ function Login() {
                     Login
                 </button>
             </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>
+}                <a href="/forgot">Quên mật khẩu?</a>
         </>
     );
 }

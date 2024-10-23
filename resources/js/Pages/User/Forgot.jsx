@@ -9,10 +9,10 @@ const ForgotPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post("/admin/users/forgot", {
+            const response = await axios.post("/forgot", {
                 email,
             });
-            setMessage(response.data.status);
+            setMessage(response.data.message);
         } catch (error) {
             setMessage(
                 error.response.data.email || "Có lỗi xảy ra. Vui lòng thử lại."
