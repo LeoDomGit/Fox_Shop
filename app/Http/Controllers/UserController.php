@@ -7,11 +7,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\createUser;
+use App\Mail\ResetPasswordMail;
 use Inertia\Inertia;
+
 
 class UserController extends BaseCrudController
 {
@@ -111,14 +114,14 @@ class UserController extends BaseCrudController
         // Tạo người dùng mới
         return response()->json(['message' => 'User registered successfully!', 'user' => $user], 201);
     }
-    public function registerForm()
-    {
-        return Inertia::render('User/Register');
-    }
-    public function loginForm()
-    {
-        return Inertia::render('User/Login');
-    }
+    // public function registerForm()
+    // {
+    //     return Inertia::render('User/Register');
+    // }
+    // public function loginForm()
+    // {
+    //     return Inertia::render('User/Login');
+    // }
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -135,64 +138,84 @@ class UserController extends BaseCrudController
                 'email' => $user->email,
             ]
         ], 200);
-    }
+        }
 
         return response()->json(['error' => 'Unauthorized'], 401);
     }
-    public function info()
-    {
-       return Inertia::render('User/Info');
-    }
+    // public function info()
+    // {
+    //    return Inertia::render('User/Info');
+    // }
     // public function logout(Request $request)
     // {
     //     $request->user()->currentAccessToken()->delete();
     //     return response()->json(['message' => 'Logout successfully!'], 200);
     // }
-    public function forgotPassForm()
+    // public function forgotPassForm()
+    // {
+    //     return Inertia::render('User/Forgot');
+    // }
+
+
+
+
+  public function sendResetLinkEmail(Request $request)
     {
-        return Inertia::render('User/Forgot');
-    }
-
-    public function resetPassForm()
-    {
-        return Inertia::render('User/ResetPass');
-    }
-
-    public function sendResetLink(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['status' => 'Link reset mật khẩu đã được gửi đến email.'])
-            : response()->json(['email' => 'Không tìm thấy email.'], 404);
-    }
-
-    // Đặt lại password
-    public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|min:6|confirmed',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->setRememberToken(Str::random(60));
-                $user->save();
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-            ? response()->json(['status' => 'Mật khẩu đã được đặt lại thành công.'])
-            : response()->json(['email' => 'Link reset không hợp lệ hoặc đã hết hạn.'], 404);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
+        $data = [
+            'name' => $user->name,
+            'reset_link' => url('/resetpassword/'.$token.'/'.urlencode($user->email)),
+        ];
+        Mail::to($user->email)->send(new ResetPasswordMail($data));
+        });
+        if ($response === Password::RESET_LINK_SENT) {
+        return response()->json(['message' => 'Reset password link sent to your email.'], 200);
+        }
+      return response()->json(['error' => 'Unable to send reset link.'], 500);
     }
+
+    public function resetPassword(Request $request)
+{
+   // Validate the request
+    $validator = Validator::make($request->all(), [
+        'token' => 'required',
+        'password' => 'required|confirmed|min:8', // minimum password length
+        'password_confirmation' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // Find the user by email using the token
+   $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user) use ($request) {
+            $user->password = Hash::make($request->password);
+            $user->save();
+        }
+    );
+
+    return $status === Password::PASSWORD_RESET
+        ? response()->json(['status' => 'Mật khẩu đã được reset thành công!'])
+        : response()->json(['errors' => ['email' => 'Có lỗi xảy ra.']], 500);
+}
+// public function resetForm($token, $email)
+// {
+//     return Inertia::render('User/ResetPass', [
+//         'token' => $token,
+//         'email' => $email, // Trả về email
+//     ]);
+// }
+
+
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -216,9 +239,7 @@ class UserController extends BaseCrudController
         $users = User::with('roles')->get();
         return response()->json(['check' => true, 'data' => $users]);
     }
-    /**
-     * Show the form for editing the specified resource.
-     */
+  
     public function edit(User $user)
     {
         //

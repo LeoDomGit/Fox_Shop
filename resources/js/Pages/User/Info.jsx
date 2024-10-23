@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-function Dashboard() {
+function Info() {
     const [user, setUser] = useState({ name: "", email: "" });
 
     useEffect(() => {
-        // Lấy thông tin người dùng từ localStorage
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (storedUser) {
-            setUser(storedUser);
+        try {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+                setUser(JSON.parse(storedUser)); // Chỉ parse nếu tồn tại giá trị hợp lệ
+            }
+        } catch (error) {
+            console.error("Failed to parse user data:", error);
         }
     }, []);
 
@@ -19,4 +22,4 @@ function Dashboard() {
     );
 }
 
-export default Dashboard;
+export default Info;
