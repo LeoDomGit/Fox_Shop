@@ -564,66 +564,109 @@ function Index({
                                                         <div className="checkbox">
                                                             {sizes.map(
                                                                 (size) => (
-                                                                    <label
-                                                                        key={
-                                                                            size.id
-                                                                        }
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            value={
+                                                                    <div>
+                                                                        <label
+                                                                            key={
                                                                                 size.id
                                                                             }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleSizeChange(
-                                                                                    e,
+                                                                        >
+                                                                            <input
+                                                                                className="form-check-input"
+                                                                                style={{
+                                                                                    marginRight:
+                                                                                        "7px",
+                                                                                    border: "1px solid #000",
+                                                                                    borderRadius:
+                                                                                        "0px",
+                                                                                }}
+                                                                                type="checkbox"
+                                                                                value={
                                                                                     size.id
-                                                                                )
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    handleSizeChange(
+                                                                                        e,
+                                                                                        size.id
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                            {
+                                                                                size.type
                                                                             }
-                                                                        />
-                                                                        {
-                                                                            size.type
-                                                                        }
-                                                                    </label>
+                                                                        </label>
+                                                                    </div>
                                                                 )
                                                             )}
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="col-md-4">
+                                                <div className="col-md-8">
                                                     <div className="form-group">
                                                         <label htmlFor="">
                                                             Color:
                                                         </label>
                                                         <br />
-                                                        <div className="checkbox">
+                                                        <div className="checkbox row">
                                                             {colors.map(
                                                                 (color) => (
-                                                                    <label
-                                                                        key={
-                                                                            color.id
-                                                                        }
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            value={
-                                                                                color.id
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleColorChange(
-                                                                                    e,
+                                                                    <div className="col-md-6">
+                                                                        <div
+                                                                            className="row m-1 p-1"
+                                                                            style={{
+                                                                                border: "1px solid #cdcd",
+                                                                            }}
+                                                                        >
+                                                                            <div className="col-md-8">
+                                                                                <label
+                                                                                    key={
+                                                                                        color.id
+                                                                                    }
+                                                                                >
+                                                                                    <input
+                                                                                        className="form-check-input"
+                                                                                        style={{
+                                                                                            marginRight:
+                                                                                                "7px",
+                                                                                            border: "1px solid #000",
+                                                                                            borderRadius:
+                                                                                                "0px",
+                                                                                        }}
+                                                                                        type="checkbox"
+                                                                                        value={
+                                                                                            color.id
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            handleColorChange(
+                                                                                                e,
+                                                                                                color.id
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                    {
+                                                                                        color.type
+                                                                                    }
+                                                                                </label>
+                                                                            </div>
+
+                                                                            <div
+                                                                                className=""
+                                                                                key={
                                                                                     color.id
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                        {
-                                                                            color.type
-                                                                        }
-                                                                    </label>
+                                                                                }
+                                                                                style={{
+                                                                                    width: 20,
+                                                                                    height: 20,
+                                                                                    backgroundColor:
+                                                                                        color.type,
+                                                                                    border: "1px solid #000",
+                                                                                }}
+                                                                            ></div>
+                                                                        </div>
+                                                                    </div>
                                                                 )
                                                             )}
                                                         </div>
