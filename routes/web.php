@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\AttributeController;
-
-
 Route::get('/', function () {
     return view('welcome');
 });
