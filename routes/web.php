@@ -13,7 +13,6 @@ use App\Http\Controllers\AttributeController;
 Route::get('/', function () {
     return view('welcome');
 });
-Auth::routes(['reset' => true]);
 Route::get('/registerform', [UserController::class, 'registerForm']);
 Route::get('/loginform', [UserController::class, 'loginForm']);
 Route::get('/info', [UserController::class, 'info']);
