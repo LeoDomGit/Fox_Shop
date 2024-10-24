@@ -243,7 +243,7 @@ function Edit({
                         setTimeout(() => {
                             notyf.success("Đã xóa thành công");
                         }, 17000);
-                        window.location.replace("/products");
+                        window.location.replace("/admin/products");
                     } else if (res.data.check == false) {
                         if (res.data.msg) {
                             notyf.error(res.data.msg);

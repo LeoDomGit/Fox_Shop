@@ -136,7 +136,6 @@ class ProductController extends Controller
 
     // Thêm sản phẩm mới và lấy id
     $id = $this->model::insertGetId($data);
-
     // Lưu danh mục cho sản phẩm
     foreach ($request->categories as $value) {
         ProductCategory::create(['id_product' => $id, 'id_categories' => $value, 'created_at' => now()]);
