@@ -189,7 +189,7 @@ class ProductController extends Controller
 
         $selectedAttributes = ProductsAttribute::where('product_id', $identifier)->pluck('attribute_id')->toArray();
             $gallery = [];
-
+        $selectedCategories = ProductCategory::where('id_product', $identifier)->pluck('id_categories')->toArray();
         foreach ($oldImages as  $value) {
 
             $gallery[] = Storage::url('products/' .  $value);
@@ -200,9 +200,9 @@ class ProductController extends Controller
         $image = Gallery::where('id_parent', $identifier)->where('status', 1)->value("image");
 
         if ($image) {
-            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes, 'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
+            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands,'cate'=>$selectedCategories, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes, 'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
         } else {
-            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes,'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
+            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands,'cate'=>$selectedCategories, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes,'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
         }
     }
 
@@ -324,24 +324,26 @@ class ProductController extends Controller
             'color.*' => 'exists:attribute,id',
             'size.*' => 'exists:attribute,id' 
 
+
         ]);
         if ($validator->fails()) {
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
         $data = $request->all();
-        if ($request->name != '') {
-            $data['slug'] = Str::slug($request->name);
-        }
         $product = Products::find($identifier);
         if (!$product) {
         return response()->json(['check' => false, 'msg' => 'Product not found']);
         }
         if ($product) {
         $product->name = $request->name ?? $product->name;
+        if ($request->name != '') {
+        $product->slug = Str::slug($request->name); 
+        }
         $product->price = $request->price ?? $product->price;
         $product->discount = floatval($request->discount); // Chuyển đổi discount sang kiểu số
         $product->in_stock = intval($request->in_stock); // Chuyển đổi in_stock sang kiểu số
         $product->content = $request->content;
+        $product->id_brand = $request->id_brand ?? $product->id_brand;
         $product->save();
         }
         if($request->has('categories')){
