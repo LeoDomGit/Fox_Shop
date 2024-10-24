@@ -244,6 +244,12 @@ function Index({
             setSelectedSize(selectedSize.filter((id) => id !== sizeId));
         }
     };
+        const handleChange = (event) => {
+            const {
+                target: { value },
+            } = event;
+            setCate(typeof value === "string" ? value.split(",") : value);
+        };
 
     const resetCreate = () => {
         setName("");
@@ -346,22 +352,19 @@ function Index({
             selectedFiles.forEach((file) => {
                 formData.append("files[]", file);
             });
-            if (Array.isArray(categories) && categories.length > 0) {
-                categories.forEach((category) => {
-                    if (category && category.id) {
-                        formData.append("categories[]", category.id);
-                    } else {
-                        console.error(
-                            "Category không hợp lệ hoặc thiếu thuộc tính id:",
-                            category
-                        );
-                    }
-                });
-            } else {
-                console.error(
-                    "Categories không phải là một mảng hợp lệ hoặc rỗng."
-                );
-            }
+           if (Array.isArray(cate) && cate.length > 0) {
+               cate.forEach((id) => {
+                   if (id) {
+                       formData.append("categories[]", id);
+                   } else {
+                       console.error("Category không hợp lệ:", id);
+                   }
+               });
+           } else {
+               console.error(
+                   "Categories không phải là một mảng hợp lệ hoặc rỗng."
+               );
+           }
 
             axios
                 .post("/admin/products", formData, {
@@ -400,15 +403,6 @@ function Index({
         const updatedPreviews = [...filePreviews];
         updatedPreviews.splice(index, 1);
         setFilePreviews(updatedPreviews);
-    };
-    const handleChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setCate(
-            // On autofill we get a stringified value.
-            typeof value === "string" ? value.split(",") : value
-        );
     };
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
@@ -494,35 +488,75 @@ function Index({
                                             </div>
                                             <div className="row mt-2">
                                                 <div className="col-md-4">
-                                                    <InputLabel id="demo-multiple-name-label">
-                                                        Danh mục sản phầm
-                                                    </InputLabel>
-                                                    <Select
-                                                        labelId="demo-multiple-name-label"
-                                                        id="demo-multiple-name"
-                                                        multiple
-                                                        value={cate}
-                                                        onChange={handleChange}
-                                                        className="form-control"
-                                                        input={
-                                                            <OutlinedInput label="Name" />
-                                                        }
-                                                    >
-                                                        {categories.map(
-                                                            (item) => (
-                                                                <MenuItem
-                                                                    key={
-                                                                        item.id
-                                                                    }
-                                                                    value={
-                                                                        item.id
-                                                                    }
-                                                                >
-                                                                    {item.name}
-                                                                </MenuItem>
-                                                            )
-                                                        )}
-                                                    </Select>
+                                                    <label>
+                                                        Danh mục sản phẩm:
+                                                    </label>
+                                                    <FormControl fullWidth>
+                                                        <InputLabel id="category-select-label"></InputLabel>
+                                                        <Select
+                                                            labelId="category-select-label"
+                                                            id="category-select"
+                                                            name="categories"
+                                                            multiple
+                                                            value={cate}
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            renderValue={(
+                                                                selected
+                                                            ) => {
+                                                                // Tìm tên danh mục dựa trên ID đã chọn
+                                                                const selectedNames =
+                                                                    selected.map(
+                                                                        (
+                                                                            id
+                                                                        ) => {
+                                                                            const found =
+                                                                                categories.find(
+                                                                                    (
+                                                                                        item
+                                                                                    ) =>
+                                                                                        item.id ===
+                                                                                        id
+                                                                                );
+                                                                            return found
+                                                                                ? found.name
+                                                                                : "";
+                                                                        }
+                                                                    );
+                                                                return selectedNames.join(
+                                                                    ", "
+                                                                );
+                                                            }}
+                                                        >
+                                                            {categories.map(
+                                                                (item) => (
+                                                                    <MenuItem
+                                                                        key={
+                                                                            item.id
+                                                                        }
+                                                                        value={
+                                                                            item.id
+                                                                        }
+                                                                    >
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                cate.indexOf(
+                                                                                    item.id
+                                                                                ) >
+                                                                                -1
+                                                                            }
+                                                                            readOnly
+                                                                        />{" "}
+                                                                        {
+                                                                            item.name
+                                                                        }
+                                                                    </MenuItem>
+                                                                )
+                                                            )}
+                                                        </Select>
+                                                    </FormControl>
                                                 </div>
                                                 <div className="col-md-4">
                                                     <label>Brands:</label>
