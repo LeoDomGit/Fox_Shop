@@ -114,14 +114,14 @@ class UserController extends BaseCrudController
         // Tạo người dùng mới
         return response()->json(['message' => 'User registered successfully!', 'user' => $user], 201);
     }
-    // public function registerForm()
-    // {
-    //     return Inertia::render('User/Register');
-    // }
-    // public function loginForm()
-    // {
-    //     return Inertia::render('User/Login');
-    // }
+    public function registerForm()
+    {
+        return Inertia::render('User/Register');
+    }
+    public function loginForm()
+    {
+        return Inertia::render('User/Login');
+    }
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -142,19 +142,19 @@ class UserController extends BaseCrudController
 
         return response()->json(['error' => 'Unauthorized'], 401);
     }
-    // public function info()
-    // {
-    //    return Inertia::render('User/Info');
-    // }
-    // public function logout(Request $request)
-    // {
-    //     $request->user()->currentAccessToken()->delete();
-    //     return response()->json(['message' => 'Logout successfully!'], 200);
-    // }
-    // public function forgotPassForm()
-    // {
-    //     return Inertia::render('User/Forgot');
-    // }
+    public function info()
+    {
+       return Inertia::render('User/Info');
+    }
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logout successfully!'], 200);
+    }
+    public function forgotPassForm()
+    {
+        return Inertia::render('User/Forgot');
+    }
 
 
 

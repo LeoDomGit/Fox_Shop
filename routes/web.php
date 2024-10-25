@@ -11,17 +11,6 @@ use App\Http\Controllers\AttributeController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/registerform', [UserController::class, 'registerForm']);
-Route::get('/loginform', [UserController::class, 'loginForm']);
-Route::get('/info', [UserController::class, 'info']);
-Route::get('/forgot', [UserController::class, 'forgotPassForm']);
-Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);
-Route::get('/resetpassword/{token}/{email}', [UserController::class, 'resetForm']);
-Route::post('/resetPassword', [UserController::class, 'resetPassword']);
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
-
-
 Route::prefix('admin')->group(function () {
     Route::resource('/roles', RolesController::class);
     Route::resource('/permissions', PermissionController::class);
