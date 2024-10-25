@@ -55,9 +55,8 @@ function Login() {
                 </button>
             </form>
             {error && <p style={{ color: "red" }}>{error}</p>
-}                <a href="/forgot">Quên mật khẩu?</a>
+}                <a href="/api/forgot">Quên mật khẩu?</a>
         </>
     );
 }
-
 export default Login;

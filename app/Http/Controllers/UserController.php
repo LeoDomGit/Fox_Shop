@@ -215,8 +215,6 @@ public function resetForm($token, $email)
         'email' => $email,
     ]);
 }
-
-
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
