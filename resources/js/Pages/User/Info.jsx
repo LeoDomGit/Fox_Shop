@@ -14,12 +14,18 @@ function Info() {
         }
     }, []);
 
-    return (
-        <div>
-            <h1>Welcome, {user.name}!</h1>
-            <p>Email: {user.email}</p>
-        </div>
-    );
+return (
+    <div>
+        <h1>Welcome, {user.name}!</h1>
+        <p>Email: {user.email}</p>
+        <img
+            src={`https://dashboard.codingfs.com${user.avatar}`}
+            alt="User Avatar"
+        />
+        <a href="/api/logout">Đăng xuất</a>
+    </div>
+);
+
 }
 
 export default Info;

@@ -20,6 +20,7 @@ Route::get('/user', function (Request $request) {
     Route::post('/resetPassword', [UserController::class, 'resetPassword']);
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
+    Route::post('/logout', [UserController::class, 'logout']);
     // 
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
