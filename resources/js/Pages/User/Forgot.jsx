@@ -9,7 +9,7 @@ const ForgotPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post("/forgot", {
+            const response = await axios.post("/api/forgot", {
                 email,
             });
             setMessage(response.data.message);
