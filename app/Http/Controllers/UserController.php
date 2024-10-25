@@ -136,6 +136,7 @@ class UserController extends BaseCrudController
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'avatar' => $user->avatar
             ]
         ], 200);
         }
@@ -171,7 +172,7 @@ class UserController extends BaseCrudController
         $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
         $data = [
             'name' => $user->name,
-            'reset_link' => url('/resetpassword/'.$token.'/'.urlencode($user->email)),
+            'reset_link' => url('/api/resetpassword/'.$token.'/'.urlencode($user->email)),
         ];
         Mail::to($user->email)->send(new ResetPasswordMail($data));
         });
@@ -207,13 +208,13 @@ class UserController extends BaseCrudController
         ? response()->json(['status' => 'Mật khẩu đã được reset thành công!'])
         : response()->json(['errors' => ['email' => 'Có lỗi xảy ra.']], 500);
 }
-// public function resetForm($token, $email)
-// {
-//     return Inertia::render('User/ResetPass', [
-//         'token' => $token,
-//         'email' => $email, // Trả về email
-//     ]);
-// }
+public function resetForm($token, $email)
+{
+    return Inertia::render('User/ResetPass', [
+        'token' => $token,
+        'email' => $email,
+    ]);
+}
 
 
     public function update(Request $request, $id)
