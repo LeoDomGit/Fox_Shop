@@ -9,7 +9,7 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault(); // Ngăn không cho trang bị load lại
         try {
-            const response = await axios.post("/login", {
+            const response = await axios.post("/api/login", {
                 email,
                 password,
             });
