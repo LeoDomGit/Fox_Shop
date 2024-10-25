@@ -20,7 +20,7 @@ function Login() {
                 if (user) {
                    localStorage.setItem("token", token);
                    localStorage.setItem("user", JSON.stringify(user));
-                   window.location.href = "/info";
+                   window.location.href = "/api/info";
                } else {
                    console.error("User data is invalid or undefined.");
                }
