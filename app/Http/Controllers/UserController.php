@@ -79,31 +79,33 @@ class UserController extends BaseCrudController
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'avatar' => 'nullable|image|max:2048', // Kích thước tối đa 2MB
+            'phone' => 'required|string|max:255|regex:/^(0[1-9]{1})([0-9]{8})$/',
+            'avatar' => 'nullable|image|max:2048',
         ]);
-
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-
-        // Xử lý upload avatar
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
+            
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $avatarUrl = Storage::url($avatarPath);
             \Log::info("Avatar path: " . $avatarUrl);
             $user = User::create([
              'name' => $request->name,
              'email' => $request->email,
+             'phone' => $request->phone,
              'password' => Hash::make($request->password),
              'avatar' => $avatarUrl,
              'idRole' => 2,
             ]);
         }else{
+            
             $user = User::create([
              'name' => $request->name,
              'email' => $request->email,
              'password' => Hash::make($request->password),
+             'phone' => $request->phone,
              'avatar' => "/storage/avatars/c4RwwjBs5BM9vLufRAvwurArjQDAwoIrSeT8cgkh.png",
              'idRole' => 2,
             ]);
@@ -143,15 +145,18 @@ class UserController extends BaseCrudController
 
         return response()->json(['error' => 'Unauthorized'], 401);
     }
+public function logout()
+    {
+        Auth::logout();
+        return redirect('/'); 
+    }
+
+
     public function info()
     {
        return Inertia::render('User/Info');
     }
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logout successfully!'], 200);
-    }
+
     public function forgotPassForm()
     {
         return Inertia::render('User/Forgot');

@@ -7,9 +7,10 @@ use App\Models\Products;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
-class CategoriesController extends BaseCrudController
+class CategoriesController extends Controller
 {
 
     public function __construct(){
@@ -31,62 +32,37 @@ class CategoriesController extends BaseCrudController
     {
         //
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function UploadImages(Request $request){
-        if (!request()->has('images')) {
-             $images = $request->file('images');
-             $imageName = $images->getClientOriginalName();
-
-             $extractTo = storage_path('app/public/categories/');
-             $images->move($extractTo, $imageName);
-             $result[] = Storage::url('categories/' . $imageName);
-              Categories::create([
-                'images' => $imageName
-            ]);
-             return response()->json(['check' => true, 'result' => $result]);
-
-        }
-        $images = $request->images;
-        $extractTo = storage_path('app/public/categories/');
-        $images->move($extractTo, $imageName);
-
-        $result[] = Storage::url('categories/' . $imageName);
-        Categories::create([
-            'images' => $imageName
-        ]);
-        return response()->json(['check' => true, 'result' => $result]);
-
-    }
     
 
     public function store(Request $request){
-        $validated = $this->validateRequest($request);
-        $data=$validated;
-        $data['slug']=Str::slug($validated['name']);
-        if ($request->hasFile('images')) {
-        $images = [];
-        foreach ($request->file('images') as $image) {
-            // Kiểm tra xem file có hợp lệ hay không
-            if ($image->isValid()) {
-                // Lưu ảnh vào thư mục public/categories
-                $path =  $image->store('public/categories');
-                $images[] = basename($path); 
-            }
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:categories|max:255|string',
+            'position' => 'nullable|numeric',
+            'images' => 'nullable|image|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
-        $data['images'] = json_encode($images);
-    }
+        $data=[];
+        $data['name'] = $request->name;
+        $data['position'] = $request->position;
+        $data['slug']=Str::slug($data['name']);
+        $imagesPath=null;
+        if ($request->hasFile('images')) {
+        $imagesPath = $request->file('images')->store('categories', 'public');
+        $imagesUrl = Storage::url($imagesPath);
+        \Log::info("Avatar path: " . $imagesUrl);
+        $data['images'] = $imagesUrl;
+        }
         $this->model::create($data);
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show(Categories $categories)
+    public function show($id)
     {
-        //
+        $result = Categories::find($id);
+        return Inertia::render('Categories/Edit', ['dataId' => $id,'category' => $result]);
+        
     }
 
     /**
@@ -94,30 +70,49 @@ class CategoriesController extends BaseCrudController
      */
     public function edit(Categories $categories)
     {
-        //
+        
     }
 
-    public function update(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'name'=>'unqiue:categories,name|max:255|string',
-           'position'=>'numeric',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['check'=>false,'msg'=>$validator->errors()->first()]);
-        }
-        $resource = $this->model::findOrFail($id);
-        $data=$request->all();
-        $resource->update($data);
-        $result = $this->model::all();
-        return response()->json([
-           'check'=>true,
-           'data'=>$result,
-        ], 200);
+public function update(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'sometimes|string|max:255', 
+        'position' => 'sometimes|numeric',
+        'images' => 'nullable'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
     }
-    /**
-     * Update the specified resource in storage.
-     */
+
+    // Tìm tài nguyên
+    $resource = Categories::findOrFail($id);
+    $data = $request->only(['position']);
+    
+    // Chỉ cập nhật name và slug nếu có thay đổi
+    if ($request->has('name')) {
+        $data['name'] = $request->name;
+        $data['slug'] = Str::slug($data['name']);
+    }
+
+    if ($request->hasFile('images')) {
+        $path = $request->file('images')->store('categories', 'public');
+        $imagesUrl = Storage::url($path);
+        \Log::info("Avatar path: " . $imagesUrl);
+        $data['images'] = $imagesUrl;
+    }
+
+    // Cập nhật tài nguyên
+    $resource->update($data);
+
+    // Trả về tài nguyên đã cập nhật
+    return response()->json([
+        'check' => true,
+        'data' => $resource,
+    ], 200);
+}
+
+
     protected function validateRequest(Request $request)
     {
         $rules = [

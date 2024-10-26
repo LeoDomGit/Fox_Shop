@@ -118,6 +118,7 @@ function Edit({
                 type: "error",
                 background: "indianred",
                 duration: 2000,
+                className: "notyf-error",
                 dismissible: true,
             },
             {
@@ -125,6 +126,7 @@ function Edit({
                 background: "green",
                 color: "white",
                 duration: 2000,
+                className: "notyf-success",
                 dismissible: true,
             },
             {
