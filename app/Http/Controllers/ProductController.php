@@ -403,31 +403,23 @@ class ProductController extends Controller
             return response()->json($result);
         }
     }
-    public function api_product_cate(Request $request)
-    {
-        // Khởi tạo query ban đầu với điều kiện mặc định
-        $query = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+public function api_product_cate($id)
+{
+    $result = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
         ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+        ->join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('gallery.status', 1)
+        ->where('product_categories.id_categories', $id)
         ->where('products.status', 1)
         ->where('categories.status', 1)
-        ->select('products.*');
+        ->select('products.*', 'categories.name as category_name', 'gallery.image as image')
+        ->distinct() // Đảm bảo kết quả không bị trùng lặp
+        ->get();
 
-    // Nếu có yêu cầu lọc theo loại (category)
-    if ($request->has('id_categories')) {
-        $query->where('categories.id', $request->category_id);
-    }
-
-    // Nếu có yêu cầu giới hạn số lượng sản phẩm
-    if ($request->has('limit')) {
-        $result = $query->take($request->limit)->get();
-    } else {
-        // Nếu không có yêu cầu limit, sử dụng phân trang
-        $result = $query->paginate(16);
-    }
-
-    // Trả về kết quả dưới dạng JSON
     return response()->json($result);
-    }
+}
+
+
     // --------------------------------------
     public function api_search_product($slug)
     {
