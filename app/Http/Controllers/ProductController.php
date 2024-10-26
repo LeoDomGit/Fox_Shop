@@ -498,6 +498,41 @@ class ProductController extends Controller
             ->pluck('image');
         return response()->json(['images' => $images]);
     }
+    public function api_product_details(Request $request, $productId)
+{
+    // Lấy sản phẩm cùng với thông tin liên kết (brand, category)
+    $product = Products::where('id', $productId)
+        ->where('status', 1)
+        ->first();
+
+    // Kiểm tra nếu không tìm thấy sản phẩm
+    if (!$product) {
+        return response()->json(['error' => 'Product not found'], 404);
+    }
+
+    // Lấy thuộc tính (color, size) của sản phẩm
+    $attributes = ProductsAttribute::where('product_id', $productId)
+        ->join('attribute', 'products_attribute.attribute_id', '=', 'attribute.id')
+        ->select('attribute.type', 'attribute.name')
+        ->get()
+        ->groupBy('name'); // Nhóm theo 'name' để tách color và size
+
+    // Phân loại thuộc tính color và size
+    $colors = $attributes->get('color', []);
+    $sizes = $attributes->get('size', []);
+
+    // Lấy danh sách hình ảnh liên quan
+    $images = Gallery::where('id_parent', $productId)->get();
+
+    // Trả về dữ liệu dưới dạng JSON
+    return response()->json([
+        'product' => $product,
+        'color' => $colors,
+        'size' => $sizes,
+        'images' => $images,
+    ]);
+}
+
 
     public function api_load_cart_product(Request $request)
     {
