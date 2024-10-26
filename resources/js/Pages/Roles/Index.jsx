@@ -40,13 +40,15 @@ function Index({ roles }) {
         type: 'error',
         background: 'indianred',
         duration: 2000,
-        dismissible: true
+        dismissible: true,
+        className: "notyf-error",
       },
       {
         type: 'success',
         background: 'green',
         color: 'white',
         duration: 2000,
+        className: "notyf-success",
         dismissible: true
       },
       {

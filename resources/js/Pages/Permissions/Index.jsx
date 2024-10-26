@@ -40,6 +40,7 @@ function Index({ permissions }) {
                 type: "error",
                 background: "indianred",
                 duration: 2000,
+                className: "notyf-error",
                 dismissible: true,
             },
             {
@@ -47,6 +48,7 @@ function Index({ permissions }) {
                 background: "green",
                 color: "white",
                 duration: 2000,
+                className: "notyf-success",
                 dismissible: true,
             },
             {

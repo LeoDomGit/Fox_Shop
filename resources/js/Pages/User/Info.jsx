@@ -1,31 +1,57 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function Info() {
-    const [user, setUser] = useState({ name: "", email: "" });
+    const [user, setUser] = useState({ name: "", email: "", avatar: "" });
 
     useEffect(() => {
         try {
             const storedUser = localStorage.getItem("user");
             if (storedUser) {
-                setUser(JSON.parse(storedUser)); // Chỉ parse nếu tồn tại giá trị hợp lệ
+                setUser(JSON.parse(storedUser));
             }
         } catch (error) {
             console.error("Failed to parse user data:", error);
         }
     }, []);
 
-return (
-    <div>
-        <h1>Welcome, {user.name}!</h1>
-        <p>Email: {user.email}</p>
-        <img
-            src={`https://dashboard.codingfs.com${user.avatar}`}
-            alt="User Avatar"
-        />
-        <a href="/api/logout">Đăng xuất</a>
-    </div>
-);
+    const handleLogout = async () => {
+        try {
+            await axios.post(
+                "/api/logout",
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
+                    },
+                }
+            );
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            window.location.href = "/api/loginform";
+        } catch (error) {
+            console.error("Logout failed:", error.response?.data || error);
+        }
+    };
 
+    return (
+        <div>
+            <h1>Welcome, {user.name}!</h1>
+            <p>Email: {user.email}</p>
+            {/* {user.avatar && (
+                <img
+                    src={`https://dashboard.codingfs.com${user.avatar}`}
+                    alt="User Avatar"
+                    onError={(e) => {
+                        e.target.src = "default-avatar.png";
+                    }}
+                />
+            )} */}
+            <button onClick={handleLogout}>Logout</button>
+        </div>
+    );
 }
 
 export default Info;

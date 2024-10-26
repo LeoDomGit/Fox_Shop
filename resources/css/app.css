@@ -10,3 +10,8 @@ a {
 .notyf-error{
     background-color: red !important;
 }
+.MuiDataGrid-row{
+    max-height: 70px !important;
+    min-height: 70px !important;
+    height: 70px !important;
+}
