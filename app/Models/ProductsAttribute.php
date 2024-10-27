@@ -15,8 +15,7 @@ class ProductsAttribute extends Model
     // Các trường có thể gán giá trị hàng loạt
     protected $fillable = [
         'product_id',      // ID sản phẩm
-        'attribute_id',    // ID thuộc tính (màu sắc, kích thước...)
-        'quantity',        // Số lượng của thuộc tính
+        'attribute_id',    // ID thuộc tính (màu sắc, kích thước...)       // Số lượng của thuộc tính
     ];
 
     // Định nghĩa các mối quan hệ nếu cần
