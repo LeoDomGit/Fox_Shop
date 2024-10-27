@@ -1,14 +1,57 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import axios from "axios";
+import { Notyf } from "notyf";
 import { Form } from "react-bootstrap";
+import "notyf/notyf.min.css";
+
 function Edit({ category }) {
     const [name, setName] = useState("");
     const [position, setPosition] = useState("");
     const [fileImg, setFileImg] = useState([]);
+    const notyf = new Notyf({
+        duration: 1000,
+        position: {
+            x: "right",
+            y: "top",
+        },
+        types: [
+            {
+                type: "warning",
+                background: "orange",
+                icon: {
+                    className: "material-icons",
+                    tagName: "i",
+                    text: "warning",
+                },
+            },
+            {
+                type: "error",
+                background: "indianred",
+                duration: 2000,
+                className: "notyf-error",
+                dismissible: true,
+            },
+            {
+                type: "success",
+                background: "green",
+                color: "white",
+                duration: 2000,
+                className: "notyf-success",
+                dismissible: true,
+            },
+            {
+                type: "info",
+                background: "#24b3f0",
+                color: "white",
+                duration: 1500,
+                dismissible: false,
+                icon: '<i class="bi bi-bag-check"></i>',
+            },
+        ],
+    });
     const handleSubmit = (e) => {
         e.preventDefault();
-        
         const formData = new FormData() ;
         formData.append("name", name) ;
         formData.append("position", position) ;
@@ -21,7 +64,17 @@ function Edit({ category }) {
             .post("/admin/categories/imgaes/" + category.id, formData)
             .then((res) => {
                 if (res.data.check === true) {
-                    alert("Cap nhat thanh cong");
+                    notyf.open({
+                        type: "success",
+                        message: "Đã chỉnh sửa thành công",
+                    });
+                    window.location.href = "/admin/categories";
+                }
+                else  {
+                    notyf.open({
+                        type: "error",
+                        message: res.data.msg,
+                    })
                 }
             });
     };
@@ -66,13 +119,16 @@ function Edit({ category }) {
                         </div>
                         <div>
                             <label htmlFor="">Hình Ảnh</label>
-                            <img src={fileImg} alt="aaaaaa" />
+                            <br />
+                            <img className="mb-3" style={{ width: "100px" }} src={fileImg} alt="aaaaaa" />
+                            <br />
                             <input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) => setFileImg(e.target.files)}
                                 name="images"
                                 id=""
+                                className="mb-3"
                             />
                         </div>
 
