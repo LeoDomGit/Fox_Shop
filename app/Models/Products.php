@@ -10,7 +10,6 @@ class Products extends Model
     use HasFactory;
     protected $table = 'products';
     protected $fillable = [
-        'id',
         'name',
         'slug',
         'attribute',
@@ -29,6 +28,10 @@ class Products extends Model
     {
         return $this->belongsTo(Brand::class, 'id_brand');
     }
+      public function categories()
+    {
+        return $this->belongsToMany(Categories::class, 'product_categories', 'id_product', 'id_categories');
+    }
 
     public function gallery()
     {
@@ -38,10 +41,7 @@ class Products extends Model
     {
         return $query->where('status', 1);
     }
-    public function categories()
-    {
-        return $this->belongsToMany(Categories::class, 'product_categories', 'id_product', 'id_categories');
-    }
+  
     public function attributes()
     {
         return $this->belongsToMany(Attribute::class, 'products_attribute', 'product_id', 'attribute_id');
@@ -50,9 +50,9 @@ class Products extends Model
     {
         return $this->belongsToMany(ProductsAttribute::class, 'id_product');
     }
-    public function product_categories()
+    public function productCategories()
     {
-        return $this->belongsToMany(ProductCategory::class, 'id_product');
+        return $this->belongsToMany(ProductCategory::class);
     }
     
 }

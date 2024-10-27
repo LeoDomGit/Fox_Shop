@@ -9,7 +9,7 @@ class Categories extends Model
 {
     use HasFactory;
     protected $table='categories';
-    protected $fillable=['id','name','slug','images','position','status','created_at','updated_at'];
+    protected $fillable=['name','slug','images','position','status','created_at','updated_at'];
 
     public function scopeActive($query)
     {
@@ -17,6 +17,6 @@ class Categories extends Model
     } 
     public function products()
     {
-        return $this->belongsToMany(Products::class, 'product_categories', 'id_categories', 'id_product');
+        return $this->belongsToMany(Products::class);
     }  
 }

@@ -22,6 +22,7 @@ class CategoriesController extends Controller
     public function index()
     {
         $categories=Categories::all();
+
         return Inertia::render('Categories/Index', ['categories' => $categories]);
     }
 
@@ -61,7 +62,8 @@ class CategoriesController extends Controller
     public function show($id)
     {
         $result = Categories::find($id);
-        return Inertia::render('Categories/Edit', ['dataId' => $id,'category' => $result]);
+        // dd($result);
+        return Inertia::render('Categories/Edit', ['category' => $result]);
         
     }
 
@@ -76,29 +78,28 @@ class CategoriesController extends Controller
 public function update(Request $request, $id)
 {
     $validator = Validator::make($request->all(), [
-        'name' => 'sometimes|string|max:255', 
-        'position' => 'sometimes|numeric',
-        'images' => 'nullable'
+        'name' => 'nullable|string|max:255', 
+        'position' => 'nullable|numeric',
+        'images' => 'nullable|max:2048',
     ]);
-
+    
     if ($validator->fails()) {
         return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
     }
+    dd($request->all());
 
     // Tìm tài nguyên
     $resource = Categories::findOrFail($id);
     $data = $request->only(['position']);
-    
-    // Chỉ cập nhật name và slug nếu có thay đổi
     if ($request->has('name')) {
         $data['name'] = $request->name;
         $data['slug'] = Str::slug($data['name']);
     }
-
     if ($request->hasFile('images')) {
         $path = $request->file('images')->store('categories', 'public');
         $imagesUrl = Storage::url($path);
         \Log::info("Avatar path: " . $imagesUrl);
+        dd($imagesUrl);
         $data['images'] = $imagesUrl;
     }
 
@@ -111,8 +112,24 @@ public function update(Request $request, $id)
         'data' => $resource,
     ], 200);
 }
+public function updateCate(Request $request, $id) {
+    $validator = Validator::make($request->all(), [
+        'name' => 'nullable|string|max:255',
+        'position' => 'nullable|numeric',
+        'images' => 'nullable|max:2048',
+    ]);
 
+    if ($validator->fails()) {
+        return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
+    }
+    $check = $this->model::find($id)->update($request->all());
+if ($check) {
+        return response()->json(['check' => true, 'data' => $this->model::find($id)]);
+}
 
+    return response()->json(['check' => false, 'msg' => 'Cập nhật thất bại']);
+    
+}
     protected function validateRequest(Request $request)
     {
         $rules = [

@@ -42,7 +42,7 @@ function Info() {
             <p>Email: {user.email}</p>
             {/* {user.avatar && (
                 <img
-                    src={`https://dashboard.codingfs.com${user.avatar}`}
+                    src={`https://dashboard.codingfs.com${Truyền tham số}`}
                     alt="User Avatar"
                     onError={(e) => {
                         e.target.src = "default-avatar.png";

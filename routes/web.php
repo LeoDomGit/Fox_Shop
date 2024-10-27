@@ -18,6 +18,7 @@ Route::resource('/users', UserController::class);
 Route::resource('/categories', CategoriesController::class);
 Route::resource('/brands', BrandController::class);
 Route::resource('/products', ProductController::class);
+Route::post('categories/imgaes/{id}', [CategoriesController::class, 'updateCate']);
 Route::put('/products/switch/{id}', [ProductController::class, 'switchProduct']);
 Route::delete('/products/drop-image/{id}/{imageName}', [ProductController::class, 'removeImage']);
 Route::post('/products/set-image/{id}/{imageName}', [ProductController::class, 'setImage']);
