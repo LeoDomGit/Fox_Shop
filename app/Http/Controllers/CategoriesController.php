@@ -122,7 +122,17 @@ public function updateCate(Request $request, $id) {
     if ($validator->fails()) {
         return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
     }
-    $check = $this->model::find($id)->update($request->all());
+    $data = [];
+    $data['name'] = $request->name;
+    $data['slug'] = Str::slug($data['name']);
+    $data['position'] = $request->position;
+    if ($request->hasFile('images')) {
+        $path = $request->file('images')->store('categories', 'public');
+        $imagesUrl = Storage::url($path);
+        \Log::info("Avatar path: " . $imagesUrl);
+        $data['images'] = $imagesUrl;
+    }
+    $check = $this->model::find($id)->update($data);
 if ($check) {
         return response()->json(['check' => true, 'data' => $this->model::find($id)]);
 }
