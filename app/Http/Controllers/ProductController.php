@@ -311,49 +311,60 @@ class ProductController extends Controller
         return response()->json(['check' => true, 'data' => $result]);
     }
 
-  public function update(Request $request, $identifier)
-{
-    // Xác thực dữ liệu đầu vào
-    $validator = Validator::make($request->all(), [
-        'name' => 'string|max:255|unique:categories,name,' . $identifier,
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-    ]);
+ public function update(Request $request, $identifier)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255',
+            'price' => 'numeric|min:0',
+            'discount' => 'numeric|min:0',
+            'in_stock' => 'nullable|numeric',
+            'categories.*' => 'exists:categories,id',
+            'color.*' => 'exists:attribute,id',
+            'size.*' => 'exists:attribute,id' 
 
-    if ($validator->fails()) {
-        return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
-    }
 
-    // Tìm danh mục theo ID
-    $category = Category::find($identifier);
-    if (!$category) {
-        return response()->json(['check' => false, 'msg' => 'Category not found']);
-    }
-
-    // Cập nhật dữ liệu cho danh mục
-    $category->name = $request->name ?? $category->name;
-    $category->slug = Str::slug($request->name) ?? $category->slug;
-
-    // Xử lý hình ảnh nếu có file mới
-    if ($request->hasFile('image')) {
-        // Xóa ảnh cũ nếu có
-        if ($category->image && Storage::exists('public/categories/' . $category->image)) {
-            Storage::delete('public/categories/' . $category->image);
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
-
-        // Lưu ảnh mới và cập nhật đường dẫn trong cơ sở dữ liệu
-        $image = $request->file('image');
-        $imageName = $image->getClientOriginalName();
-        $image->move(storage_path('app/public/categories'), $imageName);
-        $category->image = $imageName;
+        $data = $request->all();
+        $product = Products::find($identifier);
+        if (!$product) {
+        return response()->json(['check' => false, 'msg' => 'Product not found']);
+        }
+        if ($product) {
+        $product->name = $request->name ?? $product->name;
+        if ($request->name != '') {
+        $product->slug = Str::slug($request->name); 
+        }
+        $product->price = $request->price ?? $product->price;
+        $product->discount = floatval($request->discount); // Chuyển đổi discount sang kiểu số
+        $product->in_stock = intval($request->in_stock); // Chuyển đổi in_stock sang kiểu số
+        $product->content = $request->content;
+        $product->id_brand = $request->id_brand ?? $product->id_brand;
+        $product->save();
+        }
+        if($request->has('categories')){
+            unset($data['categories']);
+            ProductCategory::where('id_product',$identifier)->delete();
+            foreach ($request->categories as $key => $value) {
+                ProductCategory::create(['id_product'=>$identifier,'id_categories'=>$value,'created_at'=>now()]);
+            }
+        }
+        if ($request->has('color') || $request->has('size')) {
+                unset($data['color'], $data['size']);
+                ProductsAttribute::where('product_id', $identifier)->delete();
+                
+                $attributes = $request->color ?? [];
+                $attributes = array_merge($attributes, $request->size ?? []);
+                
+                foreach ($attributes as $value) {
+                    ProductsAttribute::create(['product_id' => $identifier, 'attribute_id' => $value, 'created_at' => now()]);
+                }
+            }
+                    $result = $this->model::with('categories', 'brands')->get();
+                    return response()->json(['check' => true, 'data' => $result]);
     }
-
-    $category->save();
-
-    // Trả về thông tin danh mục đã cập nhật
-    $updatedCategory = Category::with('relatedModel')->find($identifier); // Nếu có liên kết với bảng khác
-    return response()->json(['check' => true, 'data' => $updatedCategory]);
-}
-
 
 
 

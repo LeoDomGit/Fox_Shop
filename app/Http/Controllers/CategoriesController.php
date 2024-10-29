@@ -53,7 +53,6 @@ class CategoriesController extends Controller
         if ($request->hasFile('images')) {
         $imagesPath = $request->file('images')->store('categories', 'public');
         $imagesUrl = Storage::url($imagesPath);
-        \Log::info("Avatar path: " . $imagesUrl);
         $data['images'] = $imagesUrl;
         }
         $this->model::create($data);

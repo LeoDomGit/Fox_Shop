@@ -114,7 +114,7 @@ class UserController extends BaseCrudController
         $users = User::with('roles')->get();
         return response()->json(['check' => true, 'data' => $users]);
         // Tạo người dùng mới
-        return response()->json(['message' => 'User registered successfully!', 'user' => $user], 201);
+        return response()->json(['message' => 'User registered successfully!'], 201);
     }
     public function registerForm()
     {
