@@ -6,6 +6,7 @@ import { Notyf } from "notyf";
 import { Box, Switch, Typography } from "@mui/material";
 import "notyf/notyf.min.css";
 import CKEditor from "../../components/CKEditor";
+import QuillEditor from "../../components/Quill";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { useTheme } from "@mui/material/styles";
@@ -426,19 +427,20 @@ function Index({
                                     className="btn btn-sm btn-primary mb-3"
                                     onClick={(e) => ChangeCreate()}
                                 >
-                                    Create
+                                    Tạo mới sản phẩm
                                 </button>
                             </div>
                             <div className="col-md"></div>
                         </div>
                         {create == true && (
                             <>
+                                <h3>Thêm sản phẩm mới</h3>
                                 <div className="col-md-8">
                                     <div class="card border-0 ps-2 shadow">
                                         <div class="card-body">
                                             <div className="row">
                                                 <div className="col-md-4">
-                                                    <label>Name:</label>
+                                                    <label>Tên sản phẩm:</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
@@ -450,7 +452,7 @@ function Index({
                                                     />
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Price:</label>
+                                                    <label>Giá sản phẩm:</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
@@ -462,7 +464,7 @@ function Index({
                                                     />
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Discount:</label>
+                                                    <label>Giảm giá:</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
@@ -492,7 +494,9 @@ function Index({
                                                         Danh mục sản phẩm:
                                                     </label>
                                                     <FormControl fullWidth>
-                                                        <InputLabel id="category-select-label"></InputLabel>
+                                                        <InputLabel id="category-select-label">
+                                                            Chọn danh mục
+                                                        </InputLabel>
                                                         <Select
                                                             labelId="category-select-label"
                                                             id="category-select"
@@ -505,7 +509,6 @@ function Index({
                                                             renderValue={(
                                                                 selected
                                                             ) => {
-                                                                // Tìm tên danh mục dựa trên ID đã chọn
                                                                 const selectedNames =
                                                                     selected.map(
                                                                         (
@@ -559,7 +562,9 @@ function Index({
                                                     </FormControl>
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Brands:</label>
+                                                    <label>
+                                                        Thương hiệu sản phẩm:
+                                                    </label>
                                                     <select
                                                         name="brandId"
                                                         defaultValue={0}
@@ -592,7 +597,7 @@ function Index({
                                                 <div className="col-md-4">
                                                     <div className="form-group">
                                                         <label htmlFor="">
-                                                            Size:
+                                                            Kích cỡ:
                                                         </label>
                                                         <br />
                                                         <div className="checkbox">
@@ -639,7 +644,7 @@ function Index({
                                                 <div className="col-md-8">
                                                     <div className="form-group">
                                                         <label htmlFor="">
-                                                            Color:
+                                                            Màu sắc:
                                                         </label>
                                                         <br />
                                                         <div className="checkbox row">
@@ -709,6 +714,9 @@ function Index({
                                             </div>
                                             <div className="row mb-2 mt-2">
                                                 <div className="col-md-3">
+                                                    <label htmlFor="">
+                                                        Hình ảnh:
+                                                    </label>
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -721,7 +729,10 @@ function Index({
                                             </div>
                                             <div className="row mt-3">
                                                 <div className="col-md">
-                                                    <CKEditor
+                                                    <label htmlFor="">
+                                                        Mô tả sản phẩm
+                                                    </label>
+                                                    <QuillEditor
                                                         value={content}
                                                         onBlur={setContent}
                                                     />
@@ -771,7 +782,7 @@ function Index({
                                                                         )
                                                                     }
                                                                 >
-                                                                    Remove
+                                                                    Xóa ảnh
                                                                 </button>
                                                             </div>
                                                         )
@@ -782,12 +793,12 @@ function Index({
                                                 <div className="col-md-2">
                                                     {create == true && (
                                                         <button
-                                                            className="btn w-100  btn-primary"
+                                                            className="btn w-100 btn-primary"
                                                             onClick={(e) =>
                                                                 SubmitProduct()
                                                             }
                                                         >
-                                                            Store
+                                                            Thêm mới
                                                         </button>
                                                     )}
                                                 </div>

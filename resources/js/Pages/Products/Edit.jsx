@@ -8,11 +8,13 @@ import { Dropzone, FileMosaic } from "@dropzone-ui/react";
 import Modal from "react-bootstrap/Modal";
 import "notyf/notyf.min.css";
 import CKEditor from "../../components/CKEditor";
+import QuillEditor from "../../components/Quill";
 import Swal from "sweetalert2";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { useTheme } from "@mui/material/styles";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import Quill from "quill";
 
 function Edit({
     dataId,
@@ -534,7 +536,7 @@ function Edit({
                         </div>
                     </div>
                     <div className="row mt-3">
-                        <CKEditor
+                        <QuillEditor
                             value={product.content}
                             onBlur={(newContent) =>
                                 setProduct({ ...product, content: newContent })

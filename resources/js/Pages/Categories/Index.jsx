@@ -92,12 +92,13 @@ function Index({ categories }) {
         { field: "position", headerName: "Thứ tự", width: 65, editable: true },
         {
             field: "created_at",
-            headerName: "Created at",
+            headerName: "Ngày tạo",
             valueGetter: (params) => formatCreatedAt(params),
         },
         {
             field: "editLink",
-            headerName: "Edit",
+            headerName: "Sửa",
+            width: 70,
             renderCell: (params) => {
                 const categoryId = params.row.id;
                 return (
@@ -105,12 +106,57 @@ function Index({ categories }) {
                         className="btn btn-sm btn-warning"
                         href={`/admin/categories/${categoryId}`}
                     >
-                        Edit
+                        Sửa
                     </a>
                 );
             },
         },
+        {
+            field: "deleteLink",
+            headerName: "Xóa",
+            renderCell: (params) => {
+                const categoryId = params.row.id;
+                return (
+                    <button
+                        className="btn btn-sm btn-danger"
+                        onClick={(e) => handleDelete(categoryId)}
+                    >
+                        Xóa
+                    </button>
+                    
+                );
+            },
+        },
     ];
+        const handleDelete = (categoryId) => {
+            Swal.fire({
+                icon: "question",
+                text: "Xóa danh mục này ?",
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: "Đúng",
+                denyButtonText: `Không`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios
+                        .delete("/admin/categories/" + categoryId)
+                        .then((res) => {
+                            if (res.data.check == true) {
+                                setTimeout(() => {
+                                    notyf.success("Đã xóa thành công");
+                                }, 17000);
+                                window.location.replace("/admin/categories");
+                            } else if (res.data.check == false) {
+                                if (res.data.msg) {
+                                    notyf.error(res.data.msg);
+                                }
+                            }
+                        });
+                } else if (result.isDenied) {
+                }
+            });
+        };
+
     const submitCategory = () => {
         const formData = new FormData();
         if (images) {
@@ -213,7 +259,7 @@ function Index({ categories }) {
             <>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Tạo loại tài khoản</Modal.Title>
+                        <Modal.Title>Tạo mới danh mục</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <label htmlFor="">Loại sản phẩm</label>
@@ -303,6 +349,9 @@ function Index({ categories }) {
                     </div>
                 </nav>
                 <div className="row">
+                    <div className="flex">
+                        <h3 className="p-3">Danh sách danh mục</h3>
+                    </div>
                     <div className="col-md-9">
                         {data && data.length > 0 && (
                             <Box sx={{ height: 500 }}>

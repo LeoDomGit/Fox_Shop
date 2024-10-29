@@ -9,6 +9,7 @@ function Edit({ category }) {
     const [name, setName] = useState("");
     const [position, setPosition] = useState("");
     const [fileImg, setFileImg] = useState([]);
+    const [showImg, setShowImg] = useState(true);
     const notyf = new Notyf({
         duration: 1000,
         position: {
@@ -50,16 +51,20 @@ function Edit({ category }) {
             },
         ],
     });
+    const changeImage = (e) => {
+        setFileImg(Array.from(e.target.files));
+        setShowImg(false);
+    };
     const handleSubmit = (e) => {
         e.preventDefault();
-        const formData = new FormData() ;
-        formData.append("name", name) ;
-        formData.append("position", position) ;
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("position", position);
         if (fileImg.length > 0) {
             formData.append("images", ...fileImg);
         }
         console.log(...formData);
-        
+
         axios
             .post("/admin/categories/imgaes/" + category.id, formData)
             .then((res) => {
@@ -69,12 +74,11 @@ function Edit({ category }) {
                         message: "Đã chỉnh sửa thành công",
                     });
                     window.location.href = "/admin/categories";
-                }
-                else  {
+                } else {
                     notyf.open({
                         type: "error",
                         message: res.data.msg,
-                    })
+                    });
                 }
             });
     };
@@ -89,47 +93,91 @@ function Edit({ category }) {
             <div>
                 <div className="container">
                     <h2>Chỉnh sửa danh mục</h2>
-                 
+
                     <form
                         onSubmit={handleSubmit}
                         enctype="multipart/form-data"
                         method="POST"
                     >
-                        <div className="form-group">
-                            <label htmlFor="name">Tên danh mục</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={name}
-                                name="name"
-                                placeholder="Tên danh mục"
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="name">Tên danh mục</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={position}
-                                name="name"
-                                onChange={(e) => setPosition(e.target.value)}
-                                placeholder="Tên danh mục"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="">Hình Ảnh</label>
-                            <br />
-                            <img className="mb-3" style={{ width: "100px" }} src={fileImg} alt="aaaaaa" />
-                            <br />
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => setFileImg(e.target.files)}
-                                name="images"
-                                id=""
-                                className="mb-3"
-                            />
+                        <div className="row">
+                            <div className="col-6">
+                                <div className="form-group">
+                                    <label htmlFor="name">Tên danh mục</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={name}
+                                        name="name"
+                                        placeholder="Tên danh mục"
+                                        onChange={(e) =>
+                                            setName(e.target.value)
+                                        }
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="name">Tên danh mục</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={position}
+                                        name="name"
+                                        onChange={(e) =>
+                                            setPosition(e.target.value)
+                                        }
+                                        placeholder="Tên danh mục"
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-6">
+                                <div>
+                                    <label htmlFor="">Hình Ảnh</label>
+                                    <br />
+                                    {showImg === true && (
+                                        <img
+                                            className="mb-3"
+                                            style={{ width: "100px" }}
+                                            src={fileImg}
+                                            alt=""
+                                        />
+                                    )}
+                                    {showImg === false &&
+                                        Array.isArray(fileImg) &&
+                                        fileImg.length > 0 && (
+                                            <div>
+                                                <div className="d-flex">
+                                                    {fileImg.map(
+                                                        (file, index) => (
+                                                            <img
+                                                                key={index}
+                                                                src={URL.createObjectURL(
+                                                                    file
+                                                                )}
+                                                                alt={`preview-${index}`}
+                                                                width="100"
+                                                                height="100"
+                                                                className="m-2"
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    <br />
+                                    <button
+                                        class="container-btn-file"
+                                    >
+                                        Tải hình ảnh
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={changeImage}
+                                            name="images"
+                                            id=""
+                                            className="mb-3"
+                                        />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="form-group">

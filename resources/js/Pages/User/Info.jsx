@@ -40,15 +40,15 @@ function Info() {
         <div>
             <h1>Welcome, {user.name}!</h1>
             <p>Email: {user.email}</p>
-            {/* {user.avatar && (
+            {user.avatar && (
                 <img
-                    src={`https://dashboard.codingfs.com${Truyền tham số}`}
+                    src={user.avatar}
                     alt="User Avatar"
                     onError={(e) => {
                         e.target.src = "default-avatar.png";
                     }}
                 />
-            )} */}
+            )}
             <button onClick={handleLogout}>Logout</button>
         </div>
     );
