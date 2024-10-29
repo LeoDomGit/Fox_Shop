@@ -111,9 +111,8 @@ class UserController extends BaseCrudController
             ]);
         }
          Mail::to($user->email)->send(new createUser($user));
-        $users = User::with('roles')->get();
+        $users = User::with('roles')->where('id', $user->id)->get();
         return response()->json(['check' => true, 'data' => $users]);
-        // Tạo người dùng mới
         return response()->json(['message' => 'User registered successfully!'], 201);
     }
     public function registerForm()
