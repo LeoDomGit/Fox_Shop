@@ -6,6 +6,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
 import Swal from "sweetalert2";
 import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 import axios from "axios";
 
 function Index({ posts }) {
