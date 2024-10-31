@@ -12,7 +12,6 @@ function Index({ data }) {
     });
     const [totalAmount, setTotalAmount] = useState(0);
     const [userId, setUserId] = useState("");
-
     useEffect(() => {
         try {
             const storedUser = localStorage.getItem("user");
@@ -76,15 +75,22 @@ function Index({ data }) {
                     order_details: orderDetails,
                     id_payment: 1,
                 });
+                handleRemoveItem(orderDetails[0].id_product);
                 console.log("Order saved successfully:", response.data);
             } else if (paymentMethod === "card") {
                 const response = await axios.post("/api/payment", {
                     ...orderInfo,
+                    id_user: userId,
                     total_amount: totalAmount,
                     order_details: orderDetails,
                 });
                 console.log("Payment successful:", response.data);
-                window.location.href = response.data.url;
+                if (response.data.url) {
+                    handleRemoveItem(orderDetails[0].id_product);
+                    window.location.href = response.data.url;
+                } else {
+                    console.error("URL not found in response");
+                }
             }
         } catch (error) {
             console.error("Error processing checkout:", error);

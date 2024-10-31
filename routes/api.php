@@ -24,9 +24,11 @@ Route::get('/user', function (Request $request) {
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
-    Route::post('/payment', [PaymentController::class, 'initiatePayment']);
+    Route::post('/payment', [PaymentController::class, 'vnpay_payment']);
+    Route::get('/payment/url', [PaymentController::class, 'vnpay_payment_url']);
     Route::post('/orders', [OrderController::class, 'store']);
-    Route::get('/vnpayreturn', [PaymentController::class, 'vnpayReturn']);
+    Route::get('/vnpay-return', [PaymentController::class, 'vnpayreturn'])->name('payment.return');
+    Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
 
 
 
