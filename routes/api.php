@@ -6,6 +6,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,6 +24,11 @@ Route::get('/user', function (Request $request) {
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+    Route::post('/payment', [PaymentController::class, 'initiatePayment']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/vnpayreturn', [PaymentController::class, 'vnpayReturn']);
+
+
 
 
     // 

@@ -397,6 +397,17 @@ class ProductController extends Controller
             return response()->json(['check' => false, 'msg' => 'File is required']);
         }
     }
+    public function ProDetail($slug){
+        $data = $this->model::where('slug', $slug)->with('categories', 'brands', 'gallery', 'attributes')->first()->toArray();  
+        $data['attributes'] = ProductsAttribute::where('product_id', $data['id'])->with('attribute')->get()->map(function ($attribute) {
+            return [
+                'id' => $attribute->id,
+                'name' => $attribute->attribute->name,
+                'type' => $attribute->attribute->type
+            ];
+        });
+        return Inertia::render('Products/Detail', ['product' => $data]);
+    }
 
     public function api_product(Request $request)
     {

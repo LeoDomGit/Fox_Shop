@@ -130,7 +130,6 @@ class UserController extends BaseCrudController
         if (Auth::attempt($credentials)) {
         $user = Auth::user();
         $token = $user->createToken('YourAppName')->plainTextToken;
-
         return response()->json([
             'token' => $token,
             'user' => [

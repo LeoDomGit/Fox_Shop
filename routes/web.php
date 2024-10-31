@@ -9,6 +9,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CartController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -28,5 +29,8 @@ Route::post('/products/set-image/{id}/{imageName}', [ProductController::class, '
 Route::post('/products/upload-images/{id}', [ProductController::class, 'UploadImages']);
 Route::resource('/attributes', AttributeController::class);
 Route::resource('/posts', PostController::class);
+Route::resource('/cart',CartController::class);
+// 
+Route::get('/products/detail/{slug}', [ProductController::class, 'ProDetail']);
 });
 
