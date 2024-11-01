@@ -13,7 +13,7 @@ use App\Http\Controllers\PaymentController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-// 
+
     Route::get('/registerform', [UserController::class, 'registerForm']);
     Route::get('/loginform', [UserController::class, 'loginForm']);
     Route::get('/info', [UserController::class, 'info']);
@@ -29,11 +29,6 @@ Route::get('/user', function (Request $request) {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/vnpay-return', [PaymentController::class, 'vnpayreturn'])->name('payment.return');
     Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
-
-
-
-
-    // 
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
     Route::get('/search/{id}',[ProductController::class,'api_search_product']);
