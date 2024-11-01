@@ -30,7 +30,6 @@ Route::post('/products/upload-images/{id}', [ProductController::class, 'UploadIm
 Route::resource('/attributes', AttributeController::class);
 Route::resource('/posts', PostController::class);
 Route::resource('/cart',CartController::class);
-// 
 Route::get('/products/detail/{slug}', [ProductController::class, 'ProDetail']);
 });
 
