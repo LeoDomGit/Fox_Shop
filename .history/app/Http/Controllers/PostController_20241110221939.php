@@ -134,6 +134,5 @@ class PostController extends Controller
             }
         }
         return response()->json(['message' => 'Cần có slug để tìm bài viết'], 400);
-        return response()->json(['message' => 'Cần có slug'], 400);
     }
 }
