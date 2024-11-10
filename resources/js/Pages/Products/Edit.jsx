@@ -8,11 +8,13 @@ import { Dropzone, FileMosaic } from "@dropzone-ui/react";
 import Modal from "react-bootstrap/Modal";
 import "notyf/notyf.min.css";
 import CKEditor from "../../components/CKEditor";
+import QuillEditor from "../../components/Quill";
 import Swal from "sweetalert2";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { useTheme } from "@mui/material/styles";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import Quill from "quill";
 
 function Edit({
     dataId,
@@ -23,13 +25,14 @@ function Edit({
     dataimage,
     dataColor,
     dataSize,
+    cate,
     dataQuantity,
     selectedAttributes,
 }) {
     const [id, setId] = useState(dataId);
     const [show, setShow] = useState(false);
     const [categories, setCategories] = useState(dataCate);
-    const [category, setCategory] = useState([]);
+    const [category, setCategory] = useState(cate);
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [brands, setBrands] = useState(dataBrand);
@@ -63,10 +66,7 @@ function Edit({
         const {
             target: { value },
         } = event;
-        setCategory(
-            // On autofill we get a stringified value.
-            typeof value === "string" ? value.split(",") : value
-        );
+        setCategory(typeof value === "string" ? value.split(",") : value);
     };
     const handleColorChange = (event) => {
         const value = parseInt(event.target.value);
@@ -86,13 +86,14 @@ function Edit({
                 : [...prev, value]
         );
     };
-   const handleInputChange = (e) => {
-       const { name, value } = e.target;
-       setProduct((prevProduct) => ({
-           ...prevProduct,
-           [name]: value, // Đảm bảo cập nhật đúng theo name
-       }));
-   };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setProduct((prevProduct) => ({
+            ...prevProduct,
+            [name]: value,
+        }));
+        console.log(product);
+    };
     const updateFiles = (incommingFiles) => {
         setFiles(incommingFiles);
     };
@@ -119,6 +120,7 @@ function Edit({
                 type: "error",
                 background: "indianred",
                 duration: 2000,
+                className: "notyf-error",
                 dismissible: true,
             },
             {
@@ -126,6 +128,7 @@ function Edit({
                 background: "green",
                 color: "white",
                 duration: 2000,
+                className: "notyf-success",
                 dismissible: true,
             },
             {
@@ -244,7 +247,7 @@ function Edit({
                         setTimeout(() => {
                             notyf.success("Đã xóa thành công");
                         }, 17000);
-                        window.location.replace("/products");
+                        window.location.replace("/admin/products");
                     } else if (res.data.check == false) {
                         if (res.data.msg) {
                             notyf.error(res.data.msg);
@@ -284,7 +287,10 @@ function Edit({
                 }
             });
     };
-
+    useEffect(() => {
+        console.log("prosssduct", product); // In ra product mỗi khi nó thay đổi
+    }, [product]);
+    // console.log("product", dataproduct);
     return (
         <Layout>
             <Modal show={show} fullscreen={true} onHide={() => setShow(false)}>
@@ -435,31 +441,51 @@ function Edit({
                                     <option key={category.id} value={category.id}>{category.name}</option>
                                 ))}
                             </select> */}
-                            <InputLabel id="demo-multiple-name-label">
-                                Danh mục sản phầm
-                            </InputLabel>
-                            <Select
-                                labelId="demo-multiple-name-label"
-                                id="demo-multiple-name"
-                                multiple
-                                value={category}
-                                onChange={handleChange}
-                                className="form-control"
-                                input={<OutlinedInput label="Name" />}
-                            >
-                                {categories.map((item) => (
-                                    <MenuItem key={item.id} value={item.id}>
-                                        {item.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            <label>Danh mục sản phẩm:</label>
+                            <FormControl fullWidth>
+                                <InputLabel id="category-select-label"></InputLabel>
+                                <Select
+                                    labelId="category-select-label"
+                                    id="category-select"
+                                    name="categories"
+                                    multiple
+                                    value={category}
+                                    onChange={handleChange}
+                                    renderValue={(selected) => {
+                                        // Tìm tên danh mục dựa trên ID đã chọn
+                                        const selectedNames = selected.map(
+                                            (id) => {
+                                                const found = categories.find(
+                                                    (item) => item.id === id
+                                                );
+                                                return found ? found.name : "";
+                                            }
+                                        );
+                                        return selectedNames.join(", ");
+                                    }}
+                                >
+                                    {categories.map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    category.indexOf(item.id) >
+                                                    -1
+                                                }
+                                                readOnly
+                                            />{" "}
+                                            {item.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </div>
                         <div className="col-md-4">
                             <label>Brands:</label>
                             <select
-                                name="brandId"
+                                name="id_brand"
                                 className="form-control"
-                                value={product.idBrand}
+                                value={product.id_brand}
                                 onChange={handleInputChange}
                             >
                                 <option value="0" disabled>
@@ -510,7 +536,7 @@ function Edit({
                         </div>
                     </div>
                     <div className="row mt-3">
-                        <CKEditor
+                        <QuillEditor
                             value={product.content}
                             onBlur={(newContent) =>
                                 setProduct({ ...product, content: newContent })

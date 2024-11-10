@@ -22,11 +22,6 @@ function Index({ categories }) {
         const date = new Date(dateString);
         return date.toLocaleString();
     };
-    const handleImageChange = (event) => {
-        const files = Array.from(event.target.files);
-        setImages(files); // Lưu ảnh vào state
-    };
-
     const notyf = new Notyf({
         duration: 1000,
         position: {
@@ -47,6 +42,7 @@ function Index({ categories }) {
                 type: "error",
                 background: "indianred",
                 duration: 2000,
+                className: "notyf-error",
                 dismissible: true,
             },
             {
@@ -54,6 +50,7 @@ function Index({ categories }) {
                 background: "green",
                 color: "white",
                 duration: 2000,
+                className: "notyf-success",
                 dismissible: true,
             },
             {
@@ -70,29 +67,104 @@ function Index({ categories }) {
         {
             field: "id",
             headerName: "#",
-            width: 100,
+            width: 40,
             renderCell: (params) => params.rowIndex,
         },
         {
             field: "name",
-            headerName: "Loại tài khoản",
+            headerName: "Tên danh mục",
             width: 200,
             editable: true,
         },
-        { field: "position", headerName: "Thứ tự", width: 200, editable: true },
+        {
+            field: "images",
+            headerName: "Hình ảnh",
+            width: 200,
+            editable: true,
+            renderCell: (params) => (
+                <img
+                    src={params.value}
+                    alt="Product Image"
+                    style={{ width: "40px" }}
+                />
+            ),
+        },
+        { field: "position", headerName: "Thứ tự", width: 65, editable: true },
         {
             field: "created_at",
-            headerName: "Created at",
+            headerName: "Ngày tạo",
             valueGetter: (params) => formatCreatedAt(params),
         },
+        {
+            field: "editLink",
+            headerName: "Sửa",
+            width: 70,
+            renderCell: (params) => {
+                const categoryId = params.row.id;
+                return (
+                    <a
+                        className="btn btn-sm btn-warning"
+                        href={`/admin/categories/${categoryId}`}
+                    >
+                        Sửa
+                    </a>
+                );
+            },
+        },
+        {
+            field: "deleteLink",
+            headerName: "Xóa",
+            renderCell: (params) => {
+                const categoryId = params.row.id;
+                return (
+                    <button
+                        className="btn btn-sm btn-danger"
+                        onClick={(e) => handleDelete(categoryId)}
+                    >
+                        Xóa
+                    </button>
+                    
+                );
+            },
+        },
     ];
+        const handleDelete = (categoryId) => {
+            Swal.fire({
+                icon: "question",
+                text: "Xóa danh mục này ?",
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: "Đúng",
+                denyButtonText: `Không`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios
+                        .delete("/admin/categories/" + categoryId)
+                        .then((res) => {
+                            if (res.data.check == true) {
+                                setTimeout(() => {
+                                    notyf.success("Đã xóa thành công");
+                                }, 17000);
+                                window.location.replace("/admin/categories");
+                            } else if (res.data.check == false) {
+                                if (res.data.msg) {
+                                    notyf.error(res.data.msg);
+                                }
+                            }
+                        });
+                } else if (result.isDenied) {
+                }
+            });
+        };
+
     const submitCategory = () => {
         const formData = new FormData();
-        images.forEach((image) => {
-            formData.append("images[]", image);
-        });
+        if (images) {
+            formData.append("images", images);
+        }
         formData.append("name", category);
         formData.append("position", Number(position));
+        console.log(formData);
 
         axios
             .post("/admin/categories", formData, {
@@ -109,7 +181,7 @@ function Index({ categories }) {
                     setData(res.data.data);
                     setShow(false);
                     setCategory("");
-                    setImages([]); // Reset ảnh sau khi submit thành công
+                    setImages([]);
                 } else if (res.data.check === false) {
                     notyf.open({
                         type: "error",
@@ -187,7 +259,7 @@ function Index({ categories }) {
             <>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Tạo loại tài khoản</Modal.Title>
+                        <Modal.Title>Tạo mới danh mục</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <label htmlFor="">Loại sản phẩm</label>
@@ -209,7 +281,7 @@ function Index({ categories }) {
                             type="file"
                             className="form-control"
                             multiple
-                            onChange={handleImageChange}
+                            onChange={(e) => setImages(e.target.files[0])}
                         />
                         {images.length > 0 && (
                             <div>
@@ -277,9 +349,12 @@ function Index({ categories }) {
                     </div>
                 </nav>
                 <div className="row">
-                    <div className="col-md-7">
+                    <div className="flex">
+                        <h3 className="p-3">Danh sách danh mục</h3>
+                    </div>
+                    <div className="col-md-9">
                         {data && data.length > 0 && (
-                            <Box sx={{ height: 400, width: "100%" }}>
+                            <Box sx={{ height: 500 }}>
                                 <DataGrid
                                     rows={data}
                                     columns={columns}
@@ -293,13 +368,6 @@ function Index({ categories }) {
                                     pageSizeOptions={[5]}
                                     checkboxSelection
                                     disableRowSelectionOnClick
-                                    onCellEditStop={(params, e) =>
-                                        handleCellEditStop(
-                                            params.row.id,
-                                            params.field,
-                                            e.target.value
-                                        )
-                                    }
                                 />
                             </Box>
                         )}

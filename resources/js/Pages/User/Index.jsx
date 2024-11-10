@@ -38,32 +38,34 @@ function Index({roles,users}) {
     const notyf = new Notyf({
         duration: 1000,
         position: {
-            x: 'right',
-            y: 'top',
+            x: "right",
+            y: "top",
         },
         types: [
             {
-                type: 'warning',
-                background: 'orange',
+                type: "warning",
+                background: "orange",
                 icon: {
-                    className: 'material-icons',
-                    tagName: 'i',
-                    text: 'warning'
-                }
+                    className: "material-icons",
+                    tagName: "i",
+                    text: "warning",
+                },
             },
             {
-                type: 'error',
-                background: 'indianred',
+                type: "error",
+                background: "indianred",
                 duration: 2000,
-                dismissible: true
+                className: "notyf-error",
+                dismissible: true,
             },
             {
-                type: 'success',
-                background: '#7dd3e8',
+                type: "success",
+                background: "#7dd3e8",
                 duration: 2000,
-                dismissible: true
-            }
-        ]
+                className: "notyf-success",
+                dismissible: true,
+            },
+        ],
     });
     const [idUser,setIdUser]= useState(0);
 

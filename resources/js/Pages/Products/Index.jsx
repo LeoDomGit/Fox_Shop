@@ -6,6 +6,7 @@ import { Notyf } from "notyf";
 import { Box, Switch, Typography } from "@mui/material";
 import "notyf/notyf.min.css";
 import CKEditor from "../../components/CKEditor";
+import QuillEditor from "../../components/Quill";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { useTheme } from "@mui/material/styles";
@@ -244,6 +245,12 @@ function Index({
             setSelectedSize(selectedSize.filter((id) => id !== sizeId));
         }
     };
+        const handleChange = (event) => {
+            const {
+                target: { value },
+            } = event;
+            setCate(typeof value === "string" ? value.split(",") : value);
+        };
 
     const resetCreate = () => {
         setName("");
@@ -346,22 +353,19 @@ function Index({
             selectedFiles.forEach((file) => {
                 formData.append("files[]", file);
             });
-            if (Array.isArray(categories) && categories.length > 0) {
-                categories.forEach((category) => {
-                    if (category && category.id) {
-                        formData.append("categories[]", category.id);
-                    } else {
-                        console.error(
-                            "Category không hợp lệ hoặc thiếu thuộc tính id:",
-                            category
-                        );
-                    }
-                });
-            } else {
-                console.error(
-                    "Categories không phải là một mảng hợp lệ hoặc rỗng."
-                );
-            }
+           if (Array.isArray(cate) && cate.length > 0) {
+               cate.forEach((id) => {
+                   if (id) {
+                       formData.append("categories[]", id);
+                   } else {
+                       console.error("Category không hợp lệ:", id);
+                   }
+               });
+           } else {
+               console.error(
+                   "Categories không phải là một mảng hợp lệ hoặc rỗng."
+               );
+           }
 
             axios
                 .post("/admin/products", formData, {
@@ -401,15 +405,6 @@ function Index({
         updatedPreviews.splice(index, 1);
         setFilePreviews(updatedPreviews);
     };
-    const handleChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setCate(
-            // On autofill we get a stringified value.
-            typeof value === "string" ? value.split(",") : value
-        );
-    };
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         setSelectedFiles(files);
@@ -432,19 +427,20 @@ function Index({
                                     className="btn btn-sm btn-primary mb-3"
                                     onClick={(e) => ChangeCreate()}
                                 >
-                                    Create
+                                    Tạo mới sản phẩm
                                 </button>
                             </div>
                             <div className="col-md"></div>
                         </div>
                         {create == true && (
                             <>
+                                <h3>Thêm sản phẩm mới</h3>
                                 <div className="col-md-8">
                                     <div class="card border-0 ps-2 shadow">
                                         <div class="card-body">
                                             <div className="row">
                                                 <div className="col-md-4">
-                                                    <label>Name:</label>
+                                                    <label>Tên sản phẩm:</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
@@ -456,7 +452,7 @@ function Index({
                                                     />
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Price:</label>
+                                                    <label>Giá sản phẩm:</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
@@ -468,7 +464,7 @@ function Index({
                                                     />
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Discount:</label>
+                                                    <label>Giảm giá:</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
@@ -494,38 +490,81 @@ function Index({
                                             </div>
                                             <div className="row mt-2">
                                                 <div className="col-md-4">
-                                                    <InputLabel id="demo-multiple-name-label">
-                                                        Danh mục sản phầm
-                                                    </InputLabel>
-                                                    <Select
-                                                        labelId="demo-multiple-name-label"
-                                                        id="demo-multiple-name"
-                                                        multiple
-                                                        value={cate}
-                                                        onChange={handleChange}
-                                                        className="form-control"
-                                                        input={
-                                                            <OutlinedInput label="Name" />
-                                                        }
-                                                    >
-                                                        {categories.map(
-                                                            (item) => (
-                                                                <MenuItem
-                                                                    key={
-                                                                        item.id
-                                                                    }
-                                                                    value={
-                                                                        item.id
-                                                                    }
-                                                                >
-                                                                    {item.name}
-                                                                </MenuItem>
-                                                            )
-                                                        )}
-                                                    </Select>
+                                                    <label>
+                                                        Danh mục sản phẩm:
+                                                    </label>
+                                                    <FormControl fullWidth>
+                                                        <InputLabel id="category-select-label">
+                                                            Chọn danh mục
+                                                        </InputLabel>
+                                                        <Select
+                                                            labelId="category-select-label"
+                                                            id="category-select"
+                                                            name="categories"
+                                                            multiple
+                                                            value={cate}
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            renderValue={(
+                                                                selected
+                                                            ) => {
+                                                                const selectedNames =
+                                                                    selected.map(
+                                                                        (
+                                                                            id
+                                                                        ) => {
+                                                                            const found =
+                                                                                categories.find(
+                                                                                    (
+                                                                                        item
+                                                                                    ) =>
+                                                                                        item.id ===
+                                                                                        id
+                                                                                );
+                                                                            return found
+                                                                                ? found.name
+                                                                                : "";
+                                                                        }
+                                                                    );
+                                                                return selectedNames.join(
+                                                                    ", "
+                                                                );
+                                                            }}
+                                                        >
+                                                            {categories.map(
+                                                                (item) => (
+                                                                    <MenuItem
+                                                                        key={
+                                                                            item.id
+                                                                        }
+                                                                        value={
+                                                                            item.id
+                                                                        }
+                                                                    >
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                cate.indexOf(
+                                                                                    item.id
+                                                                                ) >
+                                                                                -1
+                                                                            }
+                                                                            readOnly
+                                                                        />{" "}
+                                                                        {
+                                                                            item.name
+                                                                        }
+                                                                    </MenuItem>
+                                                                )
+                                                            )}
+                                                        </Select>
+                                                    </FormControl>
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <label>Brands:</label>
+                                                    <label>
+                                                        Thương hiệu sản phẩm:
+                                                    </label>
                                                     <select
                                                         name="brandId"
                                                         defaultValue={0}
@@ -558,72 +597,115 @@ function Index({
                                                 <div className="col-md-4">
                                                     <div className="form-group">
                                                         <label htmlFor="">
-                                                            Size:
+                                                            Kích cỡ:
                                                         </label>
                                                         <br />
                                                         <div className="checkbox">
                                                             {sizes.map(
                                                                 (size) => (
-                                                                    <label
-                                                                        key={
-                                                                            size.id
-                                                                        }
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            value={
+                                                                    <div>
+                                                                        <label
+                                                                            key={
                                                                                 size.id
                                                                             }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleSizeChange(
-                                                                                    e,
+                                                                        >
+                                                                            <input
+                                                                                className="form-check-input"
+                                                                                style={{
+                                                                                    marginRight:
+                                                                                        "7px",
+                                                                                    border: "1px solid #000",
+                                                                                    borderRadius:
+                                                                                        "0px",
+                                                                                }}
+                                                                                type="checkbox"
+                                                                                value={
                                                                                     size.id
-                                                                                )
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    handleSizeChange(
+                                                                                        e,
+                                                                                        size.id
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                            {
+                                                                                size.type
                                                                             }
-                                                                        />
-                                                                        {
-                                                                            size.type
-                                                                        }
-                                                                    </label>
+                                                                        </label>
+                                                                    </div>
                                                                 )
                                                             )}
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="col-md-4">
+                                                <div className="col-md-8">
                                                     <div className="form-group">
                                                         <label htmlFor="">
-                                                            Color:
+                                                            Màu sắc:
                                                         </label>
                                                         <br />
-                                                        <div className="checkbox">
+                                                        <div className="checkbox row">
                                                             {colors.map(
                                                                 (color) => (
-                                                                    <label
-                                                                        key={
-                                                                            color.id
-                                                                        }
-                                                                    >
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            value={
-                                                                                color.id
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleColorChange(
-                                                                                    e,
+                                                                    <div className="col-md-6">
+                                                                        <div
+                                                                            className="row m-1 p-1"
+                                                                            style={{
+                                                                                border: "1px solid #cdcd",
+                                                                            }}
+                                                                        >
+                                                                            <div className="col-md-8">
+                                                                                <label
+                                                                                    key={
+                                                                                        color.id
+                                                                                    }
+                                                                                >
+                                                                                    <input
+                                                                                        className="form-check-input"
+                                                                                        style={{
+                                                                                            marginRight:
+                                                                                                "7px",
+                                                                                            border: "1px solid #000",
+                                                                                            borderRadius:
+                                                                                                "0px",
+                                                                                        }}
+                                                                                        type="checkbox"
+                                                                                        value={
+                                                                                            color.id
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e
+                                                                                        ) =>
+                                                                                            handleColorChange(
+                                                                                                e,
+                                                                                                color.id
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                    {
+                                                                                        color.type
+                                                                                    }
+                                                                                </label>
+                                                                            </div>
+
+                                                                            <div
+                                                                                className=""
+                                                                                key={
                                                                                     color.id
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                        {
-                                                                            color.type
-                                                                        }
-                                                                    </label>
+                                                                                }
+                                                                                style={{
+                                                                                    width: 20,
+                                                                                    height: 20,
+                                                                                    backgroundColor:
+                                                                                        color.type,
+                                                                                    border: "1px solid #000",
+                                                                                }}
+                                                                            ></div>
+                                                                        </div>
+                                                                    </div>
                                                                 )
                                                             )}
                                                         </div>
@@ -632,6 +714,9 @@ function Index({
                                             </div>
                                             <div className="row mb-2 mt-2">
                                                 <div className="col-md-3">
+                                                    <label htmlFor="">
+                                                        Hình ảnh:
+                                                    </label>
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -644,7 +729,10 @@ function Index({
                                             </div>
                                             <div className="row mt-3">
                                                 <div className="col-md">
-                                                    <CKEditor
+                                                    <label htmlFor="">
+                                                        Mô tả sản phẩm
+                                                    </label>
+                                                    <QuillEditor
                                                         value={content}
                                                         onBlur={setContent}
                                                     />
@@ -694,7 +782,7 @@ function Index({
                                                                         )
                                                                     }
                                                                 >
-                                                                    Remove
+                                                                    Xóa ảnh
                                                                 </button>
                                                             </div>
                                                         )
@@ -705,12 +793,12 @@ function Index({
                                                 <div className="col-md-2">
                                                     {create == true && (
                                                         <button
-                                                            className="btn w-100  btn-primary"
+                                                            className="btn w-100 btn-primary"
                                                             onClick={(e) =>
                                                                 SubmitProduct()
                                                             }
                                                         >
-                                                            Store
+                                                            Thêm mới
                                                         </button>
                                                     )}
                                                 </div>

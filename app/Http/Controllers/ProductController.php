@@ -136,7 +136,6 @@ class ProductController extends Controller
 
     // Thêm sản phẩm mới và lấy id
     $id = $this->model::insertGetId($data);
-
     // Lưu danh mục cho sản phẩm
     foreach ($request->categories as $value) {
         ProductCategory::create(['id_product' => $id, 'id_categories' => $value, 'created_at' => now()]);
@@ -189,9 +188,8 @@ class ProductController extends Controller
 
         $selectedAttributes = ProductsAttribute::where('product_id', $identifier)->pluck('attribute_id')->toArray();
             $gallery = [];
-
+        $selectedCategories = ProductCategory::where('id_product', $identifier)->pluck('id_categories')->toArray();
         foreach ($oldImages as  $value) {
-
             $gallery[] = Storage::url('products/' .  $value);
         }
         $categories = \App\Models\Categories::active()->get();
@@ -200,9 +198,9 @@ class ProductController extends Controller
         $image = Gallery::where('id_parent', $identifier)->where('status', 1)->value("image");
 
         if ($image) {
-            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes, 'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
+            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands,'cate'=>$selectedCategories, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes, 'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
         } else {
-            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes,'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
+            return Inertia::render('Products/Edit', ['dataId' => $identifier, 'dataBrand' => $brands,'cate'=>$selectedCategories, 'dataCate' => $categories, 'dataproduct' => $result,  'dataColor' => $allColors, 'dataSize' => $allSizes,'selectedAttributes' => $selectedAttributes, 'datagallery' => $gallery, 'dataimage' => Storage::url('products/' . $image)]);
         }
     }
 
@@ -313,7 +311,7 @@ class ProductController extends Controller
         return response()->json(['check' => true, 'data' => $result]);
     }
 
-    public function update(Request $request, $identifier)
+ public function update(Request $request, $identifier)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
@@ -324,24 +322,26 @@ class ProductController extends Controller
             'color.*' => 'exists:attribute,id',
             'size.*' => 'exists:attribute,id' 
 
+
         ]);
         if ($validator->fails()) {
             return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
         $data = $request->all();
-        if ($request->name != '') {
-            $data['slug'] = Str::slug($request->name);
-        }
         $product = Products::find($identifier);
         if (!$product) {
         return response()->json(['check' => false, 'msg' => 'Product not found']);
         }
         if ($product) {
         $product->name = $request->name ?? $product->name;
+        if ($request->name != '') {
+        $product->slug = Str::slug($request->name); 
+        }
         $product->price = $request->price ?? $product->price;
         $product->discount = floatval($request->discount); // Chuyển đổi discount sang kiểu số
         $product->in_stock = intval($request->in_stock); // Chuyển đổi in_stock sang kiểu số
         $product->content = $request->content;
+        $product->id_brand = $request->id_brand ?? $product->id_brand;
         $product->save();
         }
         if($request->has('categories')){
@@ -397,6 +397,17 @@ class ProductController extends Controller
             return response()->json(['check' => false, 'msg' => 'File is required']);
         }
     }
+    public function ProDetail($slug){
+        $data = $this->model::where('slug', $slug)->with('categories', 'brands', 'gallery', 'attributes')->first()->toArray();  
+        $data['attributes'] = ProductsAttribute::where('product_id', $data['id'])->with('attribute')->get()->map(function ($attribute) {
+            return [
+                'id' => $attribute->id,
+                'name' => $attribute->attribute->name,
+                'type' => $attribute->attribute->type
+            ];
+        });
+        return Inertia::render('Products/Detail', ['product' => $data]);
+    }
 
     public function api_product(Request $request)
     {
@@ -414,31 +425,23 @@ class ProductController extends Controller
             return response()->json($result);
         }
     }
-    public function api_product_cate(Request $request)
-    {
-        // Khởi tạo query ban đầu với điều kiện mặc định
-        $query = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+public function api_product_cate($id)
+{
+    $result = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
         ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+        ->join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('gallery.status', 1)
+        ->where('product_categories.id_categories', $id)
         ->where('products.status', 1)
         ->where('categories.status', 1)
-        ->select('products.*');
+        ->select('products.*', 'categories.name as category_name', 'gallery.image as image')
+        ->distinct() // Đảm bảo kết quả không bị trùng lặp
+        ->get();
 
-    // Nếu có yêu cầu lọc theo loại (category)
-    if ($request->has('id_categories')) {
-        $query->where('categories.id', $request->category_id);
-    }
-
-    // Nếu có yêu cầu giới hạn số lượng sản phẩm
-    if ($request->has('limit')) {
-        $result = $query->take($request->limit)->get();
-    } else {
-        // Nếu không có yêu cầu limit, sử dụng phân trang
-        $result = $query->paginate(16);
-    }
-
-    // Trả về kết quả dưới dạng JSON
     return response()->json($result);
-    }
+}
+
+
     // --------------------------------------
     public function api_search_product($slug)
     {
@@ -457,44 +460,86 @@ class ProductController extends Controller
         return response()->json(['products' => $result]);
     }
     // --------------------------------------
-    public function api_single_product($slug)
-    {
-        $result = Products::with(['brands', 'categories'])
+public function apiProductDetail($slug) {
+    $data = $this->model::where('slug', $slug)->with('categories', 'brands', 'gallery', 'attributes')->first()->toArray();
+    
+    $data['attributes'] = ProductsAttribute::where('product_id', $data['id'])->with('attribute')->get()->map(function ($attribute) {
+        return [
+            'id' => $attribute->id,
+            'name' => $attribute->attribute->name,  // Assuming 'name' is from the related 'attribute' model
+            'type' => $attribute->attribute->type
+        ];
+    });
+
+    return response()->json($data);
+}
+
+
+public function api_single_product($slug)
+{
+    $result = Products::with(['brands', 'categories'])
         ->where('products.slug', $slug)
         ->where('products.status', 1)
         ->select('products.*')
-            ->first();
-        // $result = Products::with(['brands', 'categories', 'comments'])->where('products.slug', $slug)->where('products.status', 1)->select('products.*')
-        //     ->first();
-        if (!$result) {
-            return response()->json([]);
-        }
-        $medias = Gallery::where('id_parent', $result->id)
+        ->first();
+    if (!$result) {
+        return response()->json([]);
+    }
+
+    $medias = Gallery::where('id_parent', $result->id)
         ->pluck('image');
-        $result=ProductCategory::where('id_product',$result->id)->first();
-        $id_cate=$result->id_categories;
-        $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+
+    // Lấy thông tin danh mục của sản phẩm
+    $categoryData = ProductCategory::where('id_product', $result->id)->first();
+    $id_cate = $categoryData->id_categories;
+
+    // Lấy sản phẩm cùng danh mục
+    $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
         ->join('gallery', 'products.id', '=', 'gallery.id_parent')
         ->where('products.status', 1)
         ->where('product_categories.id_categories', $id_cate)
         ->where('gallery.status', 1)
         ->select('products.*', 'gallery.image as image')
         ->take(4);
-        $brand_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->where('products.status', 1)
-            ->where('products.id_brand', $result->idBrand)
-            ->where('gallery.status', 1)
-            ->select('products.*', 'gallery.image as image')
-            ->take(4);
-        if ($brand_products->exists() && $cate_products->exists()) {
-            $links = $cate_products->union($brand_products)->get();
-        } elseif (!$brand_products->exists()) {
-            $links = $cate_products->get();
-        } else {
-            $links = $brand_products->get();
-        }
-        return response()->json(['product' => $result, 'medias' => $medias, 'links' => $links]);
+
+    // Lấy sản phẩm cùng brand
+    $brand_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('products.status', 1)
+        ->where('products.id_brand', $result->idBrand)
+        ->where('gallery.status', 1)
+        ->select('products.*', 'gallery.image as image')
+        ->take(4);
+
+    // Xử lý để lấy sản phẩm liên quan
+    if ($brand_products->exists() && $cate_products->exists()) {
+        $links = $cate_products->union($brand_products)->get();
+    } elseif (!$brand_products->exists()) {
+        $links = $cate_products->get();
+    } else {
+        $links = $brand_products->get();
     }
+
+    // Lấy màu và kích thước của sản phẩm
+    $attributes = ProductsAttribute::where('product_id', $result->id)
+        ->join('attribute', 'products_attribute.attribute_id', '=', 'attribute.id')
+        ->select('attribute.type', 'attribute.name')
+        ->get()
+        ->groupBy('name'); // Nhóm theo 'name' để tách color và size
+
+    // Phân loại thuộc tính color và size
+    $colors = $attributes->get('color', []);
+    $sizes = $attributes->get('size', []);
+
+    // Trả về dữ liệu dưới dạng JSON
+    return response()->json([
+        'product' => $result,
+        'medias' => $medias,
+        'links' => $links,
+        'colors' => $colors,
+        'sizes' => $sizes
+    ]);
+}
+
 
     public function api_gallery_by_product_id(Request $request, $productId)
     {
@@ -509,7 +554,6 @@ class ProductController extends Controller
             ->pluck('image');
         return response()->json(['images' => $images]);
     }
-
     public function api_load_cart_product(Request $request)
     {
         $validator = Validator::make($request->all(), [
