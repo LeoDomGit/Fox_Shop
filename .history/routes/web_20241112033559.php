@@ -30,5 +30,7 @@ Route::resource('/attributes', AttributeController::class);
 Route::resource('/posts', PostController::class);
 Route::resource('/cart',CartController::class);
 Route::get('/products/detail/{slug}', [ProductController::class, 'ProDetail']);
+Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
+
 });
 
