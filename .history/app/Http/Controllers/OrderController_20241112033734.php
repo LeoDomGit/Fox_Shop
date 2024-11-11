@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order_detail;
 use App\Models\Orders;
+use App\Models\Order_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

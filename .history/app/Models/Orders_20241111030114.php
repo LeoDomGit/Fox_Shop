@@ -20,13 +20,4 @@ class Orders extends Model
         'order_note',
         'total_amount',
     ];
-    public function orderDetails()
-{
-    return $this->hasMany(Order_detail::class, 'id_order');
-}
-
-public function payment()
-{
-    return $this->belongsTo(Payment::class, 'id_payment');
-}
 }

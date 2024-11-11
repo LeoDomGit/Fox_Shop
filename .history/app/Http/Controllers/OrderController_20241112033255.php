@@ -41,7 +41,7 @@ class OrderController extends Controller
     }
     public function getOrdersByUserId($id_user)
 {
-    $orders = Orders::with(['orderDetails.product', 'payment'])
+    $orders = Order::with(['orderDetails.product', 'payment'])
                   ->where('id_user', $id_user)
                   ->get();
     return response()->json($orders);

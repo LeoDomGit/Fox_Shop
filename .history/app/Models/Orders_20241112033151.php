@@ -22,7 +22,7 @@ class Orders extends Model
     ];
     public function orderDetails()
 {
-    return $this->hasMany(Order_detail::class, 'id_order');
+    return $this->hasMany(OrderDetail::class, 'id_order');
 }
 
 public function payment()
