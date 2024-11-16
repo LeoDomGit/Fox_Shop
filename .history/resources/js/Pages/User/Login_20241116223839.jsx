@@ -19,13 +19,17 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
+    // Toggles password visibility
     const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    // Prevents the default action of mouse down on the password visibility toggle button
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
     };
 
     const handleLogin = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Ngăn không cho trang bị load lại
         try {
             const response = await axios.post("/api/login", {
                 email,
