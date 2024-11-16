@@ -38,7 +38,7 @@ function Login() {
                 if (user) {
                     localStorage.setItem("token", token);
                     localStorage.setItem("user", JSON.stringify(user));
-                    window.location.href = "/admin/dashboard";
+                    window.location.href = "/api/info";
                 } else {
                     console.error("Tài khoản không tồn tại");
                 }
