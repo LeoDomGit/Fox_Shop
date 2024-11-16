@@ -212,6 +212,7 @@ public function logout()
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
         ]);
+        dd($request->all());
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -222,8 +223,8 @@ public function logout()
         ];
         Mail::to($user->email)->send(new ResetPasswordMail($data));
         });
-        if ($response) {
-            return response()->json(['message' => 'Reset password link sent to your email.'], 200);
+        if ($response === Password::RESET_LINK_SENT) {
+        return response()->json(['message' => 'Reset password link sent to your email.'], 200);
         }
       return response()->json(['error' => 'Unable to send reset link.'], 500);
     }

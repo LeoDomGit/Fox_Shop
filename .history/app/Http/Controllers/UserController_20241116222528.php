@@ -216,14 +216,16 @@ public function logout()
             return response()->json(['errors' => $validator->errors()], 422);
         }
         $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
+            
         $data = [
             'name' => $user->name,
             'reset_link' => url('/api/resetpassword/'.$token.'/'.urlencode($user->email)),
         ];
         Mail::to($user->email)->send(new ResetPasswordMail($data));
+        dd(Mail::to($user->email)->send(new ResetPasswordMail($data)));
         });
-        if ($response) {
-            return response()->json(['message' => 'Reset password link sent to your email.'], 200);
+        if ($response === Password::RESET_LINK_SENT) {
+        return response()->json(['message' => 'Reset password link sent to your email.'], 200);
         }
       return response()->json(['error' => 'Unable to send reset link.'], 500);
     }
