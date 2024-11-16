@@ -207,26 +207,37 @@ public function logout()
 
 
 
-  public function sendResetLinkEmail(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-        $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
-        $data = [
-            'name' => $user->name,
-            'reset_link' => url('/api/resetpassword/'.$token.'/'.urlencode($user->email)),
-        ];
-        Mail::to($user->email)->send(new ResetPasswordMail($data));
-        });
-        if ($response) {
-            return response()->json(['message' => 'Reset password link sent to your email.'], 200);
-        }
-      return response()->json(['error' => 'Unable to send reset link.'], 500);
+public function sendResetLinkEmail(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email|exists:users,email',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
+
+    $response = Password::sendResetLink($request->only('email'));
+
+    if ($response === Password::RESET_LINK_SENT) {
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user) {
+            $token = app('auth.password.broker')->createToken($user);
+
+            $data = [
+                'name' => $user->name,
+                'reset_link' => url('/api/resetpassword/' . $token . '/' . urlencode($user->email)),
+            ];
+
+            Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($data));
+        }
+
+        return response()->json(['message' => 'Reset password link sent to your email.'], 200);
+    }
+
+    return response()->json(['error' => 'Unable to send reset link.'], 500);
+}
 
     public function resetPassword(Request $request)
 {
