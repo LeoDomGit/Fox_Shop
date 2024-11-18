@@ -9,7 +9,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\ReviewController;
 
 
 Route::get('/user', function (Request $request) {
