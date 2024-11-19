@@ -7,9 +7,47 @@ use App\Models\Orders;
 use App\Models\Order_detail;
 use App\Models\Payment_management;
 use App\Models\Products;
+use App\Models\Payment;
+use Illuminate\Support\Facades\Validator;
 class PaymentController extends Controller
 {
     protected $cart = [];
+    public function __construct(){
+        $this->model = Payment::class;
+    }
+    public function Index(){
+        $payment = Payment::all();
+        return Inertia::render('Payment/Home', ['payment'=>$payment]);
+    }
+    public function store(Request $request){
+        $validator = Validator::make($request->all(),[
+            'method' => 'required|string',
+        ]);
+        if($validator->fails()){
+            return response()->json(['check'=>false, 'msg'=>$validator->errors()->first()]);
+        }
+        $data = [];
+        $data['method'] = $request->method;
+        $this->model::create($data);
+        return response()->json(['check'=>true, 'data'=>$this->model::all()]);
+    }
+    public function show($id){
+        $resulft = $this->model::find($id);
+        return Inertia::render('Payment/Edit', ['payments' => $resulft]);
+    }
+    public function updatePayment(Request $request, $id){
+        $validator = Validator::make($request->all(),[
+            'method' => 'required|string',
+        ]);
+        if($validator->fails()){
+            return response()->json(['check'=>false, 'msg'=>$validator->errors()->first()]);
+        }
+        $data = [];
+        $data['method'] = $request->method;
+        $this->model::find($id)->update($data);
+        return response()->json(['check'=>true, 'data'=>$this->model::all()]);
+    }
+>>>>>>> Stashed changes
     public function vnpay_payment(Request $request)
     {
         error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
@@ -53,11 +91,7 @@ class PaymentController extends Controller
             $inputData['vnp_BankCode'] = $vnp_BankCode;
         }
         if (isset($vnp_Bill_State) && $vnp_Bill_State != "") {
-            $inputData['vnp_Bill_State'] = $vnp_Bill_State;
         }
-        
-        //var_dump($inputData);
-        ksort($inputData);
         $query = "";
         $i = 0;
         $hashdata = "";
@@ -91,11 +125,11 @@ class PaymentController extends Controller
                 $product->update(['in_stock' => $newQuantity]);
             }
         }
-       return response()->json(['message' => 'Order created successfully', 'url' => $vnp_Url]);
+        return response()->json(['message' => 'Order created successfully', 'url' => $vnp_Url]);
     }
     public function vnpayreturn(Request $request){
-       $data =$request->all();
-       return Inertia::render('Payment/Index', ['data' => $data]);
+        $data =$request->all();
+        return Inertia::render('Payment/Index', ['data' => $data]);
     }
     public function vnpay_data(Request $request){
         $order = Orders::find($request->data['vnp_TxnRef']);

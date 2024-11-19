@@ -24,10 +24,9 @@ function Index({ data }) {
     const handleSubmit = () => {
         console.log("data", data);
         axios
-                   
             .post("/api/vnpay-data", 
-              {data,
-               id_user: userId}
+                {data,
+                id_user: userId}
             )
             .then((res) => {
                 window.location.href = "https://foxshop.trungthanhzone.com/";
