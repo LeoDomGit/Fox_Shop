@@ -94,7 +94,7 @@ function Index(orders) {
                                             {item.status && item.status == "pending"  ? (
                                               <Badge bg="danger">Đang chờ xử lý</Badge>
                                             ):(
-                                              <Badge bg="primary">{item.status}</Badge>
+                                              <Badge bg="success">{item.status}</Badge>
                                             )}
                                             </td>
                                             <td>

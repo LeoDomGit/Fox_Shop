@@ -92,9 +92,9 @@ function Index(orders) {
                                             <td>{item.order_date}</td>
                                             <td>
                                             {item.status && item.status == "pending"  ? (
-                                              <Badge bg="danger">Đang chờ xử lý</Badge>
+                                              <Badge badgeContent={'Đang chờ xử lý'} color="error"></Badge>
                                             ):(
-                                              <Badge bg="primary">{item.status}</Badge>
+                                              <Badge badgeContent={item.status} color="primary"></Badge>
                                             )}
                                             </td>
                                             <td>

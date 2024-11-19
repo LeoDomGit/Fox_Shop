@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import Badge from 'react-bootstrap/Badge';
+import Badge from '@mui/material/Badge';
 import { Table, Pagination } from "react-bootstrap";
 function Index(orders) {
     const [data, setData] = useState(orders.orders);
@@ -92,9 +92,9 @@ function Index(orders) {
                                             <td>{item.order_date}</td>
                                             <td>
                                             {item.status && item.status == "pending"  ? (
-                                              <Badge bg="danger">Đang chờ xử lý</Badge>
+                                              <Badge badgeContent={'Đang chờ xử lý'} color="error"></Badge>
                                             ):(
-                                              <Badge bg="primary">{item.status}</Badge>
+                                              <Badge badgeContent={item.status} color="primary"></Badge>
                                             )}
                                             </td>
                                             <td>
