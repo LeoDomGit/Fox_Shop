@@ -108,13 +108,12 @@ class UserController extends BaseCrudController
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
             'password.regex' => 'Mật khẩu phải có ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
         
-            // Thông báo lỗi cho 'phone'
             'phone.required' => 'Vui lòng nhập số điện thoại.',
             'phone.max' => 'Số điện thoại không được quá 10 ký tự.',
             'phone.min' => 'Số điện thoại sai định dạng.',
             'phone.regex' => 'Số điện thoại không đúng định dạng.',
         
-            // Thông báo lỗi cho 'avatar'
+
             'avatar.image' => 'Ảnh đại diện phải là một tệp hình ảnh.',
             'avatar.max' => 'Ảnh đại diện không được quá 2MB.',
         ]);
