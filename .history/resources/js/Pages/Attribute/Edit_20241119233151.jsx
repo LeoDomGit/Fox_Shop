@@ -13,7 +13,6 @@ function Edit({ attribute }) {
     const [data, setData] = useState(attribute);
     const [value, setValue] = useState(data.value);
     const [name, setName] = useState(data.name);
-    const [type, setType] = useState(data.type);
     const notyf = new Notyf({
         duration: 1000,
         position: {
@@ -66,7 +65,6 @@ function Edit({ attribute }) {
             .put("/admin/attributes/" + attribute.id, {
                 name: name,
                 value: value,
-                type: type,
             })
             .then((res) => {
                 if (res.data.check === true) {
@@ -105,14 +103,7 @@ function Edit({ attribute }) {
                                 <h6>Chỉnh sửa thuộc tính: {data.type} </h6>
                             </div>
                             <div>
-                                <input
-                                    type="text"
-                                    name="type"
-                                    className="form-control"
-                                    onChange={(e) => setType(e.target.value)}
-                                    value={type}
-                                    id=""
-                                />
+                                <input type="text" name="type" value={data.type} id="" />
                             </div>
                             <div>
                                 <label htmlFor="">Giá trị thuộc tính:</label>{" "}

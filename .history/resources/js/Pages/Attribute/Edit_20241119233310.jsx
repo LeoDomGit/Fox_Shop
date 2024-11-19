@@ -66,7 +66,6 @@ function Edit({ attribute }) {
             .put("/admin/attributes/" + attribute.id, {
                 name: name,
                 value: value,
-                type: type,
             })
             .then((res) => {
                 if (res.data.check === true) {
@@ -108,9 +107,8 @@ function Edit({ attribute }) {
                                 <input
                                     type="text"
                                     name="type"
-                                    className="form-control"
                                     onChange={(e) => setType(e.target.value)}
-                                    value={type}
+                                    value={data.type}
                                     id=""
                                 />
                             </div>

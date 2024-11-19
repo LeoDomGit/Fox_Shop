@@ -110,7 +110,7 @@ function Edit({ attribute }) {
                                     name="type"
                                     className="form-control"
                                     onChange={(e) => setType(e.target.value)}
-                                    value={type}
+                                    value={data.type}
                                     id=""
                                 />
                             </div>

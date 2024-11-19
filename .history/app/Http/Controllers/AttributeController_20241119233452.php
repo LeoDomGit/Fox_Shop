@@ -82,7 +82,7 @@ class AttributeController extends Controller
     {
         $validator = Validator::make($request->all(), [
            'value' => 'nullable',
-           'name'=> 'nullable|string',
+           'name'=> 'nullable|string'
            'type'=>'nullable'
            ]);
            if ($validator->fails()) {
