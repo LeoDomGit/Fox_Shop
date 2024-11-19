@@ -47,7 +47,6 @@ class PaymentController extends Controller
         $this->model::find($id)->update($data);
         return response()->json(['check'=>true, 'data'=>$this->model::all()]);
     }
->>>>>>> Stashed changes
     public function vnpay_payment(Request $request)
     {
         error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
