@@ -296,9 +296,7 @@ public function logout()
         ];
         Mail::to($user->email)->send(new ResetPasswordMail($data));
         });
-        if ($response === Password::RESET_LINK_SENT) {
-        return response()->json(['message' => 'Vui lòng kiểm tra email của bạn.'], 200);
-        }
+
       return response()->json(['error' => 'Không thể gửi liên kết.'], 500);
     }
 
