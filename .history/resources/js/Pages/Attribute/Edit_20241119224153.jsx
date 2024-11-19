@@ -116,16 +116,7 @@ function Edit({ attribute }) {
                                         }
                                     />
                                 ) : (
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name=""
-                                        id=""
-                                        value={value}
-                                        onChange={(e) =>
-                                            setValue(e.target.value)
-                                        }
-                                    />
+                                    <input type="text" name="" id="" />
                                 )}
                             </div>
                             <div>
