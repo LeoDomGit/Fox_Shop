@@ -227,16 +227,6 @@ function Index({ attributes }) {
             }
         });
     };
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const totalPages = Math.ceil(attr.length / itemsPerPage);
-    const currentData = attr.slice(indexOfFirstItem, indexOfLastItem);
-    console.log(currentData);
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
     return (
         <Layout>
             <Container>
@@ -280,9 +270,9 @@ function Index({ attributes }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentData &&
-                                    currentData.length > 0 &&
-                                    currentData.map((item) => (
+                                {attr &&
+                                    attr.length > 0 &&
+                                    attr.map((item) => (
                                         <tr key={item.id}>
                                             <td>
                                                 <input type="checkbox" />
@@ -319,7 +309,7 @@ function Index({ attributes }) {
                                                     <div>
                                                         <a
                                                             className="btn btn-sm btn-warning"
-                                                            href={`/admin/attributes/${item.id}`}
+                                                            // href={`/admin/categories/${item.id}`}
                                                         >
                                                             Sửa
                                                         </a>
@@ -345,39 +335,6 @@ function Index({ attributes }) {
                                     ))}
                             </tbody>
                         </Table>
-                    </div>
-                    <div className="card-footer">
-                        <Pagination className="justify-content-center">
-                            <Pagination.First
-                                onClick={() => handlePageChange(1)}
-                                disabled={currentPage === 1}
-                            />
-                            <Pagination.Prev
-                                onClick={() =>
-                                    handlePageChange(currentPage - 1)
-                                }
-                                disabled={currentPage === 1}
-                            />
-                            {[...Array(totalPages).keys()].map((page) => (
-                                <Pagination.Item
-                                    key={page + 1}
-                                    active={page + 1 === currentPage}
-                                    onClick={() => handlePageChange(page + 1)}
-                                >
-                                    {page + 1}
-                                </Pagination.Item>
-                            ))}
-                            <Pagination.Next
-                                onClick={() =>
-                                    handlePageChange(currentPage + 1)
-                                }
-                                disabled={currentPage === totalPages}
-                            />
-                            <Pagination.Last
-                                onClick={() => handlePageChange(totalPages)}
-                                disabled={currentPage === totalPages}
-                            />
-                        </Pagination>
                     </div>
                 </div>
             </Container>

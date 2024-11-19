@@ -90,14 +90,7 @@ function Index(orders) {
                                             <td>{item.address}</td>
                                             <td>{item.payment?.method}</td>
                                             <td>{item.order_date}</td>
-                                            <td>
-                                            {item.status && item.status == "pending"  ? (
-                                              <Badge badgeContent={'Đang chờ xử lý'} color="error">dsfd</Badge>
-                                            ):(
-                                              <Badge badgeContent={item.status} color="primary"></Badge>
-                                            )}
-
-                                            </td>
+                                            <td>{item.status}</td>
                                             <td>
                                                 <div className="d-flex">
                                                     <div>
