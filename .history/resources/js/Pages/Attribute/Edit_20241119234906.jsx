@@ -65,6 +65,7 @@ function Edit({ attribute }) {
             .put("/admin/attributes/" + attribute.id, {
                 name: name,
                 value: value,
+                type: type,
             })
             .then((res) => {
                 if (res.data.check === true) {
