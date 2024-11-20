@@ -285,7 +285,6 @@ public function logout()
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
         ]);
-
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
