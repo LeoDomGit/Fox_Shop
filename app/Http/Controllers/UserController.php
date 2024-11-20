@@ -75,46 +75,147 @@ class UserController extends BaseCrudController
     }
     public function register(Request $request)
     {
+        // Validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|min:2',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'phone' => 'required|string|max:255|regex:/^(0[1-9]{1})([0-9]{8})$/',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&.]/'
+            ],
+            'phone' => 'required|string|max:10|min:0|regex:/^(0[1-9]{1})([0-9]{8})$/',
             'avatar' => 'nullable|image|max:2048',
+        ], [
+            // Thông báo lỗi cho 'name'
+            'name.required' => 'Vui lòng nhập tên.',
+            'name.string' => 'Tên không chứa kí tự số.',
+            'name.max' => 'Tên không được quá 255 ký tự.',
+            'name.min' => 'Tên phải lớn hơn 2 ký tự.',
+        
+            // Thông báo lỗi cho 'email'
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không hợp lệ.',
+            'email.max' => 'Email không được quá 255 ký tự.',
+            'email.unique' => 'Email đã được sử dụng.',
+        
+            // Thông báo lỗi cho 'password'
+            'password.required' => 'Mật khẩu không được để trống.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.regex' => 'Mật khẩu phải có ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.',
+        
+            // Thông báo lỗi cho 'phone'
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.max' => 'Số điện thoại không được quá 10 ký tự.',
+            'phone.min' => 'Số điện thoại sai định dạng.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
+        
+            // Thông báo lỗi cho 'avatar'
+            'avatar.image' => 'Ảnh đại diện phải là một tệp hình ảnh.',
+            'avatar.max' => 'Ảnh đại diện không được quá 2MB.',
         ]);
+        
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
+
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $avatarUrl = Storage::url($avatarPath);
-            \Log::info("Avatar path: " . $avatarUrl);
             $user = User::create([
-             'name' => $request->name,
-             'email' => $request->email,
-             'phone' => $request->phone,
-             'password' => Hash::make($request->password),
-             'avatar' => $avatarUrl,
-             'idRole' => 2,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'avatar' => $avatarUrl,
+                'idRole' => 2,
             ]);
-        }else{
-            
+        } else {
             $user = User::create([
+
              'name' => $request->name,
              'email' => $request->email,
              'password' => Hash::make($request->password),
              'phone' => $request->phone,
              'avatar' => "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg",
              'idRole' => 2,
+
+
             ]);
         }
-         Mail::to($user->email)->send(new createUser($user));
+    
+        // Gửi email xác nhận
+        Mail::to($user->email)->send(new createUser($user));
+    
+        // Trả về thông báo thành công và thông tin người dùng
         $users = User::with('roles')->where('id', $user->id)->get();
-        return response()->json(['check' => true, 'data' => $users]);
-        return response()->json(['message' => 'User registered successfully!'], 201);
+        return response()->json([
+            'check' => true,
+            'data' => $users,
+            'message' => 'Đăng kí tài khoản thành công'
+            
+        ], 201);
+        
     }
+    
+
+    public function login(Request $request)
+    {
+        // Validate các trường dữ liệu trong request
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',  
+            'password' => 'required|string|min:8',  
+        ], [
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không hợp lệ.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()->toArray()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+    
+        if (!$user) {
+            return response()->json([
+                'errors' => [
+                    'email' => ['Email này chưa được đăng ký.']
+                ]
+            ], 401);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'errors' => [
+                    'password' => ['Mật khẩu không chính xác.']
+                ]
+            ], 401);
+        }
+    
+        $token = $user->createToken('YourAppName')->plainTextToken;
+    
+        return response()->json([
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => asset($user->avatar),
+                'phone' => $user->phone
+            ]
+        ], 200);
+    }
+
+
     public function registerForm()
     {
         return Inertia::render('User/Register');
@@ -123,31 +224,7 @@ class UserController extends BaseCrudController
     {
         return Inertia::render('User/Login');
     }
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-        $user = Auth::user();
-        if ($user) {
-        $token = $user->createToken('YourAppName')->plainTextToken;
-        return response()->json([
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'avatar' => $user->avatar,
-                'phone' => $user->phone
-            ]
-        ], 200);
-    } else {
-        return response()->json(['error' => 'Login failed, user not found.'], 401);
-    }
-        }
-
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
+   
 public function logout()
     {
         Auth::logout();
@@ -173,7 +250,6 @@ public function logout()
     ]);
 
     if ($request->hasFile('avatar')) {
-        // Xóa ảnh cũ nếu có
         if ($user->avatar) {
             Storage::delete($user->avatar);
         }
@@ -188,7 +264,7 @@ public function logout()
 
     // Trả về thông tin người dùng đã cập nhật
     return response()->json([
-        'message' => 'User updated successfully',
+        'message' => 'Cập nhật thông tin thành công.',
         'user' => $user
     ], 200);
 }
@@ -207,7 +283,7 @@ public function logout()
 
 
 
-  public function sendResetLinkEmail(Request $request)
+    public function sendResetLinkEmail(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
@@ -218,14 +294,14 @@ public function logout()
         $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
         $data = [
             'name' => $user->name,
-            'reset_link' => url('/api/resetpassword/'.$token.'/'.urlencode($user->email)),
+            'reset_link' => url('https://foxshop.trungthanhzone.com/recover-password/'.$token.'/'.urlencode($user->email)),
         ];
         Mail::to($user->email)->send(new ResetPasswordMail($data));
         });
         if ($response) {
-            return response()->json(['message' => 'Reset password link sent to your email.'], 200);
+            return response()->json(['message' => 'Vui lòng kiểm tra email để thay đổi mật khẩu.'], 200);
         }
-      return response()->json(['error' => 'Unable to send reset link.'], 500);
+      return response()->json(['error' => 'Không thể gửi liên kết.'], 500);
     }
 
     public function resetPassword(Request $request)
@@ -251,7 +327,7 @@ public function logout()
     );
 
     return $status === Password::PASSWORD_RESET
-        ? response()->json(['status' => 'Mật khẩu đã được reset thành công!'])
+        ? response()->json(['status' => 'Mật khẩu đã được cập nhập thành công!'])
         : response()->json(['errors' => ['email' => 'Có lỗi xảy ra.']], 500);
 }
 public function resetForm($token, $email)

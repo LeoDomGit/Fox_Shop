@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order_detail;
 use App\Models\Orders;
+use App\Models\Products;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +15,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $order = Orders::create([
-            'id_user' => $request->input('id_user') ?? $id_user,
+            'id_user' => $request->input('id_user'),
             'id_payment' => $request->input('id_payment'),
             'address' => $request->input('address'),
             'status' => 'pending',
