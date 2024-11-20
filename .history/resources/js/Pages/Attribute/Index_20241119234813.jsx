@@ -352,6 +352,7 @@ function Index({ attributes }) {
                                 )}
                             </FormControl>
                             <Button
+                                variant="contained"
                                 type="submit"
                                 onClick={handleSubmit}
                             >

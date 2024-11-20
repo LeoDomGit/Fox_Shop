@@ -90,6 +90,7 @@ class AttributeController extends Controller
         $data = [];
         $data ['value'] = $request->value;
         $data['name'] = $request->name;
+        $data['type'] = $request->type;
         $attribute = Attribute::find($id)->update( $data );
         return response()->json(['check'=>true,'data'=>$this->model::all()]);
     }
