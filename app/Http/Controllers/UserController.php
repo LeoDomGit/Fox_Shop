@@ -296,7 +296,9 @@ public function logout()
         ];
         Mail::to($user->email)->send(new ResetPasswordMail($data));
         });
-
+        if ($response) {
+            return response()->json(['message' => 'Vui lòng kiểm tra email để thay đổi mật khẩu.'], 200);
+        }
       return response()->json(['error' => 'Không thể gửi liên kết.'], 500);
     }
 
