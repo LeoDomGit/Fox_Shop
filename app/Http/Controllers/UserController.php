@@ -284,41 +284,70 @@ public function logout()
 
 
     public function sendResetLinkEmail(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-        $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
-        $data = [
-            'name' => $user->name,
-            'reset_link' => url('https://foxshop.trungthanhzone.com/recover-password/'.$token.'/'.urlencode($user->email)),
-        ];
-        Mail::to($user->email)->send(new ResetPasswordMail($data));
-        });
-        if ($response) {
-            return response()->json(['message' => 'Vui lòng kiểm tra email để thay đổi mật khẩu.'], 200);
-        }
-      return response()->json(['error' => 'Không thể gửi liên kết.'], 500);
-    }
-
-    public function resetPassword(Request $request)
 {
-   // Validate the request
+    // Thêm điều kiện validate chi tiết hơn
     $validator = Validator::make($request->all(), [
-        'token' => 'required',
-        'password' => 'required|confirmed|min:8', // minimum password length
-        'password_confirmation' => 'required',
+        'email' => [
+            'required',
+            'email',
+            function ($attribute, $value, $fail) {
+                $user = User::where('email', $value)->first();
+                if (!$user) {
+                    $fail('Email không tồn tại trong hệ thống.');
+                }
+            }
+        ],
     ]);
 
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    // Find the user by email using the token
-   $status = Password::reset(
+    try {
+        $response = Password::sendResetLink($request->only('email'), function ($user, $token) {
+            $data = [
+                'name' => $user->name,
+                'reset_link' => url('/api/reset-password/' . $token . '/' . urlencode($user->email)),
+            ];
+            Mail::to($user->email)->send(new ResetPasswordMail($data));
+        });
+
+        if ($response) {
+            return response()->json(['message' => 'Vui lòng kiểm tra email để thay đổi mật khẩu.'], 200);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Đã xảy ra lỗi khi gửi liên kết. Vui lòng thử lại sau.'], 500);
+    }
+
+    return response()->json(['error' => 'Không thể gửi liên kết.'], 500);
+}
+
+
+    public function resetPassword(Request $request)
+{
+    // Validate các thông tin đầu vào
+    $validator = Validator::make($request->all(), [
+        'token' => 'required',
+        'password' => [
+            'required',
+            'confirmed',
+            'min:8',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/',
+        ],
+        'password_confirmation' => 'required',
+    ], [
+        'password.regex' => 'Mật khẩu phải bao gồm ít nhất 8 ký tự, trong đó có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt.',
+        'email.exists' => 'Email không tồn tại trong hệ thống.',
+        'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+        'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // Thực hiện reset mật khẩu
+    $status = Password::reset(
         $request->only('email', 'password', 'password_confirmation', 'token'),
         function ($user) use ($request) {
             $user->password = Hash::make($request->password);
@@ -326,10 +355,18 @@ public function logout()
         }
     );
 
-    return $status === Password::PASSWORD_RESET
-        ? response()->json(['status' => 'Mật khẩu đã được cập nhập thành công!'])
-        : response()->json(['errors' => ['email' => 'Có lỗi xảy ra.']], 500);
+    
+    if ($status === Password::PASSWORD_RESET) {
+
+        return response()->json([
+            'status' => 'Mật khẩu đã được cập nhật thành công!',
+            'redirect' => url('/login') 
+        ], 200);
+    }
+
+    return response()->json(['errors' => ['token' => 'Token không hợp lệ hoặc đã hết hạn.']], 422);
 }
+
 public function resetForm($token, $email)
 {
     return Inertia::render('User/ResetPass', [
