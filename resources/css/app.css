@@ -56,7 +56,7 @@ a {
 .container-btn-file:hover::before {
     width: 100%;
 }
-.header_navbar{
+.header_navbar {
     height: 70px;
     background-color: rgb(249, 249, 249, 0.7);
 }
