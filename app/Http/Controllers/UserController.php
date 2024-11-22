@@ -239,37 +239,95 @@ public function logout()
 {
     $userId = $request->id;
     $user = User::find($userId);
+
     if (!$user) {
         return response()->json(['error' => 'User not found'], 404);
     }
 
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'phone' => 'required|string|max:15|unique:users,phone,' . $user->id,
-        'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    $validatedData = [];
+
+    if ($request->has('name')) {
+        $request->validate([
+            'name' => 'required|string|min:2|max:255',
+        ], [
+            'name.required' => 'Vui lòng nhập họ và tên.',
+            'name.min' => 'Họ và tên phải có ít nhất 2 ký tự.',
+            'name.max' => 'Họ và tên không được quá 255 ký tự.',
+        ]);
+        $validatedData['name'] = $request->name;
+    }
+
+    if ($request->has('phone')) {
+        $request->validate([
+            'phone' => 'required|string|digits:10',
+        ], [
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.digits' => 'Số điện thoại phải gồm 10 chữ số.',
+        ]);
+        $validatedData['phone'] = $request->phone;
+    }
+
+    // Kiểm tra mật khẩu
+ // Kiểm tra mật khẩu
+if ($request->has('currentPassword') && $request->has('newPassword') && $request->has('newPassword_confirmation')) {
+    $request->validate([
+        'currentPassword' => 'required|string',
+        'newPassword' => [
+            'required',
+            'string',
+            'min:8',
+            'regex:/[A-Z]/',
+            'regex:/[a-z]/',
+            'regex:/\d/',
+            'regex:/[@$!%*?&.]/',
+            'confirmed',
+        ],
+    ], [
+        'currentPassword.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+        'newPassword.required' => 'Vui lòng nhập mật khẩu mới.',
+        'newPassword.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+        'newPassword.regex' => 'Mật khẩu mới phải có chữ hoa, chữ thường, số và ký tự đặc biệt.',
+        'newPassword.confirmed' => 'Mật khẩu mới và xác nhận không khớp.',
     ]);
 
+    // Xác minh mật khẩu hiện tại
+    if (!Hash::check($request->currentPassword, $user->password)) {
+        return response()->json(['errors' => ['currentPassword' => 'Mật khẩu hiện tại không đúng.']], 422);
+    }
+
+    // Kiểm tra nếu mật khẩu mới giống mật khẩu cũ
+    if (Hash::check($request->newPassword, $user->password)) {
+        return response()->json(['errors' => ['newPassword' => 'Mật khẩu mới phải khác mật khẩu hiện tại.']], 422);
+    }
+
+    // Lưu mật khẩu mới đã mã hóa
+    $validatedData['password'] = Hash::make($request->newPassword);
+} elseif ($request->has('currentPassword') || $request->has('newPassword') || $request->has('newPassword_confirmation')) {
+    return response()->json(['errors' => ['general' => 'Vui lòng điền đầy đủ thông tin mật khẩu.']], 422);
+}
+
+
+    // Cập nhật ảnh đại diện nếu có
     if ($request->hasFile('avatar')) {
-        if ($user->avatar) {
+        if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
             Storage::delete($user->avatar);
         }
 
         $avatarPath = $request->file('avatar')->store('avatars', 'public');
-        $avatarUrl = Storage::url($avatarPath);
+        $avatarUrl = url(Storage::url($avatarPath));
         $validatedData['avatar'] = $avatarUrl;
     }
 
     // Cập nhật thông tin người dùng
     $user->update($validatedData);
 
-    // Trả về thông tin người dùng đã cập nhật
     return response()->json([
         'message' => 'Cập nhật thông tin thành công.',
-        'user' => $user
+        'user' => $user,
     ], 200);
 }
 
-
+    
 public function info(Request $request)
 {
     $user = $request->user();
@@ -407,10 +465,32 @@ public function resetForm($token, $email)
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($identifier)
-    {
-        User::where('id', $identifier)->delete();
-        $data = $this->model::with('roles')->get();
-        return response()->json(['check' => true, 'data' => $data], 200);
-    }
+   // app/Http/Controllers/UserController.php
+   public function destroy($id)
+   {
+       // Tìm kiếm người dùng theo ID
+       $user = User::find($id);
+   
+       if (!$user) {
+           return response()->json(['message' => 'Tài khoản không tồn tại'], 404);
+       }
+   
+       try {
+
+           $orders = $user->orders; 
+   
+           foreach ($orders as $order) {
+               $order->orderDetails()->delete();
+           }
+           $user->delete();
+   
+           return response()->json(['message' => 'Tài khoản và các dữ liệu liên quan đã được xóa thành công.'], 200);
+       } catch (\Exception $e) {
+           return response()->json(['message' => 'Có lỗi xảy ra khi xóa tài khoản.', 'error' => $e->getMessage()], 500);
+       }
+   }
+   
+   
+    
+    
 }
