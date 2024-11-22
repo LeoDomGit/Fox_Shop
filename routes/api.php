@@ -11,6 +11,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\WishlistController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -38,7 +40,10 @@ Route::delete('/user/delete/{id}', [UserController::class, 'destroy']);
     Route::get('/vnpay-return', [PaymentController::class, 'vnpayreturn'])->name('payment.return');
     Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
     Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
+    Route::get('/orders/detail/{id}', [OrderController::class, 'getOrdersById']);
+
     Route::resource('/review', ReviewController::class);
+    Route::resource('/wishlist', WishlistController::class);
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
     Route::get('/search/{id}',[ProductController::class,'api_search_product']);
@@ -63,4 +68,10 @@ Route::prefix('post')->name('post.')->group(function () {
 Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::post('/',[VoucherController::class,'api_voucher_user']);
     Route::delete('/user_vouchers',[VoucherController::class,'deleteVoucher']);
+});
+Route::prefix('comment')->name('comment.')->group(function () {
+    Route::get('/',[ReviewController::class,'getAllComments']);
+});
+Route::prefix('wishlist')->name('wishlist.')->group(function () {
+    Route::get('/list/{id_user}', [WishlistController::class, 'getAllListByUser']);
 });
