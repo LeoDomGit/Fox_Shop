@@ -98,8 +98,9 @@ class ReviewController extends Controller
     }
 
     // 
-    public function getAllComments(Request $request){
-        $comments = Review::all();
+    public function getAllComments(Request $request)
+    {
+        $comments = Review::latest('created_at')->get(); 
         return response()->json($comments);
     }
 }
