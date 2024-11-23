@@ -1019,7 +1019,7 @@ function Index({
                                                     <div className="col-md-2">
                                                         {create == true && (
                                                             <button
-                                                                className="btn w-100 btn-primary mt-3"
+                                                                className="btn w-100 btn-primary"
                                                                 onClick={(e) =>
                                                                     SubmitProduct()
                                                                 }

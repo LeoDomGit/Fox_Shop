@@ -11,11 +11,11 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 function Index(revenue) {
     const [data, setData] = useState(revenue.revenue);
     const [loading, setLoading] = useState(true);
-    const [showLoad, setShowLoad] = useState(true);
+    const [showLoad, setShowLoad] = useState(false);
     useEffect(() => {
         const timer = setTimeout(() => {
-            setShowLoad(false);
-        }, 2000);
+            setLoading(false);
+        }, 3000);
         return () => clearTimeout(timer);
     }, []);
     useEffect(() => {

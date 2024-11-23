@@ -290,24 +290,23 @@ function Index({ voucher }) {
             formData.append("start", start);
             formData.append("end", end);
             formData.append("limit", limit);
-            axios.post("/admin/vouchers", formData).then((res) => {
-                setShowLoad(false);
-                if (res.data.check === true) {
-                    notyf.open({
-                        type: "success",
-                        message: "Đã tạo thành công",
-                    });
-                    setCreate(false);
-                    setData(res.data.data);
-                    // window.location.reload();
-                } else if (res.data.check === false) {
-                    setShowLoad(false);
-                    notyf.open({
-                        type: "error",
-                        message: res.data.msg,
-                    });
-                }
-            });
+            // axios.post("/admin/vouchers", formData).then((res) => {
+            //     if (res.data.check === true) {
+            //         notyf.open({
+            //             type: "success",
+            //             message: "Đã tạo thành công",
+            //         });
+            //         setCreate(false);
+            //         setData(res.data.data);
+            //         setShowLoad(false);
+            //         window.location.reload();
+            //     } else if (res.data.check === false) {
+            //         notyf.open({
+            //             type: "error",
+            //             message: res.data.msg,
+            //         });
+            //     }
+            // });
         }
     };
     const handleCreate = () => {

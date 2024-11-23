@@ -291,7 +291,6 @@ function Index({ voucher }) {
             formData.append("end", end);
             formData.append("limit", limit);
             axios.post("/admin/vouchers", formData).then((res) => {
-                setShowLoad(false);
                 if (res.data.check === true) {
                     notyf.open({
                         type: "success",
@@ -299,7 +298,8 @@ function Index({ voucher }) {
                     });
                     setCreate(false);
                     setData(res.data.data);
-                    // window.location.reload();
+                    setShowLoad(false);
+                    window.location.reload();
                 } else if (res.data.check === false) {
                     setShowLoad(false);
                     notyf.open({

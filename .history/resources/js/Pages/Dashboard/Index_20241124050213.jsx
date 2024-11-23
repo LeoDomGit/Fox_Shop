@@ -14,8 +14,8 @@ function Index(revenue) {
     const [showLoad, setShowLoad] = useState(true);
     useEffect(() => {
         const timer = setTimeout(() => {
-            setShowLoad(false);
-        }, 2000);
+            setLoading(false);
+        }, 3000);
         return () => clearTimeout(timer);
     }, []);
     useEffect(() => {
