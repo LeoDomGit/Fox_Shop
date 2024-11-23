@@ -374,33 +374,17 @@ function Index({
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
-    //
-    const itemsPerPageCZ = 5;
-    const [currentPageSize, setCurrentPageSize] = useState(1);
-    const [currentPageColor, setCurrentPageColor] = useState(1);
-    const totalPagesSize = Math.ceil(sizes.length / itemsPerPageCZ);
-    const totalPagesColor = Math.ceil(colors.length / itemsPerPageCZ);
-    const paginatedSizes = sizes.slice(
-        (currentPageSize - 1) * itemsPerPageCZ,
-        currentPageSize * itemsPerPageCZ
-    );
+    const [currentColorPage, setCurrentColorPage] = useState(1);
+    const [currentSizePage, setCurrentSizePage] = useState(1);
+    const indexOfLastColor = currentColorPage * itemsPerPage;
+    const indexOfFirstColor = indexOfLastColor - itemsPerPage;
+    const currentColors = colors.slice(indexOfFirstColor, indexOfLastColor);
 
-    const paginatedColors = colors.slice(
-        (currentPageColor - 1) * itemsPerPageCZ,
-        currentPageColor * itemsPerPageCZ
-    );
-    const handlePageChangeSize = (page) => {
-        if (page >= 1 && page <= totalPagesSize) {
-            setCurrentPageSize(page);
-        }
-    };
-
-    const handlePageChangeColor = (page) => {
-        if (page >= 1 && page <= totalPagesColor) {
-            setCurrentPageColor(page);
-        }
-    };
-
+    const indexOfLastSize = currentSizePage * itemsPerPage;
+    const indexOfFirstSize = indexOfLastSize - itemsPerPage;
+    const currentSizes = sizes.slice(indexOfFirstSize, indexOfLastSize);
+    const paginateColors = (pageNumber) => setCurrentColorPage(pageNumber);
+    const paginateSizes = (pageNumber) => setCurrentSizePage(pageNumber);
     //
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -644,13 +628,13 @@ function Index({
                                                             </select>
                                                         </div>
                                                         <div className="row mt-3">
-                                                            <div className="col-12">
+                                                            <div className="col-6">
                                                                 <label htmlFor="">
                                                                     Kích cỡ:
                                                                 </label>
                                                                 <br />
                                                                 <div className="checkbox">
-                                                                    {paginatedSizes.map(
+                                                                    {currentSizes.map(
                                                                         (
                                                                             size
                                                                         ) => (
@@ -690,104 +674,37 @@ function Index({
                                                                         )
                                                                     )}
                                                                 </div>
-
-                                                                {/* Pagination for sizes */}
-                                                                <Pagination className="justify-content-center mt-3">
-                                                                    <Pagination.First
-                                                                        onClick={() =>
-                                                                            handlePageChangeSize(
-                                                                                1
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageSize ===
-                                                                            1
-                                                                        }
-                                                                    />
-                                                                    <Pagination.Prev
-                                                                        onClick={() =>
-                                                                            handlePageChangeSize(
-                                                                                currentPageSize -
-                                                                                    1
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageSize ===
-                                                                            1
-                                                                        }
-                                                                    />
-                                                                    {[
-                                                                        ...Array(
-                                                                            totalPagesSize
-                                                                        ).keys(),
-                                                                    ].map(
-                                                                        (
-                                                                            page
-                                                                        ) => (
-                                                                            <Pagination.Item
-                                                                                key={
-                                                                                    page +
-                                                                                    1
-                                                                                }
-                                                                                active={
-                                                                                    page +
-                                                                                        1 ===
-                                                                                    currentPageSize
-                                                                                }
-                                                                                onClick={() =>
-                                                                                    handlePageChangeSize(
-                                                                                        page +
-                                                                                            1
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                {page +
-                                                                                    1}
-                                                                            </Pagination.Item>
-                                                                        )
-                                                                    )}
-                                                                    <Pagination.Next
-                                                                        onClick={() =>
-                                                                            handlePageChangeSize(
-                                                                                currentPageSize +
-                                                                                    1
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageSize ===
-                                                                            totalPagesSize
-                                                                        }
-                                                                    />
-                                                                    <Pagination.Last
-                                                                        onClick={() =>
-                                                                            handlePageChangeSize(
-                                                                                totalPagesSize
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageSize ===
-                                                                            totalPagesSize
-                                                                        }
-                                                                    />
-                                                                </Pagination>
+                                                                <Pagination
+                                                                    totalItems={
+                                                                        sizes.length
+                                                                    }
+                                                                    itemsPerPage={
+                                                                        itemsPerPage
+                                                                    }
+                                                                    currentPage={
+                                                                        currentSizePage
+                                                                    }
+                                                                    paginate={
+                                                                        paginateSizes
+                                                                    }
+                                                                />
                                                             </div>
 
-                                                            {/* Màu sắc */}
-                                                            <div className="col-12">
+                                                            <div className="col-6">
                                                                 <label htmlFor="">
                                                                     Màu sắc:
                                                                 </label>
                                                                 <br />
                                                                 <div className="checkbox row">
-                                                                    {paginatedColors.map(
+                                                                    {currentColors.map(
                                                                         (
                                                                             color
                                                                         ) => (
                                                                             <div
+                                                                                className="col-md-12"
                                                                                 key={
                                                                                     color.id
                                                                                 }
-                                                                                className="col-md-12"
                                                                             >
                                                                                 <div
                                                                                     className="row m-1 p-1"
@@ -824,9 +741,7 @@ function Index({
                                                                                             }
                                                                                         </label>
                                                                                     </div>
-
                                                                                     <div
-                                                                                        className=""
                                                                                         style={{
                                                                                             width: 20,
                                                                                             height: 20,
@@ -840,86 +755,20 @@ function Index({
                                                                         )
                                                                     )}
                                                                 </div>
-
-                                                                {/* Pagination for colors */}
-                                                                <Pagination className="justify-content-center mt-3">
-                                                                    <Pagination.First
-                                                                        onClick={() =>
-                                                                            handlePageChangeColor(
-                                                                                1
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageColor ===
-                                                                            1
-                                                                        }
-                                                                    />
-                                                                    <Pagination.Prev
-                                                                        onClick={() =>
-                                                                            handlePageChangeColor(
-                                                                                currentPageColor -
-                                                                                    1
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageColor ===
-                                                                            1
-                                                                        }
-                                                                    />
-                                                                    {[
-                                                                        ...Array(
-                                                                            totalPagesColor
-                                                                        ).keys(),
-                                                                    ].map(
-                                                                        (
-                                                                            page
-                                                                        ) => (
-                                                                            <Pagination.Item
-                                                                                key={
-                                                                                    page +
-                                                                                    1
-                                                                                }
-                                                                                active={
-                                                                                    page +
-                                                                                        1 ===
-                                                                                    currentPageColor
-                                                                                }
-                                                                                onClick={() =>
-                                                                                    handlePageChangeColor(
-                                                                                        page +
-                                                                                            1
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                {page +
-                                                                                    1}
-                                                                            </Pagination.Item>
-                                                                        )
-                                                                    )}
-                                                                    <Pagination.Next
-                                                                        onClick={() =>
-                                                                            handlePageChangeColor(
-                                                                                currentPageColor +
-                                                                                    1
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageColor ===
-                                                                            totalPagesColor
-                                                                        }
-                                                                    />
-                                                                    <Pagination.Last
-                                                                        onClick={() =>
-                                                                            handlePageChangeColor(
-                                                                                totalPagesColor
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            currentPageColor ===
-                                                                            totalPagesColor
-                                                                        }
-                                                                    />
-                                                                </Pagination>
+                                                                <Pagination
+                                                                    totalItems={
+                                                                        colors.length
+                                                                    }
+                                                                    itemsPerPage={
+                                                                        itemsPerPage
+                                                                    }
+                                                                    currentPage={
+                                                                        currentColorPage
+                                                                    }
+                                                                    paginate={
+                                                                        paginateColors
+                                                                    }
+                                                                />
                                                             </div>
                                                         </div>
                                                         <div className="row mt-3"></div>
@@ -1019,7 +868,7 @@ function Index({
                                                     <div className="col-md-2">
                                                         {create == true && (
                                                             <button
-                                                                className="btn w-100 btn-primary mt-3"
+                                                                className="btn w-100 btn-primary"
                                                                 onClick={(e) =>
                                                                     SubmitProduct()
                                                                 }

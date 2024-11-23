@@ -281,7 +281,6 @@ function Index({ voucher }) {
                 message: "Ngày bắt đầu không được lớn hơn ngày kết thúc",
             });
         } else {
-            setShowLoad(true);
             var formData = new FormData();
             formData.append("code", code);
             formData.append("type", type);
@@ -291,7 +290,6 @@ function Index({ voucher }) {
             formData.append("end", end);
             formData.append("limit", limit);
             axios.post("/admin/vouchers", formData).then((res) => {
-                setShowLoad(false);
                 if (res.data.check === true) {
                     notyf.open({
                         type: "success",
@@ -299,9 +297,8 @@ function Index({ voucher }) {
                     });
                     setCreate(false);
                     setData(res.data.data);
-                    // window.location.reload();
+                    window.location.reload();
                 } else if (res.data.check === false) {
-                    setShowLoad(false);
                     notyf.open({
                         type: "error",
                         message: res.data.msg,
@@ -336,7 +333,7 @@ function Index({ voucher }) {
     }
     return (
         <>
-            {showLoad ? (
+            {loading ? (
                 <Loading />
             ) : (
                 <Layout>

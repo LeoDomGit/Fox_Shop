@@ -299,7 +299,7 @@ function Index({ voucher }) {
                     });
                     setCreate(false);
                     setData(res.data.data);
-                    // window.location.reload();
+                    window.location.reload();
                 } else if (res.data.check === false) {
                     setShowLoad(false);
                     notyf.open({

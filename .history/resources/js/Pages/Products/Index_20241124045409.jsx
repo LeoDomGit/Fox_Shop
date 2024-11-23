@@ -375,19 +375,19 @@ function Index({
         setCurrentPage(pageNumber);
     };
     //
-    const itemsPerPageCZ = 5;
+    const itemsPerPage = 5;
     const [currentPageSize, setCurrentPageSize] = useState(1);
     const [currentPageColor, setCurrentPageColor] = useState(1);
-    const totalPagesSize = Math.ceil(sizes.length / itemsPerPageCZ);
-    const totalPagesColor = Math.ceil(colors.length / itemsPerPageCZ);
+    const totalPagesSize = Math.ceil(sizes.length / itemsPerPage);
+    const totalPagesColor = Math.ceil(colors.length / itemsPerPage);
     const paginatedSizes = sizes.slice(
-        (currentPageSize - 1) * itemsPerPageCZ,
-        currentPageSize * itemsPerPageCZ
+        (currentPageSize - 1) * itemsPerPage,
+        currentPageSize * itemsPerPage
     );
 
     const paginatedColors = colors.slice(
-        (currentPageColor - 1) * itemsPerPageCZ,
-        currentPageColor * itemsPerPageCZ
+        (currentPageColor - 1) * itemsPerPage,
+        currentPageColor * itemsPerPage
     );
     const handlePageChangeSize = (page) => {
         if (page >= 1 && page <= totalPagesSize) {
@@ -1019,7 +1019,7 @@ function Index({
                                                     <div className="col-md-2">
                                                         {create == true && (
                                                             <button
-                                                                className="btn w-100 btn-primary mt-3"
+                                                                className="btn w-100 btn-primary"
                                                                 onClick={(e) =>
                                                                     SubmitProduct()
                                                                 }

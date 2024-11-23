@@ -18,7 +18,7 @@ import "notyf/notyf.min.css";
 
 function Index({ voucher }) {
     const [loading, setLoading] = useState(true);
-    const [showLoad, setShowLoad] = useState(false);
+    const [showLoad, setShowLoad] = useState(true);
     const [data, setData] = useState(voucher);
     const [code, setCode] = useState("");
     const [type, setType] = useState("percentage");
