@@ -194,7 +194,15 @@ class UserController extends BaseCrudController
         }
 
         $user = User::where('email', $request->email)->first();
-    
+        $role = Roles::find($user->idRole);
+        if ($role->name != "admin"){
+            return response()->json([
+                'errors' => [
+                    'email' => ['Tài khoản không có quyền đăng nhập.']
+                ]
+            ], 401);
+        }
+
         if (!$user) {
             return response()->json([
                 'errors' => [
@@ -212,7 +220,6 @@ class UserController extends BaseCrudController
         }
     
         $token = $user->createToken('YourAppName')->plainTextToken;
-    
         return response()->json([
             'token' => $token,
             'user' => [
@@ -235,7 +242,7 @@ class UserController extends BaseCrudController
         return Inertia::render('User/Login');
     }
    
-public function logout()
+    public function logout()
     {
         Auth::logout();
         return redirect('/'); 
@@ -336,6 +343,13 @@ if ($request->has('currentPassword') && $request->has('newPassword') && $request
         'user' => $user,
     ], 200);
 }
+public function switchUser(Request $request, $id){
+    $user = $this->model::find($id);
+    $user->status = ($user->status === 1) ? 0 : 1;
+    $user->save();
+    return response()->json(['check' => true]);
+}
+
 
     
 public function info(Request $request)
@@ -471,11 +485,7 @@ public function resetForm($token, $email)
     {
         //
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-   // app/Http/Controllers/UserController.php
+   
    public function destroy($id)
    {
        // Tìm kiếm người dùng theo ID

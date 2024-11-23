@@ -8,12 +8,15 @@ use App\Models\Products;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\OrderConfirmationMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class OrderController extends Controller
 {
     public function store(Request $request)
     {
+        $userEmail = User::find($request->input('id_user'))->email;
         $order = Orders::create([
             'id_user' => $request->input('id_user'),
             'id_payment' => $request->input('id_payment'),
@@ -39,7 +42,10 @@ class OrderController extends Controller
                 $product->update(['in_stock' => $newQuantity]);
             }
         }
-
+        if (!$userEmail) {
+            return response()->json(['error' => 'User not found or email is missing'], 404);
+        }
+        Mail::to($userEmail)->send(new OrderConfirmationMail($order));
         return response()->json(['message' => 'Order created successfully', 'order_id' => $order->id]);
     }
     public function getOrdersByUserId($id_user)
