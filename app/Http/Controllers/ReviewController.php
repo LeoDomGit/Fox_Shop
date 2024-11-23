@@ -8,6 +8,7 @@ use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
+    protected $model;
     public function __construct(Review $model)
     {
         $this->model = Review::class;
@@ -16,7 +17,9 @@ class ReviewController extends Controller
     public function index()
     {
         $review = Review::all();
-        return Inertia::render("Reviews/Index");
+        $product = Review::with(['product.gallery'])->get();
+        $productArr = $product->toArray();
+        return Inertia::render("Reviews/Index",["review"=>$review,"product"=>$productArr]);
     }
 
     /**
@@ -41,6 +44,12 @@ class ReviewController extends Controller
 
         Review::create($validated);
 
+        return response()->json(['check' => true]);
+    }
+    public function switchReview(Request $request, $id){
+        $review = $this->model::find($id);
+        $review->status = ($review->status === 1) ? 0 : 1;
+        $review->save();
         return response()->json(['check' => true]);
     }
 
@@ -74,5 +83,11 @@ class ReviewController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    // 
+    public function getAllComments(Request $request){
+        $comments = Review::all();
+        return response()->json($comments);
     }
 }
