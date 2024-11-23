@@ -8,6 +8,7 @@ use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
+    protected $model;
     public function __construct(Review $model)
     {
         $this->model = Review::class;
@@ -90,3 +91,4 @@ class ReviewController extends Controller
         return response()->json($comments);
     }
 }
+
