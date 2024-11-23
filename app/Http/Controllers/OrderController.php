@@ -22,6 +22,7 @@ class OrderController extends Controller
             'order_date' => now(),
             'order_note' => $request->input('note'),
             'total_amount' => $request->input('total_amount'),
+            'id_vouchers' => $request->input('id_voucher') > 0 ? $request->input('id_voucher') : null,
         ]);
         foreach ($request->input('order_details') as $detail) {
             Order_detail::create([
@@ -48,4 +49,25 @@ class OrderController extends Controller
                     ->get();
         return response()->json($orders);
     }
+    public function getOrdersById($id)
+    {
+        $orders = Orders::with(['orderDetails.product', 'payment'])
+                    ->where('id', $id)
+                    ->get();
+        return response()->json($orders);
+    }
+
+    public function checkPurchase($productId)
+    {
+        $userId = request()->get('userId'); // Lấy userId từ request
+    
+        $order = Orders::where('id_user', $userId)
+                       ->whereHas('orderDetails', function ($query) use ($productId) {
+                           $query->where('id_product', $productId);
+                       })
+                       ->exists();
+    
+        return response()->json(['hasPurchased' => $order]);
+    }
+    
 }

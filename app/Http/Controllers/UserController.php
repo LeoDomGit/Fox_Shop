@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\createUser;
 use App\Mail\ResetPasswordMail;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 
 
@@ -31,6 +32,15 @@ class UserController extends BaseCrudController
         $users = $this->model::with('roles')->get();
         $roles = Roles::all();
         return Inertia::render('User/Index', ['roles' => $roles, 'users' => $users]);
+    }
+
+    public function list(): JsonResponse
+    {
+        $users = User::with('roles')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $users,
+        ]);
     }
 
     /**
