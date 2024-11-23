@@ -59,4 +59,10 @@ class User extends Authenticatable
         return $this->belongsToMany(Voucher::class, 'user_vouchers', 'user_id', 'voucher_id')
                     ->where('status', 'active');
     }
+
+    public function orders()
+{
+    return $this->hasMany(Orders::class, 'id_user');
+}
+
 }

@@ -23,9 +23,13 @@ Route::get('/user', function (Request $request) {
     Route::get('/loginform', [UserController::class, 'loginForm']);
     Route::middleware('auth:sanctum')->get('/info', [UserController::class, 'info']);
     Route::get('/forgot', [UserController::class, 'forgotPassForm']);
+   // routes/api.php
+Route::delete('/user/delete/{id}', [UserController::class, 'destroy']);
+
+
     Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);
-    Route::get('/resetpassword/{token}/{email}', [UserController::class, 'resetForm']);
-    Route::post('/resetPassword', [UserController::class, 'resetPassword']);
+    Route::get('/reset-password/{token}/{email}', [UserController::class, 'resetForm']);
+    Route::post('/reset-password', [UserController::class, 'resetPassword']);
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
