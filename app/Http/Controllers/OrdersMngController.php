@@ -23,6 +23,8 @@ class OrdersMngController extends Controller
         ])->get();
         return Inertia::render('Orders/Index' , ['orders' => $orders]);
     }
+
+
     /**
      * Show the form for creating a new resource.
      */

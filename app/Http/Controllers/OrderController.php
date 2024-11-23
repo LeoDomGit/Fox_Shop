@@ -56,4 +56,18 @@ class OrderController extends Controller
                     ->get();
         return response()->json($orders);
     }
+
+    public function checkPurchase($productId)
+    {
+        $userId = request()->get('userId'); // Lấy userId từ request
+    
+        $order = Orders::where('id_user', $userId)
+                       ->whereHas('orderDetails', function ($query) use ($productId) {
+                           $query->where('id_product', $productId);
+                       })
+                       ->exists();
+    
+        return response()->json(['hasPurchased' => $order]);
+    }
+    
 }

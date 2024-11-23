@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Models\Review;
-
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -22,6 +21,19 @@ class ReviewController extends Controller
         return Inertia::render("Reviews/Index",["review"=>$review,"product"=>$productArr]);
     }
 
+
+    public function checkIfUserHasCommented(Request $request)
+    {
+        $userId = $request->query('userId');
+        $productId = $request->query('productId');
+    
+        // Kiểm tra xem người dùng đã bình luận sản phẩm chưa
+        $hasCommented = Review::where('id_user', $userId)
+                               ->where('id_product', $productId)
+                               ->exists();
+    
+        return response()->json(['hasCommented' => $hasCommented]);
+    }
     /**
      * Show the form for creating a new resource.
      */
