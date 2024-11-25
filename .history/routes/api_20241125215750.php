@@ -7,7 +7,6 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrdersMngController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
@@ -26,16 +25,6 @@ Route::get('/user', function (Request $request) {
     Route::get('/forgot', [UserController::class, 'forgotPassForm']);
    // routes/api.php
 Route::delete('/user/delete/{id}', [UserController::class, 'destroy']);
-Route::get('/user', [UserController::class, 'list']);
-
-
-// Trong routes/api.php
-Route::get('/orders/check-purchase/{productId}', [OrderController::class, 'checkPurchase']);
-
-
-// Trong routes/api.php
-Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCommented']);
-
 
 
     Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);

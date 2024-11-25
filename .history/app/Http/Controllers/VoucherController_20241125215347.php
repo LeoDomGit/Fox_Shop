@@ -151,28 +151,14 @@ class VoucherController extends Controller
         return response()->json(['message' => 'Voucher received successfully'], 200);
     }
     
-    public function api_voucher_user(Request $request){
+    public function api_voucher_user(Request $request, $id){
+        dd($request->all());
         $userId = $request->userid;
         if (!$userId) {
             return response()->json(['error' => 'Chưa có user'], 400);
         }
         $user = User::find($userId);
     
-        if (!$user) {
-            return response()->json(['error' => 'User không tồn tại'], 404);
-        }
-        $user->load('vouchers');
-    
-        return response()->json([
-            'check' => true,
-            'data' => $user->vouchers
-        ]);
-    }
-    public function api_voucher_user_voucher(Request $request, $id){
-        if (!$id) {
-            return response()->json(['error' => 'Chưa có user'], 400);
-        }
-        $user = User::find($id);
         if (!$user) {
             return response()->json(['error' => 'User không tồn tại'], 404);
         }
