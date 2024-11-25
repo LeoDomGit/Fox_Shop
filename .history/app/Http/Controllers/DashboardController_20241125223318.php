@@ -28,11 +28,8 @@ class DashboardController extends Controller
         ->withSum('orderDetails as total_sold', 'quantity')
         ->get();
         $bestSellers = $products->sortByDesc('total_sold')->take(10)->values()->toArray();;
-        // dd($bestSellers);
-            return Inertia::render('Dashboard/Index', [
-                'revenue' => $revenue,
-                'databest' => $bestSellers
-            ]);
+        dd($bestSellers);
+            return Inertia::render('Dashboard/Index', ['revenue'=> $revenue ,'databest'=> $bestSellers]);
     }
 
     /**

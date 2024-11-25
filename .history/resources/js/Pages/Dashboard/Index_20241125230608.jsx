@@ -74,24 +74,7 @@ function Index(revenue) {
                                                         dataPro.map((item) => (
                                                             <tr key={item.id}>
                                                                 <td>
-                                                                    <div className="d-flex">
-                                                                        <div>
-                                                                            <img
-                                                                                src={`/storage/products/${item.gallery[0].image}`}
-                                                                                alt=""
-                                                                                style={{
-                                                                                    width: "50px",
-                                                                                    height: "50px",
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="ms-2">
-                                                                            <p>{item.name}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                {item.total_sold}
+                                                                    <input type="checkbox" />
                                                                 </td>
                                                             </tr>
                                                         ))}

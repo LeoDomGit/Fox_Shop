@@ -7,7 +7,6 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrdersMngController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
@@ -26,16 +25,6 @@ Route::get('/user', function (Request $request) {
     Route::get('/forgot', [UserController::class, 'forgotPassForm']);
    // routes/api.php
 Route::delete('/user/delete/{id}', [UserController::class, 'destroy']);
-Route::get('/user', [UserController::class, 'list']);
-
-
-// Trong routes/api.php
-Route::get('/orders/check-purchase/{productId}', [OrderController::class, 'checkPurchase']);
-
-
-// Trong routes/api.php
-Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCommented']);
-
 
 
     Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);
@@ -58,9 +47,9 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
     Route::get('/search/{id}',[ProductController::class,'api_search_product']);
-    Route::get('/best',[ProductController::class,'api_product_best']);
     Route::get('/{slug}',[ProductController::class,'apiProductDetail']);
     Route::get('/gallery/{id}',[ProductController::class,'api_gallery_by_product_id']);
+    Route::get('/best',[ProductController::class,'api_product_bestsellers']);
     Route::post('/loadCart',[ProductController::class,'api_load_cart_product']);
     Route::get('/products-category/{id}',[ProductController::class,'api_product_cate']);
     Route::get('/details/{slug}',[ProductController::class,'api_product_details']);

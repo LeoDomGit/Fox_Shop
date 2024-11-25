@@ -90,9 +90,6 @@ function Index(revenue) {
                                                                         </div>
                                                                     </div>
                                                                 </td>
-                                                                <td>
-                                                                {item.total_sold}
-                                                                </td>
                                                             </tr>
                                                         ))}
                                                 </tbody>
