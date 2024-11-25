@@ -168,21 +168,6 @@ class VoucherController extends Controller
             'data' => $user->vouchers
         ]);
     }
-    public function api_voucher_user_voucher(Request $request, $id){
-        if (!$id) {
-            return response()->json(['error' => 'Chưa có user'], 400);
-        }
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'User không tồn tại'], 404);
-        }
-        $user->load('vouchers');
-    
-        return response()->json([
-            'check' => true,
-            'data' => $user->vouchers
-        ]);
-    }
     public function deleteVoucher(Request $request)
 {
     $voucher = UserVoucher::where('voucher_id', $request->id_voucher)

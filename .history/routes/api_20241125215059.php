@@ -68,7 +68,7 @@ Route::prefix('post')->name('post.')->group(function () {
 Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::post('/',[VoucherController::class,'api_voucher_user']);
     Route::delete('/user_vouchers',[VoucherController::class,'deleteVoucher']);
-    Route::get('/{id_user}',[VoucherController::class,'api_voucher_user_voucher']);
+    Route::get('/{id_user}',[VoucherController::class,'api_list_voucher_user']);
 });
 Route::prefix('comment')->name('comment.')->group(function () {
     Route::get('/',[ReviewController::class,'getAllComments']);
