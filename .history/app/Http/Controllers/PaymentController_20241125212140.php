@@ -20,7 +20,7 @@ class PaymentController extends Controller
         error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
         date_default_timezone_set('Asia/Ho_Chi_Minh');
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = route('payment.return', ['id_user'=>$request->input('id_user')]);
+        $vnp_Returnurl = route('payment.return');
         $vnp_TmnCode = "M6KU6D0R";
         $vnp_HashSecret = "5J7EYR8GQ9ZX43F7HP9HI6JFVFVZCCBD";
         $order = new Orders();
@@ -101,12 +101,18 @@ class PaymentController extends Controller
     }
     public function vnpayreturn(Request $request){
         $data = $request->all();
+
+        // Tìm đơn hàng theo mã giao dịch
         $order = Orders::find($data['vnp_TxnRef']);
         if (!$order) {
             return redirect()->back()->withErrors(['message' => 'Order not found']);
         }
+    
+        // Cập nhật trạng thái đơn hàng
         $order->status = 'pending';
         $order->save();
+    
+        // Lưu thông tin thanh toán vào bảng quản lý thanh toán
         $payment_management = new Payment_management();
         $payment_management->user_id = $request->id_user;
         $payment_management->order_id = $data['vnp_TxnRef'];
@@ -117,12 +123,16 @@ class PaymentController extends Controller
         $payment_management->code_bank = $data['vnp_BankCode'];
         $payment_management->date_bank = \Carbon\Carbon::createFromFormat('YmdHis', $data['vnp_PayDate']);
         $payment_management->save();
+    
+        // Lấy email người dùng và gửi email xác nhận
         $user = User::find($request->id_user);
         if (!$user || !$user->email) {
             return redirect()->back()->withErrors(['error' => 'User not found or email is missing']);
         }
     
         Mail::to($user->email)->send(new OrderConfirmationMail($order));
+    
+        // Chuyển hướng về trang mong muốn
         return redirect('https://foxshop.trungthanhzone.com/')
             ->with('message', 'Payment processed successfully.');
     }

@@ -101,6 +101,7 @@ class PaymentController extends Controller
     }
     public function vnpayreturn(Request $request){
         $data = $request->all();
+        dd($data);
         $order = Orders::find($data['vnp_TxnRef']);
         if (!$order) {
             return redirect()->back()->withErrors(['message' => 'Order not found']);

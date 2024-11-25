@@ -20,7 +20,7 @@ class PaymentController extends Controller
         error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
         date_default_timezone_set('Asia/Ho_Chi_Minh');
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = route('payment.return', ['id_user'=>$request->input('id_user')]);
+        $vnp_Returnurl = route('payment.return');
         $vnp_TmnCode = "M6KU6D0R";
         $vnp_HashSecret = "5J7EYR8GQ9ZX43F7HP9HI6JFVFVZCCBD";
         $order = new Orders();
@@ -52,6 +52,7 @@ class PaymentController extends Controller
             "vnp_OrderType" => $vnp_OrderType,
             "vnp_ReturnUrl" => $vnp_Returnurl,
             "vnp_TxnRef" => $vnp_TxnRef,
+            "id_user" => $request->input('id_user'),
         );
         
         if (isset($vnp_BankCode) && $vnp_BankCode != "") {
@@ -101,6 +102,7 @@ class PaymentController extends Controller
     }
     public function vnpayreturn(Request $request){
         $data = $request->all();
+        dd($data);
         $order = Orders::find($data['vnp_TxnRef']);
         if (!$order) {
             return redirect()->back()->withErrors(['message' => 'Order not found']);
