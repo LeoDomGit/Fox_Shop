@@ -9,6 +9,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 // import { PieChart } from "@mui/icons-material";
 import { Table, Pagination } from "react-bootstrap";
 
+
 function Index(revenue) {
     const [data, setData] = useState(revenue.revenue);
     const [dataPro, setDataPro] = useState(revenue.databest);
@@ -63,38 +64,37 @@ function Index(revenue) {
                                             <Table striped>
                                                 <thead>
                                                     <tr>
-                                                        <th>Sản phẩm</th>
-                                                        <th>Số lượng</th>
+                                                        <th>
+                                                            <input type="checkbox" />
+                                                        </th>
+                                                        <th>Mã đơn hàng</th>
+                                                        <th>Mã sản phẩm</th>
+                                                        <th>Mã khách hàng</th>
+                                                        <th>Tổng tiền</th>
+                                                        <th>Địa chỉ</th>
+                                                        <th> Phương thức</th>
+                                                        <th>Ngày đặt</th>
+                                                        <th>Trạng thái</th>
+                                                        <th>Thao tác</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {console.log(dataPro)}
                                                     {dataPro &&
-                                                        dataPro.length > 0 &&
-                                                        dataPro.map((item) => (
-                                                            <tr key={item.id}>
-                                                                <td>
-                                                                    <div className="d-flex">
-                                                                        <div>
-                                                                            <img
-                                                                                src={`/storage/products/${item.gallery[0].image}`}
-                                                                                alt=""
-                                                                                style={{
-                                                                                    width: "50px",
-                                                                                    height: "50px",
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="ms-2">
-                                                                            <p>{item.name}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                {item.total_sold}
-                                                                </td>
-                                                            </tr>
-                                                        ))}
+                                                        dataPro.length >
+                                                            0 &&
+                                                        dataPro.map(
+                                                            (item) => (
+                                                                <tr
+                                                                    key={
+                                                                        item.id
+                                                                    }
+                                                                >
+                                                                    <td>
+                                                                        <input type="checkbox" />
+                                                                    </td>
+                                                                </tr>
+                                                            )
+                                                        )}
                                                 </tbody>
                                             </Table>
                                         </div>

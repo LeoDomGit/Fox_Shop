@@ -76,22 +76,10 @@ function Index(revenue) {
                                                                 <td>
                                                                     <div className="d-flex">
                                                                         <div>
-                                                                            <img
-                                                                                src={`/storage/products/${item.gallery[0].image}`}
-                                                                                alt=""
-                                                                                style={{
-                                                                                    width: "50px",
-                                                                                    height: "50px",
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="ms-2">
-                                                                            <p>{item.name}</p>
+                                                                            src=
+                                                                            {`/storage/products/${item.gallery[0].image}`}
                                                                         </div>
                                                                     </div>
-                                                                </td>
-                                                                <td>
-                                                                {item.total_sold}
                                                                 </td>
                                                             </tr>
                                                         ))}

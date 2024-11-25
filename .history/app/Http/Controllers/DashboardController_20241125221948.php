@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Order_detail;
 use App\Models\Orders;
-use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -22,17 +21,15 @@ class DashboardController extends Controller
             ->orderByRaw('DATE(orders.order_date) ASC')
             ->get();
 
-            
-        $products = Products::select('id', 'name')
-        ->with(['gallery:id,id_parent,image'])
-        ->withSum('orderDetails as total_sold', 'quantity')
-        ->get();
-        $bestSellers = $products->sortByDesc('total_sold')->take(10)->values()->toArray();;
-        // dd($bestSellers);
-            return Inertia::render('Dashboard/Index', [
-                'revenue' => $revenue,
-                'databest' => $bestSellers
-            ]);
+            $products = Products::all();
+            $products->load(['orderDetails' => function ($query) {
+                $query->selectRaw('id_product, SUM(quantity) as total_sold')
+                    ->groupBy('id_product');
+            }]);
+
+            $bestSellers = $products->sortByDesc('orderDetails.total_sold')->take(10);
+
+            return Inertia::render('Dashboard/Index', ['revenue'=> $revenue]);
     }
 
     /**

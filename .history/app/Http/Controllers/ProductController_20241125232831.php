@@ -438,7 +438,7 @@ class ProductController extends Controller
         return response()->json($result);
     }
     public function api_product_best(Request $request){
-        $products = Products::where('status', 1)
+        $products = Products::select('id', 'name')
         ->with(['gallery:id,id_parent,image'])
         ->withSum('orderDetails as total_sold', 'quantity')
         ->get();

@@ -307,60 +307,60 @@ class ProductController extends Controller
         return response()->json(['check' => true, 'data' => $this->model::all()]);
     }
 
-    public function update(Request $request, $identifier)
-        {
-            $validator = Validator::make($request->all(), [
-                'name' => 'string|max:255',
-                'price' => 'numeric|min:0',
-                'discount' => 'numeric|min:0',
-                'in_stock' => 'nullable|numeric',
-                'categories.*' => 'exists:categories,id',
-                'color.*' => 'exists:attribute,id',
-                'size.*' => 'exists:attribute,id' 
+ public function update(Request $request, $identifier)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|max:255',
+            'price' => 'numeric|min:0',
+            'discount' => 'numeric|min:0',
+            'in_stock' => 'nullable|numeric',
+            'categories.*' => 'exists:categories,id',
+            'color.*' => 'exists:attribute,id',
+            'size.*' => 'exists:attribute,id' 
 
 
-            ]);
-            if ($validator->fails()) {
-                return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
-            }
-            $data = $request->all();
-            $product = Products::find($identifier);
-            if (!$product) {
-            return response()->json(['check' => false, 'msg' => 'Product not found']);
-            }
-            if ($product) {
-            $product->name = $request->name ?? $product->name;
-            if ($request->name != '') {
-            $product->slug = Str::slug($request->name); 
-            }
-            $product->price = $request->price ?? $product->price;
-            $product->discount = floatval($request->discount); // Chuyển đổi discount sang kiểu số
-            $product->in_stock = intval($request->in_stock); // Chuyển đổi in_stock sang kiểu số
-            $product->content = $request->content;
-            $product->id_brand = $request->id_brand ?? $product->id_brand;
-            $product->save();
-            }
-            if($request->has('categories')){
-                unset($data['categories']);
-                ProductCategory::where('id_product',$identifier)->delete();
-                foreach ($request->categories as $key => $value) {
-                    ProductCategory::create(['id_product'=>$identifier,'id_categories'=>$value,'created_at'=>now()]);
-                }
-            }
-            if ($request->has('color') || $request->has('size')) {
-                    unset($data['color'], $data['size']);
-                    ProductsAttribute::where('product_id', $identifier)->delete();
-                    
-                    $attributes = $request->color ?? [];
-                    $attributes = array_merge($attributes, $request->size ?? []);
-                    
-                    foreach ($attributes as $value) {
-                        ProductsAttribute::create(['product_id' => $identifier, 'attribute_id' => $value, 'created_at' => now()]);
-                    }
-                }
-                        $result = $this->model::with('categories', 'brands')->get();
-                        return response()->json(['check' => true, 'data' => $result]);
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
         }
+        $data = $request->all();
+        $product = Products::find($identifier);
+        if (!$product) {
+        return response()->json(['check' => false, 'msg' => 'Product not found']);
+        }
+        if ($product) {
+        $product->name = $request->name ?? $product->name;
+        if ($request->name != '') {
+        $product->slug = Str::slug($request->name); 
+        }
+        $product->price = $request->price ?? $product->price;
+        $product->discount = floatval($request->discount); // Chuyển đổi discount sang kiểu số
+        $product->in_stock = intval($request->in_stock); // Chuyển đổi in_stock sang kiểu số
+        $product->content = $request->content;
+        $product->id_brand = $request->id_brand ?? $product->id_brand;
+        $product->save();
+        }
+        if($request->has('categories')){
+            unset($data['categories']);
+            ProductCategory::where('id_product',$identifier)->delete();
+            foreach ($request->categories as $key => $value) {
+                ProductCategory::create(['id_product'=>$identifier,'id_categories'=>$value,'created_at'=>now()]);
+            }
+        }
+        if ($request->has('color') || $request->has('size')) {
+                unset($data['color'], $data['size']);
+                ProductsAttribute::where('product_id', $identifier)->delete();
+                
+                $attributes = $request->color ?? [];
+                $attributes = array_merge($attributes, $request->size ?? []);
+                
+                foreach ($attributes as $value) {
+                    ProductsAttribute::create(['product_id' => $identifier, 'attribute_id' => $value, 'created_at' => now()]);
+                }
+            }
+                    $result = $this->model::with('categories', 'brands')->get();
+                    return response()->json(['check' => true, 'data' => $result]);
+    }
 
 
 
@@ -422,32 +422,22 @@ class ProductController extends Controller
             return response()->json($result);
         }
     }
-    public function api_product_cate($id)
-    {
-        $result = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
-            ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
-            ->join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->where('gallery.status', 1)
-            ->where('product_categories.id_categories', $id)
-            ->where('products.status', 1)
-            ->where('categories.status', 1)
-            ->select('products.*', 'categories.name as category_name', 'gallery.image as image')
-            ->distinct() // Đảm bảo kết quả không bị trùng lặp
-            ->get();
-
-        return response()->json($result);
-    }
-    public function api_product_best(Request $request){
-        $products = Products::where('status', 1)
-        ->with(['gallery:id,id_parent,image'])
-        ->withSum('orderDetails as total_sold', 'quantity')
+public function api_product_cate($id)
+{
+    $result = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+        ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+        ->join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('gallery.status', 1)
+        ->where('product_categories.id_categories', $id)
+        ->where('products.status', 1)
+        ->where('categories.status', 1)
+        ->select('products.*', 'categories.name as category_name', 'gallery.image as image')
+        ->distinct() // Đảm bảo kết quả không bị trùng lặp
         ->get();
-        $bestSellers = $products->sortByDesc('total_sold')->take(10);
 
-        return response()->json([
-            'data' => $bestSellers
-        ]);
-    }
+    return response()->json($result);
+}
+
 
     // --------------------------------------
     public function api_search_product($slug)
@@ -467,85 +457,101 @@ class ProductController extends Controller
         return response()->json(['products' => $result]);
     }
     // --------------------------------------
-    public function apiProductDetail($slug) {
-        $data = $this->model::where('slug', $slug)->with('categories', 'brands', 'gallery', 'attributes')->first()->toArray();
-        
-        $data['attributes'] = ProductsAttribute::where('product_id', $data['id'])->with('attribute')->get()->map(function ($attribute) {
-            return [
-                'id' => $attribute->id,
-                'name' => $attribute->attribute->name,
-                'type' => $attribute->attribute->type,
-                'value' => $attribute->attribute->value
-            ];
-        });
+public function apiProductDetail($slug) {
+    $data = $this->model::where('slug', $slug)->with('categories', 'brands', 'gallery', 'attributes')->first()->toArray();
+    
+    $data['attributes'] = ProductsAttribute::where('product_id', $data['id'])->with('attribute')->get()->map(function ($attribute) {
+        return [
+            'id' => $attribute->id,
+            'name' => $attribute->attribute->name,
+            'type' => $attribute->attribute->type,
+            'value' => $attribute->attribute->value
+        ];
+    });
 
-        return response()->json($data);
+    return response()->json($data);
+}
+
+
+public function api_single_product($slug)
+{
+    $result = Products::with(['brands', 'categories'])
+        ->where('products.slug', $slug)
+        ->where('products.status', 1)
+        ->select('products.*')
+        ->first();
+    if (!$result) {
+        return response()->json([]);
     }
-    public function api_single_product($slug)
-    {
-        $result = Products::with(['brands', 'categories'])
-            ->where('products.slug', $slug)
-            ->where('products.status', 1)
-            ->select('products.*')
-            ->first();
-        if (!$result) {
-            return response()->json([]);
-        }
 
-        $medias = Gallery::where('id_parent', $result->id)
-            ->pluck('image');
+    $medias = Gallery::where('id_parent', $result->id)
+        ->pluck('image');
 
-        // Lấy thông tin danh mục của sản phẩm
-        $categoryData = ProductCategory::where('id_product', $result->id)->first();
-        $id_cate = $categoryData->id_categories;
+    // Lấy thông tin danh mục của sản phẩm
+    $categoryData = ProductCategory::where('id_product', $result->id)->first();
+    $id_cate = $categoryData->id_categories;
 
-        // Lấy sản phẩm cùng danh mục
-        $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
-            ->join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->where('products.status', 1)
-            ->where('product_categories.id_categories', $id_cate)
-            ->where('gallery.status', 1)
-            ->select('products.*', 'gallery.image as image')
-            ->take(4);
+    // Lấy sản phẩm cùng danh mục
+    $cate_products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+        ->join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('products.status', 1)
+        ->where('product_categories.id_categories', $id_cate)
+        ->where('gallery.status', 1)
+        ->select('products.*', 'gallery.image as image')
+        ->take(4);
 
-        // Lấy sản phẩm cùng brand
-        $brand_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->where('products.status', 1)
-            ->where('products.id_brand', $result->idBrand)
-            ->where('gallery.status', 1)
-            ->select('products.*', 'gallery.image as image')
-            ->take(4);
+    // Lấy sản phẩm cùng brand
+    $brand_products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+        ->where('products.status', 1)
+        ->where('products.id_brand', $result->idBrand)
+        ->where('gallery.status', 1)
+        ->select('products.*', 'gallery.image as image')
+        ->take(4);
 
-        // Xử lý để lấy sản phẩm liên quan
-        if ($brand_products->exists() && $cate_products->exists()) {
-            $links = $cate_products->union($brand_products)->get();
-        } elseif (!$brand_products->exists()) {
-            $links = $cate_products->get();
-        } else {
-            $links = $brand_products->get();
-        }
+    // Xử lý để lấy sản phẩm liên quan
+    if ($brand_products->exists() && $cate_products->exists()) {
+        $links = $cate_products->union($brand_products)->get();
+    } elseif (!$brand_products->exists()) {
+        $links = $cate_products->get();
+    } else {
+        $links = $brand_products->get();
+    }
 
-        // Lấy màu và kích thước của sản phẩm
-        $attributes = ProductsAttribute::where('product_id', $result->id)
-            ->join('attribute', 'products_attribute.attribute_id', '=', 'attribute.id')
-            ->select('attribute.type', 'attribute.name')
-            ->get()
-            ->groupBy('name'); // Nhóm theo 'name' để tách color và size
+    // Lấy màu và kích thước của sản phẩm
+    $attributes = ProductsAttribute::where('product_id', $result->id)
+        ->join('attribute', 'products_attribute.attribute_id', '=', 'attribute.id')
+        ->select('attribute.type', 'attribute.name')
+        ->get()
+        ->groupBy('name'); // Nhóm theo 'name' để tách color và size
 
-        // Phân loại thuộc tính color và size
-        $colors = $attributes->get('color', []);
-        $sizes = $attributes->get('size', []);
+    // Phân loại thuộc tính color và size
+    $colors = $attributes->get('color', []);
+    $sizes = $attributes->get('size', []);
 
-        // Trả về dữ liệu dưới dạng JSON
+    // Trả về dữ liệu dưới dạng JSON
+    return response()->json([
+        'product' => $result,
+        'medias' => $medias,
+        'links' => $links,
+        'colors' => $colors,
+        'sizes' => $sizes
+    ]);
+}
+
+
+    public function api_product_bestsellers(Request $request){
+        $products = Products::with(['gallery'])
+        ->join('order_details', 'products.id', '=', 'order_details.id_product')
+        ->selectRaw('products.*, SUM(order_details.quantity) as total_sold')
+        ->groupBy('products.id')
+        ->orderByDesc('total_sold')
+        ->take(10)
+        ->get();
+
         return response()->json([
-            'product' => $result,
-            'medias' => $medias,
-            'links' => $links,
-            'colors' => $colors,
-            'sizes' => $sizes
+            'data' => $products
         ]);
     }
-
     public function api_gallery_by_product_id(Request $request, $productId)
     {
         $product = Products::find($productId);

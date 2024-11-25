@@ -85,13 +85,7 @@ function Index(revenue) {
                                                                                 }}
                                                                             />
                                                                         </div>
-                                                                        <div className="ms-2">
-                                                                            <p>{item.name}</p>
-                                                                        </div>
                                                                     </div>
-                                                                </td>
-                                                                <td>
-                                                                {item.total_sold}
                                                                 </td>
                                                             </tr>
                                                         ))}
