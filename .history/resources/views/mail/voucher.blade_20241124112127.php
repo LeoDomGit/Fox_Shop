@@ -11,12 +11,11 @@
         <p style="font-size: 16px; color: #333;">Săn mã voucher nào!:</p>
         <h2 style="font-size: 28px; color: #4CAF50; margin: 20px 0;">{{ $voucher->code }}</h2>
         <p style="font-size: 16px; color: #333;">
-        @if($voucher->discount_type === "percentage")
-            <p>Giảm giá {{ $voucher->discount_value }}% cho đơn hàng từ {{ number_format($voucher->minimum_monney) }} VND trở lên</p>
+        @if({{ $voucher->discount_type === "percentage" }})
+            Giảm giá {{ $voucher->discount_value }}% cho đơn hàng từ {{ number_format($voucher->minimum_monney) }} trở lên</p>
         @elseif($voucher->discount_type === "fixed")
-            <p>Giảm giá {{ number_format($voucher->discount_value) }} VND cho đơn hàng từ {{ number_format($voucher->minimum_monney) }} VND trở lên</p>
+        Giảm giá {{ number_format($voucher->discount_value) }} VND cho đơn hàng từ {{ number_format($voucher->minimum_monney) }} trở lên</p>
         @endif
-
         <p style="font-size: 16px; color: #333;">Số lượng có hạn nhanh tay, nhanh tay</p>
         <p style="font-size: 14px; color: #888;">Cảm ơn bạn đã đồng hành cùng chúng tôi!</p>
         <a href="https://foxshop.trungthanhzone.com/voucher" 
