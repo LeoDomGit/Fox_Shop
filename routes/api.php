@@ -66,7 +66,6 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::post('/loadCart',[ProductController::class,'api_load_cart_product']);
     Route::get('/products-category/{id}',[ProductController::class,'api_product_cate']);
     Route::get('/details/{slug}',[ProductController::class,'api_product_details']);
-    Route::get('/search', [ProductController::class, 'search']);
 
 });
 Route::prefix('categories')->name('categories.')->group(function () {
