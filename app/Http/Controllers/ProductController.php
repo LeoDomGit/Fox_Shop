@@ -466,6 +466,8 @@ class ProductController extends Controller
         }
         return response()->json(['products' => $result]);
     }
+
+
     // --------------------------------------
     public function apiProductDetail($slug) {
         $data = $this->model::where('slug', $slug)->with('categories', 'brands', 'gallery', 'attributes')->first()->toArray();

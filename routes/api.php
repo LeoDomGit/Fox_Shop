@@ -53,6 +53,8 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
     Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
     Route::get('/orders/detail/{id}', [OrderController::class, 'getOrdersById']);
 
+
+
     Route::resource('/review', ReviewController::class);
     Route::resource('/wishlist', WishlistController::class);
 Route::prefix('products')->name('products.')->group(function () {
@@ -79,6 +81,7 @@ Route::prefix('post')->name('post.')->group(function () {
 });
 Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::post('/',[VoucherController::class,'api_voucher_user']);
+    Route::post('/validate-voucher', [VoucherController::class, 'validateVoucher']);
     Route::delete('/user_vouchers',[VoucherController::class,'deleteVoucher']);
     Route::get('/{id_user}',[VoucherController::class,'api_voucher_user_voucher']);
 });

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class VoucherController extends Controller
 {
+    protected $model;
     public function __construct(Voucher $model){
         $this->model = Voucher::class;
     }
@@ -21,6 +22,40 @@ class VoucherController extends Controller
         $voucher = Voucher::all();
         return Inertia::render('Vouchers/Index', ['voucher'=>$voucher]);
     }
+
+    public function validateVoucher(Request $request)
+    {
+        $voucherCode = $request->voucher_code;
+        $totalAmount = $request->total_amount;
+    
+        $voucher = Voucher::where('code', $voucherCode)->first();
+    
+        if (!$voucher) {
+            return response()->json(['check' => false, 'msg' => 'Voucher không tồn tại'], 404);
+        }
+    
+        if (now() < $voucher->start_date || now() > $voucher->end_date) {
+            return response()->json(['check' => false, 'msg' => 'Voucher đã hết hạn'], 400);
+        }
+    
+        if ($totalAmount < $voucher->minimum_monney) {
+            return response()->json(['check' => false, 'msg' => 'Không đủ số tiền tối thiểu'], 400);
+        }
+    
+        if ($voucher->usage_limit <= 0) {
+            return response()->json(['check' => false, 'msg' => 'Voucher đã hết số lần sử dụng'], 400);
+        }
+    
+        $discount = $voucher->discount_type === 'percentage' 
+            ? $totalAmount * ($voucher->discount_value / 100) 
+            : $voucher->discount_value;
+    
+        return response()->json([
+            'check' => true,
+            'discount' => min($discount, $totalAmount), // Không giảm quá tổng giá trị đơn hàng
+        ]);
+    }
+    
     /**
      * Show the form for creating a new resource.
      */

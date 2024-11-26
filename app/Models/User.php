@@ -54,11 +54,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Roles::class, 'idRole');
     }
+
     public function vouchers()
-    {
-        return $this->belongsToMany(Voucher::class, 'user_vouchers', 'user_id', 'voucher_id')
-                    ->where('status', 'active');
-    }
+{
+    return $this->belongsToMany(Voucher::class, 'user_vouchers', 'user_id', 'voucher_id')
+                ->where('status', 'active');
+}
+
 
     public function orders()
 {
