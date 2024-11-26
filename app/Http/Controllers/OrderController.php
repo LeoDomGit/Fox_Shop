@@ -32,6 +32,7 @@ class OrderController extends Controller
                 'id_product' => $detail['id_product'],
                 'id_order' => $order->id,
                 'quantity' => $detail['quantity'],
+                'image' => $detail['image'],
                 'color' => $detail['color'],
                 'size' => $detail['size'],
                 'total_money' => $detail['total_money'],
@@ -52,7 +53,7 @@ class OrderController extends Controller
     {
         $orders = Orders::with(['orderDetails.product', 'payment'])
                     ->where('id_user', $id_user)
-                    ->get();
+                    ->orderBy('created_at', 'desc')->get();
         return response()->json($orders);
     }
     public function getOrdersById($id)

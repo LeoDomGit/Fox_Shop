@@ -123,11 +123,18 @@ class PostController extends Controller
     }
     public function api_post(Request $request)
     {
-        $post=Post::
-        where('status',1)
-        ->get();
-        return response()->json($post);
+        // Xác định số lượng bài viết trên mỗi trang (ví dụ 10)
+        $perPage = $request->input('per_page', 10); // Lấy giá trị từ request hoặc mặc định là 10
+    
+        // Lấy bài viết mới nhất, phân trang và chỉ lấy bài viết có status = 1
+        $posts = Post::where('status', 1)
+                     ->orderBy('created_at', 'desc') // Sắp xếp theo thời gian tạo giảm dần (bài mới nhất)
+                     ->paginate($perPage); // Phân trang, sử dụng số lượng trên mỗi trang từ request
+    
+        // Trả về dữ liệu dưới dạng JSON
+        return response()->json($posts);
     }
+    
     public function api_post_detail(Request $request, $slug)
     {
         if (!empty($slug)) {

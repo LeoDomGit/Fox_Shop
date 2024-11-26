@@ -59,13 +59,15 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
     Route::resource('/wishlist', WishlistController::class);
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
-    Route::get('/search/{id}',[ProductController::class,'api_search_product']);
+    // Route::get('/search/{slug}',[ProductController::class,'api_search_product']);
     Route::get('/best',[ProductController::class,'api_product_best']);
     Route::get('/{slug}',[ProductController::class,'apiProductDetail']);
     Route::get('/gallery/{id}',[ProductController::class,'api_gallery_by_product_id']);
     Route::post('/loadCart',[ProductController::class,'api_load_cart_product']);
     Route::get('/products-category/{id}',[ProductController::class,'api_product_cate']);
     Route::get('/details/{slug}',[ProductController::class,'api_product_details']);
+    Route::get('/search', [ProductController::class, 'search']);
+
 });
 Route::prefix('categories')->name('categories.')->group(function () {
     Route::get('/',[CategoriesController::class,'api_categories']);
