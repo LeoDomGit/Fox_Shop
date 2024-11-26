@@ -587,4 +587,24 @@ class ProductController extends Controller
             }
         }
         return response()->json($arr);
-    }}
+    }
+   
+
+    public function search(Request $request)
+    {
+        // Validate the search query
+        $request->validate([
+            'q' => 'required|string', // Ensure the query is at least 3 characters long
+        ]);
+
+        $query = $request->input('q');
+
+        // Search products in the database based on the query
+        $products = Products::where('name', 'like', '%' . $query . '%') // Assuming you are searching by 'name'
+            ->orWhere('description', 'like', '%' . $query . '%') // Optionally search in description
+            ->get();
+
+        // Return the search results
+        return response()->json(['data' => $products]);
+    }
+}
