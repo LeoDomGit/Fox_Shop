@@ -124,7 +124,7 @@ class PostController extends Controller
     public function api_post(Request $request)
     {
         // Xác định số lượng bài viết trên mỗi trang (ví dụ 10)
-        $perPage = $request->input('per_page', 10); // Lấy giá trị từ request hoặc mặc định là 10
+        $perPage = $request->input('per_page', 6); // Lấy giá trị từ request hoặc mặc định là 10
     
         // Lấy bài viết mới nhất, phân trang và chỉ lấy bài viết có status = 1
         $posts = Post::where('status', 1)
@@ -147,6 +147,5 @@ class PostController extends Controller
             }
         }
         return response()->json(['message' => 'Cần có slug để tìm bài viết'], 400);
-        return response()->json(['message' => 'Cần có slug'], 400);
     }
 }
