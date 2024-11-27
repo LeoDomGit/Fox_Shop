@@ -21,6 +21,12 @@ class AttributeController extends Controller
         return Inertia::render('Attribute/Index', ['attributes' => $attributes]);
     }
 
+    public function listAttr()
+    {
+        $attributes = Attribute::all();
+    return response()->json(['attributes' => $attributes]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

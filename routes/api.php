@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttributeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
@@ -68,6 +69,12 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::get('/details/{slug}',[ProductController::class,'api_product_details']);
 
 });
+
+Route::prefix('attributes')->name('attributes.')->group (function () {
+    Route::get('/',[AttributeController::class,'listAttr']);
+
+});
+
 Route::prefix('categories')->name('categories.')->group(function () {
     Route::get('/',[CategoriesController::class,'api_categories']);
     Route::get('/with-products',[CategoriesController::class,'api_categories_with_products']);
