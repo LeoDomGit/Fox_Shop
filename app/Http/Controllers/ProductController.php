@@ -409,19 +409,29 @@ class ProductController extends Controller
     public function api_product(Request $request)
     {
         if ($request->has('limit')) {
+            // When 'limit' parameter is provided
             $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+                ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
+                ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
                 ->where('products.status', 1)
-                ->where('gallery.status', 1)->select('products.*', 'gallery.image as image')
-                ->take($request->limit)->get();
+                ->where('gallery.status', 1)
+                ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+                ->take($request->limit)
+                ->get();
             return response()->json($result);
         } else {
+            // When no 'limit' parameter is provided, use pagination
             $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+                ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
+                ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
                 ->where('products.status', 1)
-                ->where('gallery.status', 1)->select('products.*', 'gallery.image as image')
+                ->where('gallery.status', 1)
+                ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
                 ->paginate(16);
             return response()->json($result);
         }
     }
+    
     public function api_product_cate($id)
     {
         $result = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
@@ -590,21 +600,4 @@ class ProductController extends Controller
     }
    
 
-    public function search(Request $request)
-    {
-        // Validate the search query
-        $request->validate([
-            'q' => 'required|string', // Ensure the query is at least 3 characters long
-        ]);
-
-        $query = $request->input('q');
-
-        // Search products in the database based on the query
-        $products = Products::where('name', 'like', '%' . $query . '%') // Assuming you are searching by 'name'
-            ->orWhere('description', 'like', '%' . $query . '%') // Optionally search in description
-            ->get();
-
-        // Return the search results
-        return response()->json(['data' => $products]);
-    }
 }
