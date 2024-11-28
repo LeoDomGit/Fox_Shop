@@ -32,7 +32,6 @@ class OrderController extends Controller
                 'id_product' => $detail['id_product'],
                 'id_order' => $order->id,
                 'quantity' => $detail['quantity'],
-                'image' => $detail['image'],
                 'color' => $detail['color'],
                 'size' => $detail['size'],
                 'total_money' => $detail['total_money'],
