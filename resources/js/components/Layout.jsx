@@ -161,7 +161,7 @@ function Layout({ children }) {
                             style={{ textAlign: "center", marginTop: "20px" }}
                         >
                             <img
-                                src="https://foxshop.trungthanhzone.com/static/media/logo.95843af8a78d16fa99cc.png"
+                                src="https://foxshop.one/static/media/logo.95843af8a78d16fa99cc.png"
                                 alt="Logo"
                                 width={"100px"}
                                 height={"100px"}
