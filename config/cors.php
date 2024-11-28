@@ -5,7 +5,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:3000',
-        'https://foxshop.trungthanhzone.com',
+        'https://foxshop.one',
     ],
 
     'allowed_methods' => ['*'],
