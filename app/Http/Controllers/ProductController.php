@@ -457,7 +457,6 @@ class ProductController extends Controller
    
         $bestSellers = $products->sortByDesc('total_sold')->take(4);
     
-        // Trả về dữ liệu dưới dạng mảng JSON
         return response()->json([
             'data' => $bestSellers->toArray() // Chuyển Collection thành mảng
         ]);
