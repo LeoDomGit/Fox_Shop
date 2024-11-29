@@ -473,9 +473,15 @@ class ProductController extends Controller
             ], 400);
         }
     
-        
-        $products = Products::where('name', 'LIKE', '%' . $keyword . '%')
-            ->where('status', 1) 
+        // Tìm kiếm sản phẩm với từ khóa
+        $products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+            ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
+            ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+            ->where('products.name', 'LIKE', '%' . $keyword . '%')
+            ->where('products.status', 1)
+            ->where('gallery.status', 1)
+            ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+            ->orderBy('products.created_at', 'desc')
             ->get();
     
         // Định dạng lại dữ liệu trả về theo yêu cầu
@@ -492,7 +498,7 @@ class ProductController extends Controller
                 "created_at" => $product->created_at,
                 "updated_at" => $product->updated_at,
                 "in_stock" => $product->in_stock,
-                "image" => $product->image,
+                "image" => $product->image,  // Chỉ lấy một hình ảnh
                 "id_category" => $product->id_category,
             ];
         });
