@@ -134,9 +134,7 @@ class ProductController extends Controller
     $data['in_stock'] = $request->quantity;
     $data['created_at'] = now();
 
-    // Thêm sản phẩm mới và lấy id
     $id = $this->model::insertGetId($data);
-    // Lưu danh mục cho sản phẩm
     foreach ($request->categories as $value) {
         ProductCategory::create(['id_product' => $id, 'id_categories' => $value, 'created_at' => now()]);
     }
@@ -409,28 +407,30 @@ class ProductController extends Controller
     public function api_product(Request $request)
     {
         if ($request->has('limit')) {
-            // When 'limit' parameter is provided
+            // Khi có tham số 'limit', lấy sản phẩm giới hạn
             $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
                 ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
                 ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
                 ->where('products.status', 1)
                 ->where('gallery.status', 1)
                 ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+                ->orderBy('products.created_at', 'desc')
                 ->take($request->limit)
                 ->get();
             return response()->json($result);
         } else {
-            // When no 'limit' parameter is provided, use pagination
             $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
                 ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
                 ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
                 ->where('products.status', 1)
                 ->where('gallery.status', 1)
                 ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+                ->orderBy('products.created_at', 'desc') 
                 ->paginate(16);
             return response()->json($result);
         }
     }
+    
     
     public function api_product_cate($id)
     {
@@ -460,22 +460,50 @@ class ProductController extends Controller
     }
 
     // --------------------------------------
-    public function api_search_product($slug)
+    public function api_search_product(Request $request)
     {
-        $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->where('products.status', 1)
-            ->where('gallery.status', 1)
-            ->where(function ($query) use ($slug) {
-                $query->where('products.name', 'like', '%' . $slug . '%')
-                    ->orWhere('products.slug', 'like', '%' . $slug . '%');
-            })
-            ->select('products.*', 'gallery.image as image')
-            ->get();
-        if (count($result) == 0) {
-            return response()->json(['product' => []]);
+        // Lấy từ khóa từ query parameter
+        $keyword = $request->input('keyword');
+    
+        // Kiểm tra nếu từ khóa không được cung cấp
+        if (!$keyword) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Keyword is required.',
+            ], 400);
         }
-        return response()->json(['products' => $result]);
+    
+        
+        $products = Products::where('name', 'LIKE', '%' . $keyword . '%')
+            ->where('status', 1) 
+            ->get();
+    
+        // Định dạng lại dữ liệu trả về theo yêu cầu
+        $formattedProducts = $products->map(function ($product) {
+            return [
+                "id" => $product->id,
+                "name" => $product->name,
+                "slug" => $product->slug,
+                "price" => $product->price,
+                "discount" => $product->discount,
+                "content" => $product->content,
+                "id_brand" => $product->id_brand,
+                "status" => $product->status,
+                "created_at" => $product->created_at,
+                "updated_at" => $product->updated_at,
+                "in_stock" => $product->in_stock,
+                "image" => $product->image,
+                "id_category" => $product->id_category,
+            ];
+        });
+    
+        // Trả về kết quả tìm kiếm
+        return response()->json([
+            'success' => true,
+            'data' => $formattedProducts,
+        ], 200);
     }
+    
 
 
     // --------------------------------------
