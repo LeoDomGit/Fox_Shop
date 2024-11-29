@@ -449,16 +449,19 @@ class ProductController extends Controller
     }
     public function api_product_best(Request $request)
     {
-
         $products = Products::where('status', 1)
-            ->with(['gallery:id,id_parent,image']) 
-            ->withSum('orderDetails as total_sold', 'quantity') 
-            ->get(); 
-   
-        $bestSellers = $products->sortByDesc('total_sold')->take(4);
+            ->with([
+                'gallery:id,id_parent,image', // Mối quan hệ gallery
+                'orderDetails' // Mối quan hệ orderDetails
+            ])
+            ->withSum('orderDetails as total_sold', 'quantity')
+            ->get();
+    
+        // Chuyển đổi dữ liệu trả về thành mảng
+        $bestSellers = $products->sortByDesc('total_sold')->take(10);
     
         return response()->json([
-            'data' => $bestSellers->toArray() // Chuyển Collection thành mảng
+            'data' => $bestSellers->toArray() // Chuyển đối tượng thành mảng
         ]);
     }
     

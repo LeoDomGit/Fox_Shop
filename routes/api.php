@@ -61,7 +61,7 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
     Route::get('/search', [ProductController::class, 'api_search_product'])->name('search');
-    Route::get('/best',[ProductController::class,'api_product_best']);
+    Route::get('/best-seller',[ProductController::class,'api_product_best']);
     Route::get('/{slug}',[ProductController::class,'apiProductDetail']);
     Route::get('/gallery/{id}',[ProductController::class,'api_gallery_by_product_id']);
     Route::post('/loadCart',[ProductController::class,'api_load_cart_product']);
