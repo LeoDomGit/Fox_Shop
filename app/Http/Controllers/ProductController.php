@@ -464,7 +464,7 @@ class ProductController extends Controller
     {
         // Lấy từ khóa từ query parameter
         $keyword = $request->input('keyword');
-    
+        
         // Kiểm tra nếu từ khóa không được cung cấp
         if (!$keyword) {
             return response()->json([
@@ -473,17 +473,26 @@ class ProductController extends Controller
             ], 400);
         }
     
-        // Tìm kiếm sản phẩm với từ khóa
-        $products = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+        // Tách các từ khóa thành mảng
+        $keywords = explode(' ', $keyword);
+    
+        // Tạo một truy vấn cơ sở dữ liệu để tìm kiếm
+        $query = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
             ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
             ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
-            ->where('products.name', 'LIKE', '%' . $keyword . '%')
             ->where('products.status', 1)
-            ->where('gallery.status', 1)
-            ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+            ->where('gallery.status', 1);
+    
+        // Duyệt qua các từ khóa và thêm điều kiện tìm kiếm cho từng từ
+        foreach ($keywords as $word) {
+            $query->whereRaw('LOWER(products.name) LIKE ?', ['%' . strtolower($word) . '%']);
+        }
+    
+        // Lấy dữ liệu sản phẩm
+        $products = $query->select('products.*', 'gallery.image as image', 'categories.id as id_category')
             ->orderBy('products.created_at', 'desc')
             ->get();
-    
+        
         // Định dạng lại dữ liệu trả về theo yêu cầu
         $formattedProducts = $products->map(function ($product) {
             return [
@@ -509,6 +518,7 @@ class ProductController extends Controller
             'data' => $formattedProducts,
         ], 200);
     }
+    
     
 
 
