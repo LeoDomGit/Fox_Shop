@@ -447,24 +447,28 @@ class ProductController extends Controller
 
         return response()->json($result);
     }
-    public function api_product_best(Request $request){
-        $products = Products::where('status', 1)
-        ->with(['gallery:id,id_parent,image'])
-        ->withSum('orderDetails as total_sold', 'quantity')
-        ->get();
-        $bestSellers = $products->sortByDesc('total_sold')->take(10);
+    public function api_product_best(Request $request)
+    {
 
+        $products = Products::where('status', 1)
+            ->with(['gallery:id,id_parent,image']) 
+            ->withSum('orderDetails as total_sold', 'quantity') 
+            ->get(); 
+   
+        $bestSellers = $products->sortByDesc('total_sold')->take(4);
+    
         return response()->json([
-            'data' => $bestSellers
+            'data' => $bestSellers->toArray() // Chuyển Collection thành mảng
         ]);
     }
+    
 
     // --------------------------------------
     public function api_search_product(Request $request)
     {
         // Lấy từ khóa từ query parameter
         $keyword = $request->input('keyword');
-    
+        
         // Kiểm tra nếu từ khóa không được cung cấp
         if (!$keyword) {
             return response()->json([
@@ -473,11 +477,26 @@ class ProductController extends Controller
             ], 400);
         }
     
-        
-        $products = Products::where('name', 'LIKE', '%' . $keyword . '%')
-            ->where('status', 1) 
-            ->get();
+        // Tách các từ khóa thành mảng
+        $keywords = explode(' ', $keyword);
     
+        // Tạo một truy vấn cơ sở dữ liệu để tìm kiếm
+        $query = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+            ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
+            ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+            ->where('products.status', 1)
+            ->where('gallery.status', 1);
+    
+        // Duyệt qua các từ khóa và thêm điều kiện tìm kiếm cho từng từ
+        foreach ($keywords as $word) {
+            $query->whereRaw('LOWER(products.name) LIKE ?', ['%' . strtolower($word) . '%']);
+        }
+    
+        // Lấy dữ liệu sản phẩm
+        $products = $query->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+            ->orderBy('products.created_at', 'desc')
+            ->get();
+        
         // Định dạng lại dữ liệu trả về theo yêu cầu
         $formattedProducts = $products->map(function ($product) {
             return [
@@ -492,7 +511,7 @@ class ProductController extends Controller
                 "created_at" => $product->created_at,
                 "updated_at" => $product->updated_at,
                 "in_stock" => $product->in_stock,
-                "image" => $product->image,
+                "image" => $product->image,  // Chỉ lấy một hình ảnh
                 "id_category" => $product->id_category,
             ];
         });
@@ -503,6 +522,7 @@ class ProductController extends Controller
             'data' => $formattedProducts,
         ], 200);
     }
+    
     
 
 
