@@ -447,23 +447,28 @@ class ProductController extends Controller
 
         return response()->json($result);
     }
-    public function api_product_best(Request $request)
-    {
-        $products = Products::where('status', 1)
-            ->with([
-                'gallery:id,id_parent,image', // Mối quan hệ gallery
-                'orderDetails' // Mối quan hệ orderDetails
-            ])
-            ->withSum('orderDetails as total_sold', 'quantity')
-            ->get();
+   public function api_product_best(Request $request)
+{
     
-        // Chuyển đổi dữ liệu trả về thành mảng
-        $bestSellers = $products->sortByDesc('total_sold')->take(10);
-    
-        return response()->json([
-            'data' => $bestSellers->toArray() // Chuyển đối tượng thành mảng
-        ]);
-    }
+    $products = Products::where('status', 1)
+        ->with('gallery:id,id_parent,image')
+        ->get();
+    $bestSellers = $products->map(function ($product) {
+        $totalSold = $product->orderDetails->sum('quantity');
+        $product->total_sold = $totalSold;
+        $firstImage = $product->gallery->first();
+        $product->image = $firstImage ? $firstImage->image : null;
+        
+        return $product;
+    });
+    $bestSellers = $bestSellers->sortByDesc('total_sold')->take(10);
+
+    // Trả về kết quả dưới dạng JSON
+    return response()->json([
+        'data' => $bestSellers->toArray()
+    ]);
+}
+
     
 
     // --------------------------------------
