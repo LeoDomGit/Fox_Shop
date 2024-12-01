@@ -488,7 +488,7 @@ class ProductController extends Controller
             return $product;
         });
  
-        $bestSellers = $bestSellers->sortByDesc('total_sold')->take(10)->values();
+        $bestSellers = $bestSellers->sortByDesc('total_sold')->take(4)->values();
         return response()->json($bestSellers);
     }
 
