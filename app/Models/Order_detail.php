@@ -15,8 +15,15 @@ class Order_detail extends Model
     ];
 
     // Mối quan hệ với model Product
-    public function product()
-    {
-        return $this->belongsTo(Products::class, 'id_product');
-    }
+ // Mối quan hệ với Order_detail
+ public function orderDetails()
+ {
+     return $this->hasMany(Order_detail::class, 'id_product');
+ }
+
+ // Mối quan hệ với Gallery
+ public function gallery()
+ {
+     return $this->hasMany(Gallery::class, 'id_parent');
+ }
 }

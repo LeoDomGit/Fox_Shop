@@ -454,6 +454,29 @@ class UserController extends BaseCrudController
     }
 
 
+public function validateEmail(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => [
+            'required',
+            'email',
+            function ($attribute, $value, $fail) {
+                $user = User::where('email', $value)->first();
+                if (!$user) {
+                    $fail('Email không tồn tại trong hệ thống.');
+                }
+            }
+        ],
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['valid' => false, 'errors' => $validator->errors()], 422);
+    }
+
+    return response()->json(['valid' => true]);
+}
+
+
     public function resetPassword(Request $request)
     {
         // Validate các thông tin đầu vào
