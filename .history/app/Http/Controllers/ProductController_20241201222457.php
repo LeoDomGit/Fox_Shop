@@ -457,7 +457,7 @@ class ProductController extends Controller
             ->where('status', 1)
             ->with([
                 'gallery:id,id_parent,image',
-                'orderDetails:id_product,quantity'
+                'orderDetails:product_id,quantity'
             ])
             ->get();
 
