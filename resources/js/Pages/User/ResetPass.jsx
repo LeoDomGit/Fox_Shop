@@ -111,7 +111,7 @@ const ResetPassword = () => {
                         <div className="text-center mt-4">
                             <p>
                                 Mật khẩu đã được thay đổi thành công!
-                                <a href="https://foxshop.trungthanhzone.com">
+                                <a href="https://foxshop.one">
                                     Vui lòng đăng nhập lại tại đây
                                 </a>
                             </p>
