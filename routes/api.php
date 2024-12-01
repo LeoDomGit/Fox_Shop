@@ -53,6 +53,7 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
     Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
     Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
     Route::get('/orders/detail/{id}', [OrderController::class, 'getOrdersById']);
+    Route::post('/forgot/validate-email', [UserController::class, 'validateEmail']);
 
 
 
