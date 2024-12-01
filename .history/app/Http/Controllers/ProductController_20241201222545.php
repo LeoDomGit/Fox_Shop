@@ -408,48 +408,32 @@ class ProductController extends Controller
         return Inertia::render('Products/Detail', ['product' => $data]);
     }
 
-     public function api_product(Request $request)
+    public function api_product(Request $request)
     {
-        $query = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
-            ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
-            ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
-            ->where('products.status', 1)
-            ->where('gallery.status', 1)
-            ->select('products.*', 'gallery.image as image', 'categories.id as id_category');
- 
-        if ($request->has('category') && !empty($request->category)) {
-            $query->where('categories.id', $request->category);
-        }
-    
-        if ($request->has('brand') && !empty($request->brand)) {
-            $query->where('products.id_brand', $request->brand);
-        }
-    
-        if ($request->has('minPrice') && !empty($request->minPrice)) {
-            $query->where('products.price', '>=', $request->minPrice);
-        }
-        if ($request->has('maxPrice') && !empty($request->maxPrice)) {
-            $query->where('products.price', '<=', $request->maxPrice);
-        }
-        
-    
-        if ($request->has('sortPrice') && in_array($request->sortPrice, ['asc', 'desc'])) {
-            $query->orderBy('products.price', $request->sortPrice);
+        if ($request->has('limit')) {
+            // Khi có tham số 'limit', lấy sản phẩm giới hạn
+            $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+                ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
+                ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+                ->where('products.status', 1)
+                ->where('gallery.status', 1)
+                ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+                ->orderBy('products.created_at', 'desc')
+                ->take($request->limit)
+                ->get();
+            return response()->json($result);
         } else {
-            $query->orderBy('products.created_at', 'desc'); 
+            $result = Products::join('gallery', 'products.id', '=', 'gallery.id_parent')
+                ->join('product_categories', 'products.id', '=', 'product_categories.id_product')
+                ->join('categories', 'product_categories.id_categories', '=', 'categories.id')
+                ->where('products.status', 1)
+                ->where('gallery.status', 1)
+                ->select('products.*', 'gallery.image as image', 'categories.id as id_category')
+                ->orderBy('products.created_at', 'desc')
+                ->paginate(16);
+            return response()->json($result);
         }
-    
-        $result = $query->paginate(16);
-    
-        if ($result->isEmpty()) {
-            return response()->json(['message' => 'Không có sản phẩm phù hợp.'], 404);
-        }
-    
-        return response()->json($result);
     }
-    
-
-    
 
 
     public function api_product_cate($id)
@@ -467,9 +451,6 @@ class ProductController extends Controller
 
         return response()->json($result);
     }
-
-
-
     public function api_product_best(Request $request)
     {
         $products = Products::select('id', 'name', 'price', 'status')

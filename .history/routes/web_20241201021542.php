@@ -27,7 +27,7 @@ Route::prefix('admin')->group(function () {
 Route::resource('/roles', RolesController::class);
 Route::resource('/permissions', PermissionController::class);
 Route::resource('/users', UserController::class);
-Route::post('/loginad', [UserController::class, 'loginAdmin']);
+Route::post('/login', [UserController::class, 'loginAdmin']);
 Route::put('/users/switch/{id}', [UserController::class, 'switchUser']);
 Route::resource('/categories', CategoriesController::class);
 Route::post('/categories/switch/{id}', [CategoriesController::class, 'switchCategories']);

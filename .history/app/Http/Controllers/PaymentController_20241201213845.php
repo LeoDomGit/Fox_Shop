@@ -123,7 +123,7 @@ class PaymentController extends Controller
         }
     
         Mail::to($user->email)->send(new OrderConfirmationMail($order));
-        return redirect('https://foxshop.one/thankyou')
+        return redirect('https://foxshop.one/thankyou/')
             ->with('message', 'Payment processed successfully.');
     }
 }
