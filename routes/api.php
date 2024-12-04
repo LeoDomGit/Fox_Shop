@@ -28,6 +28,15 @@ Route::get('/user', function (Request $request) {
    // routes/api.php
 Route::delete('/user/delete/{id}', [UserController::class, 'destroy']);
 Route::get('/user', [UserController::class, 'list']);
+Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);
+Route::get('/reset-password/{token}/{email}', [UserController::class, 'resetForm']);
+Route::post('/reset-password', [UserController::class, 'resetPassword']);
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+Route::post('/forgot/validate-email', [UserController::class, 'validateEmail']);
+Route::post('/update-profile', [UserController::class,'updateProfile']);
+Route::post('/update-password', [UserController::class,'changePassword']);
 
 
 // Trong routes/api.php
@@ -38,22 +47,15 @@ Route::get('/orders/check-purchase/{productId}', [OrderController::class, 'check
 Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCommented']);
 
 
-
-    Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);
-    Route::get('/reset-password/{token}/{email}', [UserController::class, 'resetForm']);
-    Route::post('/reset-password', [UserController::class, 'resetPassword']);
-    Route::post('/register', [UserController::class, 'register']);
-    Route::post('/login', [UserController::class, 'login']);
-    Route::post('/logout', [UserController::class, 'logout'])->name('logout');
-    Route::post('/update/user', [UserController::class,'updateUser']);
     Route::post('/payment', [PaymentController::class, 'vnpay_payment']);
     Route::get('/payment/url', [PaymentController::class, 'vnpay_payment_url']);
-    Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/vnpay-return', [PaymentController::class, 'vnpayreturn'])->name('payment.return');
     Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
+
+    
+    Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
     Route::get('/orders/detail/{id}', [OrderController::class, 'getOrdersById']);
-    Route::post('/forgot/validate-email', [UserController::class, 'validateEmail']);
 
 
 

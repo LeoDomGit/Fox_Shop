@@ -38,6 +38,7 @@ class Products extends Model
     {
         return $this->hasMany(Gallery::class, 'id_parent');
     }
+    
     public function scopeActive($query)
     {
         return $query->where('status', 1);

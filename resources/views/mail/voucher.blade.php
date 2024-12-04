@@ -19,7 +19,7 @@
 
         <p style="font-size: 16px; color: #333;">Số lượng có hạn nhanh tay, nhanh tay</p>
         <p style="font-size: 14px; color: #888;">Cảm ơn bạn đã đồng hành cùng chúng tôi!</p>
-        <a href="https://foxshop.trungthanhzone.com/voucher" 
+        <a href="https://foxshop.one" 
            style="display: inline-block; padding: 10px 20px; font-size: 16px; font-weight: bold; color: #fff; background-color: #4CAF50; border-radius: 5px; text-decoration: none; margin-top: 20px;">
             Nhận Voucher
         </a>

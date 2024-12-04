@@ -11,7 +11,12 @@ class Order_detail extends Model
     protected $table = 'order_details';
 
     protected $fillable = [
-        'id_product', 'id_attribute', 'id_order', 'quantity', 'total_money',
+        'id_product',
+        'id_attribute',
+        'id_order',
+        'quantity',
+        'total_money',
+        'image', // Thêm image vào đây
     ];
 
     // Mối quan hệ với model Product
@@ -26,4 +31,10 @@ class Order_detail extends Model
  {
      return $this->hasMany(Gallery::class, 'id_parent');
  }
+
+ public function product()
+{
+    return $this->belongsTo(Products::class, 'id_product');
+}
+
 }
