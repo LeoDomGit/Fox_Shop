@@ -472,7 +472,7 @@ class ProductController extends Controller
 
     public function api_product_best(Request $request)
     {
-        $products = Products::select('id', 'name', 'price', 'status')
+        $products = Products::select('id', 'name', 'price', 'status', 'discount')
             ->where('status', 1)
             ->with([
                 'gallery:id,id_parent,image',
@@ -488,7 +488,7 @@ class ProductController extends Controller
             return $product;
         });
  
-        $bestSellers = $bestSellers->sortByDesc('total_sold')->take(10)->values();
+        $bestSellers = $bestSellers->sortByDesc('total_sold')->take(4)->values();
         return response()->json($bestSellers);
     }
 
