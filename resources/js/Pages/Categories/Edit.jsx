@@ -203,7 +203,7 @@ function Edit({ category }) {
                         <div className="form-group">
                             <button
                                 type="submit"
-                                // onClick={handleSubmit}
+                                onClick={handleSubmit}
                                 className="btn btn-primary"
                             >
                                 Lưu danh mục

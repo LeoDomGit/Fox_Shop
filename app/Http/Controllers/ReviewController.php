@@ -29,8 +29,8 @@ class ReviewController extends Controller
     
         // Kiểm tra xem người dùng đã bình luận sản phẩm chưa
         $hasCommented = Review::where('id_user', $userId)
-                               ->where('id_product', $productId)
-                               ->exists();
+                                ->where('id_product', $productId)
+                                ->exists();
     
         return response()->json(['hasCommented' => $hasCommented]);
     }

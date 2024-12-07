@@ -119,11 +119,9 @@ class ProductController extends Controller
         'quantity' => 'nullable|numeric',
         'discount' => 'nullable|numeric'
     ]);
-
     if ($validator->fails()) {
         return response()->json(['check' => false, 'msg' => $validator->errors()->first()]);
     }
-
     $data = [];
     $data['name'] = $request->name;
     $data['slug'] = Str::slug($data['name']);
@@ -133,7 +131,6 @@ class ProductController extends Controller
     $data['content'] = $request->content;
     $data['in_stock'] = $request->quantity;
     $data['created_at'] = now();
-
     // Thêm sản phẩm mới và lấy id
     $id = $this->model::insertGetId($data);
     // Lưu danh mục cho sản phẩm
@@ -157,16 +154,13 @@ class ProductController extends Controller
                 'attribute_id' => $colorId,
             ]);
     }
-
     foreach ($request->input('sizes') as $sizeId) {
             ProductsAttribute::create([
                 'product_id' => $id,
                 'attribute_id' => $sizeId,
             ]);
     }
-
     $result = $this->model::with('categories', 'brands')->find($id);
-
     return response()->json(['check' => true, 'data' => $result]);
 }
 

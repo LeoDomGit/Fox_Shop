@@ -106,24 +106,24 @@ function Layout({ children }) {
         avatar: null,
     });
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            try {
-                const parsedUser = JSON.parse(storedUser);
-                setUser(parsedUser);
-                setUpdatedUser(parsedUser);
-            } catch (error) {
-                console.error("Failed to parse user data:", error);
-            }
-        } else {
-            window.location.href = "/";
-        }
-        setLoading(false);
-    }, []);
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    // useEffect(() => {
+    //     const storedUser = localStorage.getItem("user");
+    //     if (storedUser) {
+    //         try {
+    //             const parsedUser = JSON.parse(storedUser);
+    //             setUser(parsedUser);
+    //             setUpdatedUser(parsedUser);
+    //         } catch (error) {
+    //             console.error("Failed to parse user data:", error);
+    //         }
+    //     } else {
+    //         window.location.href = "/";
+    //     }
+    //     setLoading(false);
+    // }, []);
+    // if (loading) {
+    //     return <div>Loading...</div>;
+    // }
     const handleLogout = async () => {
         try {
             await axios.post(

@@ -36,9 +36,6 @@ Route::get('/orders/check-purchase/{productId}', [OrderController::class, 'check
 
 // Trong routes/api.php
 Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCommented']);
-
-
-
     Route::post('/forgot', [UserController::class, 'sendResetLinkEmail']);
     Route::get('/reset-password/{token}/{email}', [UserController::class, 'resetForm']);
     Route::post('/reset-password', [UserController::class, 'resetPassword']);
@@ -53,9 +50,6 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
     Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
     Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
     Route::get('/orders/detail/{id}', [OrderController::class, 'getOrdersById']);
-
-
-
     Route::resource('/review', ReviewController::class);
     Route::resource('/wishlist', WishlistController::class);
 Route::prefix('products')->name('products.')->group(function () {
@@ -69,12 +63,9 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::get('/details/{slug}',[ProductController::class,'api_product_details']);
 
 });
-
 Route::prefix('attributes')->name('attributes.')->group (function () {
     Route::get('/',[AttributeController::class,'listAttr']);
-
 });
-
 Route::prefix('categories')->name('categories.')->group(function () {
     Route::get('/',[CategoriesController::class,'api_categories']);
     Route::get('/with-products',[CategoriesController::class,'api_categories_with_products']);
