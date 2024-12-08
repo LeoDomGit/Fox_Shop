@@ -26,10 +26,10 @@ class ReviewController extends Controller
     {
         $userId = $request->query('userId');
         $productId = $request->query('productId');
-    
-        // Kiểm tra xem người dùng đã bình luận sản phẩm chưa
+
         $hasCommented = Review::where('id_user', $userId)
                                ->where('id_product', $productId)
+                               ->where('status', 1)
                                ->exists();
     
         return response()->json(['hasCommented' => $hasCommented]);
@@ -100,7 +100,10 @@ class ReviewController extends Controller
     // 
     public function getAllComments(Request $request)
     {
-        $comments = Review::latest('created_at')->get(); 
+        $comments = Review::latest('created_at')
+        ->where('status', 1)
+        ->orderBy('created_at')
+        ->get(); 
         return response()->json($comments);
     }
 }

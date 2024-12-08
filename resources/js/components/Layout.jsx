@@ -343,14 +343,7 @@ function Layout({ children }) {
                                 Quản lý đơn hàng
                             </a>
                         </MenuItem>
-                        <MenuItem icon={<FavoriteIcon />}>
-                            <a
-                                className="text-decoration-none text-dark"
-                                href={"/admin/wishlist"}
-                            >
-                                Quản lý wishlist
-                            </a>
-                        </MenuItem>
+
                         <MenuItem icon={<StarIcon />}>
                             <a
                                 className="text-decoration-none text-dark"
