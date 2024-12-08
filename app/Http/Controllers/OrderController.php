@@ -93,5 +93,30 @@ public function getOrdersById($id)
     
         return response()->json(['hasPurchased' => $order]);
     }
+
+
+    public function cancelOrder(Request $request)
+{
+    $orderId = $request->input('order_id');
+    $order = Orders::with('orderDetails')->find($orderId);
+
+    if (!$order) {
+        return response()->json(['error' => 'Order not found'], 404);
+    }
+    if ($order->status !== 'pending') {
+        return response()->json(['error' => 'Only pending orders can be canceled'], 400);
+    }
+    $order->update(['status' => 'canceled']);
+    foreach ($order->orderDetails as $detail) {
+        $product = Products::find($detail->id_product);
+        if ($product) {
+            $newQuantity = $product->in_stock + $detail->quantity;
+            $product->update(['in_stock' => $newQuantity]);
+        }
+    }
+
+    return response()->json(['message' => 'Order canceled successfully']);
+}
+
     
 }

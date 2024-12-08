@@ -15,6 +15,8 @@ use App\Mail\createUser;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Cookie;
+
 
 
 class UserController extends BaseCrudController
@@ -152,7 +154,7 @@ class UserController extends BaseCrudController
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,
-                'avatar' => "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg",
+                'avatar' => "storage/avatars/avatar.png",
                 'idRole' => 2,
             ]);
         }
@@ -172,54 +174,62 @@ class UserController extends BaseCrudController
     }
 
 
-    public function login(Request $request)
-    {
-        // Validate các trường dữ liệu trong request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
-        ], [
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Email không hợp lệ.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()->toArray()
-            ], 422);
-        }
+public function login(Request $request)
+{
+    // Validate các trường dữ liệu trong request
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required|string|min:8',
+    ], [
+        'email.required' => 'Vui lòng nhập email.',
+        'email.email' => 'Email không hợp lệ.',
+        'password.required' => 'Vui lòng nhập mật khẩu.',
+        'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+    ]);
 
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json([
-                'errors' => [
-                    'email' => ['Email này chưa được đăng ký.']
-                ]
-            ], 401);
-        }
-
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'errors' => [
-                    'password' => ['Mật khẩu không chính xác.']
-                ]
-            ], 401);
-        }
-
-        $token = $user->createToken('YourAppName')->plainTextToken;
+    if ($validator->fails()) {
         return response()->json([
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'avatar' => asset($user->avatar),
-                'phone' => $user->phone
-            ]
-        ], 200);
+            'errors' => $validator->errors()->toArray()
+        ], 422);
     }
+
+    $user = User::where('email', $request->email)->first();
+    if (!$user) {
+        return response()->json([
+            'errors' => [
+                'email' => ['Email này chưa được đăng ký.']
+            ]
+        ], 401);
+    }
+
+    if (!Hash::check($request->password, $user->password)) {
+        return response()->json([
+            'errors' => [
+                'password' => ['Mật khẩu không chính xác.']
+            ]
+        ], 401);
+    }
+
+    $token = $user->createToken('YourAppName')->plainTextToken;
+
+    // Nếu có cờ "remember" thì lưu token vào cookie
+    if ($request->has('remember') && $request->remember) {
+        Cookie::queue('remember_token', $token, 60 * 24 * 30); // Lưu trong 30 ngày
+    }
+
+    return response()->json([
+        'token' => $token,
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar' => asset($user->avatar),
+            'phone' => $user->phone
+        ]
+    ], 200);
+}
+
 
     public function loginAdmin(Request $request)
     {

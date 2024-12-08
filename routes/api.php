@@ -53,14 +53,16 @@ Route::get('/comment/check-comment', [ReviewController::class, 'checkIfUserHasCo
     Route::post('/vnpay-data', [PaymentController::class, 'vnpay_data']);
 
     
-    Route::post('/orders', [OrderController::class, 'store']);
-    Route::get('/orders/{id_user}', [OrderController::class, 'getOrdersByUserId']);
-    Route::get('/orders/detail/{id}', [OrderController::class, 'getOrdersById']);
-
+    Route::prefix('orders')->name('orders.')->group(function () {
+    Route::post('/', [OrderController::class, 'store']);
+    Route::get('//{id_user}', [OrderController::class, 'getOrdersByUserId']);
+    Route::get('/detail/{id}', [OrderController::class, 'getOrdersById']);
+    Route::post('/cancel', [OrderController::class, 'cancelOrder']);
+});
 
 
     Route::resource('/review', ReviewController::class);
-    Route::resource('/wishlist', WishlistController::class);
+
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/',[ProductController::class,'api_product']);
     Route::get('/search', [ProductController::class, 'api_search_product'])->name('search');
