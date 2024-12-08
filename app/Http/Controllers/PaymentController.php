@@ -82,11 +82,15 @@ class PaymentController extends Controller
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash; 
         }
         foreach ($request->input('order_details') as $detail) {
+
+            $product = Products::with('gallery')->find($detail['id_product']);
+            $image = $product->gallery->first()?->image ?? null;
             Order_detail::create([
                 'id_product' => $detail['id_product'],
                 'id_order' => $order->id,
                 'quantity' => $detail['quantity'],
                 'color' => $detail['color'],
+                'image' => $image,
                 'size' => $detail['size'],
                 'total_money' => $detail['total_money'],
                 'id_vouchers' => $request->input('id_voucher') > 0 ? $request->input('id_voucher') : null,
