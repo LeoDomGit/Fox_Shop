@@ -42,7 +42,6 @@ function Index(orders) {
         }
     };
     const statusMapping = {
-        "pending": { color: "danger", label: "Đang chờ xử lý" },
         "Đang chờ xử lý": { color: "danger", label: "Đang chờ xử lý" },
         "Đang xử lý": { color: "warning", label: "Đang xử lý" },
         "Đang lấy hàng": { color: "info", label: "Đang lấy hàng" },
@@ -50,13 +49,10 @@ function Index(orders) {
         "Đã hoàn thành": { color: "success", label: "Đã hoàn thành" },
         "Đã hủy": { color: "secondary", label: "Đã hủy" },
     };
-
+    
     function StatusBadge({ status }) {
-        const statusInfo = statusMapping[status] || {
-            color: "dark",
-            label: status,
-        };
-
+        const statusInfo = statusMapping[status] || { color: "dark", label: status };
+    
         return <Badge bg={statusInfo.color}>{statusInfo.label}</Badge>;
     }
     useEffect(() => {
@@ -148,10 +144,15 @@ function Index(orders) {
                                             <td>{item.payment?.method}</td>
                                             <td>{item.order_date}</td>
                                             <td>
-                                                {item.status && (
-                                                    <StatusBadge
-                                                        status={item.status}
-                                                    />
+                                                {item.status &&
+                                                item.status === "pending" ? (
+                                                    <Badge bg="danger">
+                                                        Đang chờ xử lý
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge bg="primary">
+                                                        {item.status}
+                                                    </Badge>
                                                 )}
                                             </td>
                                             <td>
@@ -165,7 +166,7 @@ function Index(orders) {
                                                         )
                                                     }
                                                 >
-                                                    <option value="Đang chờ xử lý">
+                                                    <option value="pending">
                                                         Đang chờ xử lý
                                                     </option>
                                                     <option value="Đang xử lý">
@@ -175,7 +176,7 @@ function Index(orders) {
                                                         Đang lấy hàng
                                                     </option>
                                                     <option value="Đang giao hàng">
-                                                        Đang giao hàng
+                                                        Đang giao hàng 
                                                     </option>
                                                     <option value="Đã hoàn thành">
                                                         Đã hoàn thành

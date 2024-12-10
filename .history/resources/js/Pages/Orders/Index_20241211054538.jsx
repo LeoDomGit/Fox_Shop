@@ -42,7 +42,6 @@ function Index(orders) {
         }
     };
     const statusMapping = {
-        "pending": { color: "danger", label: "Đang chờ xử lý" },
         "Đang chờ xử lý": { color: "danger", label: "Đang chờ xử lý" },
         "Đang xử lý": { color: "warning", label: "Đang xử lý" },
         "Đang lấy hàng": { color: "info", label: "Đang lấy hàng" },
@@ -165,7 +164,7 @@ function Index(orders) {
                                                         )
                                                     }
                                                 >
-                                                    <option value="Đang chờ xử lý">
+                                                    <option value="pending">
                                                         Đang chờ xử lý
                                                     </option>
                                                     <option value="Đang xử lý">
