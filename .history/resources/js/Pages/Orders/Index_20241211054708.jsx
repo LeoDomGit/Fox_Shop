@@ -42,7 +42,7 @@ function Index(orders) {
         }
     };
     const statusMapping = {
-        "pending": { color: "danger", label: "Đang chờ xử lý" },
+        "peding": { color: "danger", label: "Đang chờ xử lý" },
         "Đang chờ xử lý": { color: "danger", label: "Đang chờ xử lý" },
         "Đang xử lý": { color: "warning", label: "Đang xử lý" },
         "Đang lấy hàng": { color: "info", label: "Đang lấy hàng" },
