@@ -45,6 +45,16 @@ const RevenueChart = ({ data }) => {
     return (
         <div>
             <h5 className="mt-5">Biểu đồ Doanh thu theo ngày</h5>
+            <div className="d-flex">
+                <div>
+                    <label htmlFor="">Ngày bắt đầu:</label>
+                    <input type="date" name="stDate" id="" />
+                </div>
+                <div>
+                    <label htmlFor="">Ngày kết thúc:</label>
+                    <input type="date" name="endDate" id="" />
+                </div>
+            </div>
             <Line data={chartData} />
         </div>
     );

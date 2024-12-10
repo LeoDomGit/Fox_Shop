@@ -22,7 +22,7 @@ class DashboardController extends Controller
             ->orderByRaw('DATE(orders.order_date) ASC');
 
         if ($request->startDate && $request->endDate) {
-            $revenue = $revenue->whereBetween('orders.order_date', [$request->startDate, $request->endDate]);
+            $revenue = $revenue->whereBetween('orders.order_date', [$startDate, $endDate]);
         }
 
         $revenue = $revenue->get();
