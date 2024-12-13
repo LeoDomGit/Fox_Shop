@@ -65,9 +65,9 @@ jobs:
            DB_CONNECTION=mysql
            DB_HOST=127.0.0.1
            DB_PORT=3306
-           DB_DATABASE=einoffww_foxshop
-           DB_USERNAME=einoffww_foxshop
-           DB_PASSWORD=einoffww_foxshop
+           DB_DATABASE=${{ secrets.DB_NAME }}
+           DB_USERNAME=${{ secrets.DB_USERNAME }}
+           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
            SESSION_DRIVER=database
            SESSION_LIFETIME=120
            SESSION_ENCRYPT=false
