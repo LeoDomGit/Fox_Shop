@@ -14,7 +14,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WishlistController;
-
+use Laravel\Socialite\Facades\Socialite;
 
 
 Route::get('/user', function (Request $request) {
@@ -104,3 +104,11 @@ Route::prefix('comment')->name('comment.')->group(function () {
 Route::prefix('wishlist')->name('wishlist.')->group(function () {
     Route::get('/list/{id_user}', [WishlistController::class, 'getAllListByUser']);
 });
+
+Route::get('/auth/google/redirect', function () {
+    return Socialite::driver('google')->stateless()->redirect();
+});
+
+
+Route::get('/auth/google/callback', [UserController::class, 'handleGoogleCallback']);
+

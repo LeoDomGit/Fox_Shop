@@ -16,8 +16,9 @@ use App\Mail\ResetPasswordMail;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Cookie;
-
-
+use Illuminate\Support\Facades\Redirect;
+use Laravel\Socialite\Facades\Socialite;
+use Str;
 
 class UserController extends BaseCrudController
 {
@@ -154,7 +155,7 @@ class UserController extends BaseCrudController
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,
-                'avatar' => "storage/avatars/avatar.png",
+                'avatar' => "avatars/avatar.png",
                 'idRole' => 2,
             ]);
         }
@@ -228,6 +229,42 @@ public function login(Request $request)
             'phone' => $user->phone
         ]
     ], 200);
+}
+
+
+public function handleGoogleCallback()
+{
+    $googleUser = Socialite::driver('google')->stateless()->user();
+
+    $user = User::updateOrCreate(
+        ['google_id' => $googleUser->id],
+        [
+            'name' => $googleUser->name,
+            'email' => $googleUser->email,
+            'avatar' => $googleUser->avatar,
+            'password' => bcrypt(Str::random(12)),
+            'idRole' => 2, 
+        ]
+    );
+
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    $userInfo = [
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'avatar' => $googleUser->avatar,
+        'idRole' => $user->idRole,
+    ];
+
+    $redirectUrl = sprintf(
+        // 'http://localhost:3000/login?token=%s&user=%s',
+        'https://dashboard.foxshop.one/login?token=%s&user=%s',
+        $token,
+        urlencode(json_encode($userInfo))
+    );
+
+    return Redirect::to($redirectUrl);
 }
 
 
@@ -601,8 +638,6 @@ public function validateEmail(Request $request)
         return response()->json(['message' => 'Có lỗi xảy ra khi xóa tài khoản.', 'error' => $e->getMessage()], 500);
     }
 }
-
-
 
 
 }

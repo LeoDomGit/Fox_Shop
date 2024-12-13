@@ -59,23 +59,4 @@ Route::resource('/wishlist', WishlistController::class);
 Route::resource('/review', ReviewController::class);
 Route::post('/review/switch/{id}', [ReviewController::class, 'switchReview']);
 
-
-Route::get('/auth/google/redirect', function(Request $request){
-    return Socialite::driver("google")->redirect();
-});
-
-Route::get('/auth/google/callback', function(Request $request){
-    $googleUser = Socialite::driver("google")->user();
-    $user = User::updateOrCreate(
-        ['google_id' => $googleUser->id],
-        ['name' => $googleUser->name,
-        'email' => $googleUser->email,
-        'password' => Str::password(12)
-        ]
-        
-    );
-    Auth::login($user);
-
-    return redirect('https://foxshop.trungthanhzone.com/');
-});
 });
