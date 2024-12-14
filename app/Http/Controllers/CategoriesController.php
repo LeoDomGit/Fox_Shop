@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categories;
 use App\Models\Products;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Str;
 class CategoriesController extends Controller
 {
+    protected $model;
 
     public function __construct(){
         $this->model= Categories::class;
@@ -95,7 +97,7 @@ public function update(Request $request, $id)
     if ($request->hasFile('images')) {
         $path = $request->file('images')->store('categories', 'public');
         $imagesUrl = Storage::url($path);
-        \Log::info("Avatar path: " . $imagesUrl);
+        Log::info("Avatar path: " . $imagesUrl);
         dd($imagesUrl);
         $data['images'] = $imagesUrl;
     }
@@ -130,7 +132,7 @@ public function updateCate(Request $request, $id) {
     if ($request->hasFile('images')) {
         $path = $request->file('images')->store('categories', 'public');
         $imagesUrl = Storage::url($path);
-        \Log::info("Avatar path: " . $imagesUrl);
+        Log::info("Avatar path: " . $imagesUrl);
         $data['images'] = $imagesUrl;
     }
     $check = $this->model::find($id)->update($data);
@@ -148,7 +150,7 @@ if ($check) {
             'position'=>'numeric',
         ];
     
-        $validator = \Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
     
         if ($validator->fails()) {
             throw new HttpResponseException(response()->json([
@@ -201,23 +203,29 @@ if ($check) {
 public function api_paginate_products_by_category($slug, Request $request)
 {
     $limit = $request->has('limit') ? $request->limit : 10;
-    $category = Categories::where('slug', $slug)->first();
+    $category = Categories::where('slug', $slug,  )->first();
     if (!$category) {
         return response()->json(['message' => 'Category not found'], 404);
     }
     $products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
+        ->join('categories', 'categories.id', '=', 'product_categories.id_categories') 
         ->join('gallery', 'products.id', '=', 'gallery.id_parent')
         ->where('product_categories.id_categories', $category->id)
         ->where('products.status', 1)
         ->where('gallery.status', 1)
-        ->select('products.*', 'gallery.image as image')
+        ->select('products.*', 'gallery.image as image', 'categories.name as name' )
         ->paginate($limit);
-    if ($products->isEmpty()) {
-        return response()->json(['message' => 'No products found in this category'], 404);
-    }
-    return response()->json($products);
+   
+
+        $response = [
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ],
+            'products' => $products,
+        ];
+        return response()->json($response);
 }
-
-
 
 }
