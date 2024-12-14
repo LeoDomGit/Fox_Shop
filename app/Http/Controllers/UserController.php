@@ -259,7 +259,7 @@ public function handleGoogleCallback()
 
     $redirectUrl = sprintf(
         // 'http://localhost:3000/login?token=%s&user=%s',
-        'https://dashboard.foxshop.one/login?token=%s&user=%s',
+        'https://foxshop.one/login?token=%s&user=%s',
         $token,
         urlencode(json_encode($userInfo))
     );
