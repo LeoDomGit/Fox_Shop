@@ -203,29 +203,42 @@ if ($check) {
 public function api_paginate_products_by_category($slug, Request $request)
 {
     $limit = $request->has('limit') ? $request->limit : 10;
-    $category = Categories::where('slug', $slug,  )->first();
+
+    $category = Categories::where('slug', $slug)->first();
+
     if (!$category) {
         return response()->json(['message' => 'Category not found'], 404);
     }
+
+    // Truy vấn để lấy các sản phẩm theo danh mục
     $products = Products::join('product_categories', 'products.id', '=', 'product_categories.id_product')
         ->join('categories', 'categories.id', '=', 'product_categories.id_categories') 
         ->join('gallery', 'products.id', '=', 'gallery.id_parent')
-        ->where('product_categories.id_categories', $category->id)
-        ->where('products.status', 1)
-        ->where('gallery.status', 1)
-        ->select('products.*', 'gallery.image as image', 'categories.name as name' )
-        ->paginate($limit);
-   
+        ->where('product_categories.id_categories', $category->id)  
+        ->where('products.status', 1)  
+        ->where('gallery.status', 1)  
+        ->select(
+            'products.id',
+            'products.name as name',
+            'products.slug',        
+            'products.price',           
+            'products.discount',        
+            'products.in_stock',           
+            'gallery.image as image',   
+            'categories.name as category_name' 
+        )
+        ->paginate($limit); 
 
-        $response = [
-            'category' => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'slug' => $category->slug,
-            ],
-            'products' => $products,
-        ];
-        return response()->json($response);
+    $response = [
+        'category' => [
+            'id' => $category->id,
+            'name' => $category->name,
+            'slug' => $category->slug,
+        ],
+        'products' => $products,  
+    ];
+
+    return response()->json($response);
 }
 
 }
