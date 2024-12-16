@@ -236,24 +236,35 @@ public function handleGoogleCallback()
 {
     $googleUser = Socialite::driver('google')->stateless()->user();
 
-    $user = User::updateOrCreate(
-        ['google_id' => $googleUser->id],
-        [
+    $user = User::where('email', $googleUser->email)->first();
+
+    if ($user) {
+        if (!$user->google_id) {
+            $user->update([
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->avatar,
+            ]);
+        }
+    } else {
+        // Nếu người dùng chưa tồn tại, tạo tài khoản mới
+        $user = User::create([
+            'google_id' => $googleUser->id,
             'name' => $googleUser->name,
             'email' => $googleUser->email,
             'avatar' => $googleUser->avatar,
-            'password' => bcrypt(Str::random(12)),
-            'idRole' => 2, 
-        ]
-    );
+            'password' => bcrypt(Str::random(12)), 
+            'idRole' => 2,
+        ]);
+    }
 
+    // Tạo token để xác thực
     $token = $user->createToken('auth_token')->plainTextToken;
 
     $userInfo = [
         'id' => $user->id,
         'name' => $user->name,
         'email' => $user->email,
-        'avatar' => $googleUser->avatar,
+        'avatar' => $user->avatar,
         'idRole' => $user->idRole,
     ];
 
@@ -266,6 +277,7 @@ public function handleGoogleCallback()
 
     return Redirect::to($redirectUrl);
 }
+
 
 
     public function loginAdmin(Request $request)
@@ -393,7 +405,7 @@ public function handleGoogleCallback()
     return response()->json(['message' => 'Thay đổi mật khẩu thành công.'], 200);
 }
 
-public function updateProfile(Request $request)
+public function updateProfile(Request $request) 
 {
     $userId = $request->id;
     $user = User::find($userId);
@@ -426,15 +438,18 @@ public function updateProfile(Request $request)
     }
 
     if ($request->hasFile('avatar')) {
+        // Delete existing avatar if not a URL
         if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
             Storage::delete($user->avatar);
         }
 
+        // Save new avatar
         $avatarPath = $request->file('avatar')->store('avatars', 'public');
         $avatarUrl = url(Storage::url($avatarPath));
         $validatedData['avatar'] = $avatarUrl;
     }
 
+    // Update only fields that were validated
     $user->update($validatedData);
 
     return response()->json([
@@ -442,6 +457,7 @@ public function updateProfile(Request $request)
         'user' => $user,
     ], 200);
 }
+
 
     public function switchUser(Request $request, $id)
     {
@@ -612,7 +628,6 @@ public function validateEmail(Request $request)
 
     public function destroy($id)
 {
-    // Find the user by ID
     $user = User::find($id);
 
     if (!$user) {
@@ -620,10 +635,8 @@ public function validateEmail(Request $request)
     }
 
     try {
-        // Delete related reviews
         $user->reviews()->delete();
 
-        // Delete related orders and their details
         $orders = $user->orders;
         foreach ($orders as $order) {
             $order->orderDetails()->delete();
