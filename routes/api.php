@@ -93,10 +93,14 @@ Route::prefix('post')->name('post.')->group(function () {
     Route::get('/{slug}',[PostController::class,'api_post_detail']);
 });
 Route::prefix('voucher')->name('voucher.')->group(function () {
+    Route::get('/user-vouchers', [VoucherController::class, 'getUserVouchers']);
     Route::post('/',[VoucherController::class,'api_voucher_user']);
     Route::post('/validate-voucher', [VoucherController::class, 'validateVoucher']);
     Route::delete('/user_vouchers',[VoucherController::class,'deleteVoucher']);
     Route::get('/{id_user}',[VoucherController::class,'api_voucher_user_voucher']);
+    Route::post('/receive/{voucherId}', [VoucherController::class, 'receiveVoucher']);
+    Route::post('/cancel/{voucherId}', [VoucherController::class, 'cancelVoucher']);
+
 });
 Route::prefix('comment')->name('comment.')->group(function () {
     Route::get('/',[ReviewController::class,'getAllComments']);
