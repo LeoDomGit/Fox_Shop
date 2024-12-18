@@ -23,39 +23,7 @@ class VoucherController extends Controller
         return Inertia::render('Vouchers/Index', ['voucher'=>$voucher]);
     }
 
-    public function validateVoucher(Request $request)
-    {
-        $voucherCode = $request->voucher_code;
-        $totalAmount = $request->total_amount;
-    
-        $voucher = Voucher::where('code', $voucherCode)->first();
-    
-        if (!$voucher) {
-            return response()->json(['check' => false, 'msg' => 'Voucher không tồn tại'], 404);
-        }
-    
-        if (now() < $voucher->start_date || now() > $voucher->end_date) {
-            return response()->json(['check' => false, 'msg' => 'Voucher đã hết hạn'], 400);
-        }
-    
-        if ($totalAmount < $voucher->minimum_monney) {
-            return response()->json(['check' => false, 'msg' => 'Không đủ số tiền tối thiểu'], 400);
-        }
-    
-        if ($voucher->usage_limit <= 0) {
-            return response()->json(['check' => false, 'msg' => 'Voucher đã hết số lần sử dụng'], 400);
-        }
-    
-        $discount = $voucher->discount_type === 'percentage' 
-            ? $totalAmount * ($voucher->discount_value / 100) 
-            : $voucher->discount_value;
-    
-        return response()->json([
-            'check' => true,
-            'discount' => min($discount, $totalAmount), // Không giảm quá tổng giá trị đơn hàng
-        ]);
-    }
-    
+  
     /**
      * Show the form for creating a new resource.
      */
@@ -156,35 +124,113 @@ class VoucherController extends Controller
     {
         //
     }
-    public function receiveVoucher(Request $request, $voucherId)
-    {
-        $user = $request->userid;
-        if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
-        $voucher = Voucher::find($voucherId);
-        if (!$voucher) {
-            return response()->json(['error' => 'Voucher not found'], 404);
-        }
-        if ($voucher->usage_limit <= 0) {
-            return response()->json(['error' => 'Voucher has no more uses left'], 400);
-        }
-        $existingVoucher = UserVoucher::where('user_id', $user)
-                                        ->where('voucher_id', $voucherId)
-                                        ->first();
-    
-        if ($existingVoucher) {
-            return response()->json(['error' => 'Voucher already received'], 400);
-        }
 
-        $userVoucher = new UserVoucher();
-        $userVoucher->user_id = $user;
-        $userVoucher->voucher_id = $voucherId;
-        $userVoucher->save();
-        $voucher->usage_limit = $voucher->usage_limit - 1;
-        $voucher->save();
-        return response()->json(['message' => 'Voucher received successfully'], 200);
+    public function getUserVouchers(Request $request)
+{
+    $userId = $request->userId; // hoặc lấy từ JWT token
+
+    // Kiểm tra userId
+    if (!$userId) {
+        return response()->json(['error' => 'User not authenticated'], 401);
     }
+    $vouchers = Voucher::where('usage_limit', '>', 0) 
+        ->whereDate('end_date', '>', now()) 
+        ->get();
+
+    return response()->json([
+        'vouchers' => $vouchers
+    ]);
+}
+
+public function receiveVoucher(Request $request, $voucherId)
+{
+    $user = $request->userid;
+    if (!$user) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    $voucher = Voucher::find($voucherId);
+    if (!$voucher) {
+        return response()->json(['error' => 'Voucher not found'], 404);
+    }
+
+    if ($voucher->usage_limit <= 0) {
+        return response()->json(['error' => 'Voucher has no more uses left'], 400);
+    }
+
+    // Kiểm tra nếu người dùng đã nhận voucher này rồi
+    $existingVoucher = UserVoucher::where('user_id', $user)
+        ->where('voucher_id', $voucherId)
+        ->first();
+
+    if ($existingVoucher) {
+        return response()->json(['error' => 'Voucher already received'], 400);
+    }
+
+    // Thực hiện lưu voucher vào bảng UserVoucher
+    $userVoucher = new UserVoucher();
+    $userVoucher->user_id = $user;
+    $userVoucher->voucher_id = $voucherId;
+    $userVoucher->save();
+
+    // Giảm số lượng voucher còn lại
+    $voucher->usage_limit = $voucher->usage_limit - 1;
+    $voucher->save();
+
+    return response()->json(['message' => 'Voucher received successfully'], 200);
+}
+
+
+    public function api_voucher_user_voucher(Request $request, $id){
+        if (!$id) {
+            return response()->json(['error' => 'Chưa có user'], 400);
+        }
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User không tồn tại'], 404);
+        }
+        $user->load('vouchers');
+    
+        return response()->json([
+            'check' => true,
+            'data' => $user->vouchers
+        ]);
+    }
+
+
+    public function validateVoucher(Request $request)
+    {
+        $voucherCode = $request->voucher_code;
+        $totalAmount = $request->total_amount;
+    
+        $voucher = Voucher::where('code', $voucherCode)->first();
+    
+        if (!$voucher) {
+            return response()->json(['check' => false, 'msg' => 'Voucher không tồn tại'], 404);
+        }
+    
+        if (now() < $voucher->start_date || now() > $voucher->end_date) {
+            return response()->json(['check' => false, 'msg' => 'Voucher đã hết hạn'], 400);
+        }
+    
+        if ($totalAmount < $voucher->minimum_monney) {
+            return response()->json(['check' => false, 'msg' => 'Không đủ số tiền tối thiểu'], 400);
+        }
+    
+        if ($voucher->usage_limit <= 0) {
+            return response()->json(['check' => false, 'msg' => 'Voucher đã hết số lần sử dụng'], 400);
+        }
+    
+        $discount = $voucher->discount_type === 'percentage' 
+            ? $totalAmount * ($voucher->discount_value / 100) 
+            : $voucher->discount_value;
+    
+        return response()->json([
+            'check' => true,
+            'discount' => min($discount, $totalAmount), // Không giảm quá tổng giá trị đơn hàng
+        ]);
+    }
+    
     
     public function api_voucher_user(Request $request){
         $userId = $request->userid;
@@ -203,22 +249,7 @@ class VoucherController extends Controller
             'data' => $user->vouchers
         ]);
     }
-    public function api_voucher_user_voucher(Request $request, $id){
-        if (!$id) {
-            return response()->json(['error' => 'Chưa có user'], 400);
-        }
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'User không tồn tại'], 404);
-        }
-        $user->load('vouchers');
-    
-        return response()->json([
-            'check' => true,
-            'data' => $user->vouchers
-        ]);
-    }
-    public function deleteVoucher(Request $request)
+      public function deleteVoucher(Request $request)
 {
     $voucher = UserVoucher::where('voucher_id', $request->id_voucher)
                           ->where('user_id', $request->id_user)

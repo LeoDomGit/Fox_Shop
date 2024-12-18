@@ -438,18 +438,15 @@ public function updateProfile(Request $request)
     }
 
     if ($request->hasFile('avatar')) {
-        // Delete existing avatar if not a URL
         if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
             Storage::delete($user->avatar);
         }
 
-        // Save new avatar
         $avatarPath = $request->file('avatar')->store('avatars', 'public');
         $avatarUrl = url(Storage::url($avatarPath));
         $validatedData['avatar'] = $avatarUrl;
     }
 
-    // Update only fields that were validated
     $user->update($validatedData);
 
     return response()->json([
