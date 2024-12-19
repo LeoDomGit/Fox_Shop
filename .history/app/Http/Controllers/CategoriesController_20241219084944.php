@@ -177,6 +177,7 @@ class CategoriesController extends Controller
         }
         $productCategory = ProductCategory::where('id_categories', $id)->first();
         if ($productCategory) {
+            // Nếu có sản phẩm, không cho phép xóa danh mục và trả về thông báo lỗi
             return response()->json(['check' => false, 'msg' => 'Không thể xóa danh mục vì có sản phẩm thuộc danh mục này']);
         }
         Categories::where('id', $id)->delete();
