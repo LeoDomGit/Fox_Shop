@@ -31,7 +31,7 @@
             line-height: 40px;
             text-align: center;
             background: aqua;
-            color: black;
+            color: white;
             margin-bottom: 20px;
             padding: 10px 0;
             border-radius: 5px;
@@ -58,8 +58,6 @@
     <div class="email-box">
         <h1>Xác minh tài khoản</h1>
         <ul>
-            <p>Nếu bạn đã đăng kí tài khoản này với foxshop!</p>
-            <P>Vui lòng xác nhận</P>
             <p>Email: {{$data['email']}}</p>
             <a href="{{ url('/verify/' . $data['id'])}}"
                 style="display: inline-block; padding: 10px 20px; font-size: 16px; font-weight: bold; color: #fff; background-color:rgb(197, 53, 53); border-radius: 5px; text-decoration: none; margin-top: 20px;">

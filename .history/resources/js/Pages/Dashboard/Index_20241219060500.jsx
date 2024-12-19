@@ -19,6 +19,8 @@ function Index(revenue) {
     const [dataReviews, setdataReviews] = useState(revenue.reviews);
     const [dataOrders, setdataOrders] = useState(revenue.orders);
     const [dataProducts, setdataProducts] = useState(revenue.products);
+
+    console.log("data:", dataProducts);
     const [loading, setLoading] = useState(true);
     const [showLoad, setShowLoad] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,18 +70,21 @@ function Index(revenue) {
     });
     const handleSubmit = async () => {
         try {
-            const response = await axios.post("/admin/dashboard/date",{
+            const response = await axios.get("/admin/dashboard", {
+                params: {
                     start_date: startDate,
                     end_date: endDate,
-                });
-            if (response.data.check === true) {
+                },
+            });
+            console.log(response);
+            if (response.data.check) {
                 notyf.open({
                     type: "success",
                     message: "Đã lọc thành công",
                 });
-                setData(response.data.data);
-            } else {
-                notyf.open({
+                setDataNew(response.data.dataNew);
+            }else{
+notyf.open({
                     type: "error",
                     message: "Không có dữ liệu",
                 });
@@ -123,7 +128,7 @@ function Index(revenue) {
                     <>
                         <Container>
                             <div>
-                                <h3>Thống kê</h3>
+                                <h4>Thống kê</h4>
                             </div>
                             <div className="row">
                                 <div className="col-8">
@@ -154,7 +159,7 @@ function Index(revenue) {
                                                 type="date"
                                                 name="end_date"
                                                 id=""
-                                                onChange={(e) =>
+onChange={(e) =>
                                                     setEndDate(e.target.value)
                                                 }
                                             />
@@ -200,7 +205,7 @@ function Index(revenue) {
                                                                         }
                                                                     >
                                                                         <td>
-                                                                            <div className="d-flex">
+<div className="d-flex">
                                                                                 <div>
                                                                                     <img
                                                                                         src={`/storage/products/${item.product.gallery[0].image}`}
@@ -233,7 +238,7 @@ function Index(revenue) {
                                                                                     index <
                                                                                     item.rating ? (
                                                                                         <StarIcon
-                                                                                            key={
+key={
                                                                                                 index
                                                                                             }
                                                                                             color="warning"
@@ -271,7 +276,7 @@ function Index(revenue) {
                                 </div>
                                 <div className="col-4">
                                     <div className="card">
-                                        <div className="card-header text-center">
+<div className="card-header text-center">
                                             <h5>Danh sách bán chạy</h5>
                                         </div>
                                         <div className="card-body">
@@ -310,7 +315,7 @@ function Index(revenue) {
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    {
+{
                                                                         item.total_sold
                                                                     }
                                                                 </td>
@@ -353,7 +358,7 @@ function Index(revenue) {
                                                                                 <img
                                                                                     src={`/storage/products/${item.gallery[0].image}`}
                                                                                     alt=""
-                                                                                    style={{
+style={{
                                                                                         width: "50px",
                                                                                         height: "50px",
                                                                                     }}
@@ -393,7 +398,7 @@ function Index(revenue) {
                                     </div>
                                 </div>
                                 <div className="col-12">
-                                    <div className="mt-5">
+<div className="mt-5">
                                         <div className="card mt-5">
                                             <div className="card-header text-center">
                                                 <h5>Đơn hàng mới nhất</h5>
@@ -434,7 +439,7 @@ function Index(revenue) {
                                                                         <td>
                                                                             {
                                                                                 item.id
-                                                                            }
+}
                                                                         </td>
                                                                         <td>
                                                                             {item.order_details.map(
@@ -470,7 +475,7 @@ function Index(revenue) {
                                                                         </td>
                                                                         <td>
                                                                             {
-                                                                                item
+item
                                                                                     .payment
                                                                                     ?.method
                                                                             }
@@ -506,7 +511,7 @@ function Index(revenue) {
                                                             )}
                                                     </tbody>
                                                 </Table>
-                                            </div>
+</div>
                                         </div>
                                     </div>
                                 </div>

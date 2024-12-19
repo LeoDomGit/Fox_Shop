@@ -31,7 +31,7 @@
             line-height: 40px;
             text-align: center;
             background: aqua;
-            color: black;
+            color: white;
             margin-bottom: 20px;
             padding: 10px 0;
             border-radius: 5px;

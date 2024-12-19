@@ -19,6 +19,8 @@ function Index(revenue) {
     const [dataReviews, setdataReviews] = useState(revenue.reviews);
     const [dataOrders, setdataOrders] = useState(revenue.orders);
     const [dataProducts, setdataProducts] = useState(revenue.products);
+
+    console.log("data:", dataProducts);
     const [loading, setLoading] = useState(true);
     const [showLoad, setShowLoad] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,16 +70,19 @@ function Index(revenue) {
     });
     const handleSubmit = async () => {
         try {
-            const response = await axios.post("/admin/dashboard/date",{
+            const response = await axios.get("/admin/dashboard", {
+                params: {
                     start_date: startDate,
                     end_date: endDate,
-                });
-            if (response.data.check === true) {
+                },
+            });
+            console.log("fdfdfd",response);
+            if (response.data.check) {
                 notyf.open({
                     type: "success",
                     message: "Đã lọc thành công",
                 });
-                setData(response.data.data);
+                setDataNew(response.data.dataNew);
             } else {
                 notyf.open({
                     type: "error",

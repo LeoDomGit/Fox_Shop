@@ -23,7 +23,7 @@ ChartJS.register(
 
 const RevenueChart = ({ data }) => {
     if (!Array.isArray(data) || data.length === 0) {
-        return <div>Không có dữ liệu.</div>;
+        return <div>No data available to display the chart.</div>;
     }
 
     const dates = data.map((item) => item.date);

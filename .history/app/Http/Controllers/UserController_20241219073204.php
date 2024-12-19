@@ -214,13 +214,7 @@ class UserController extends BaseCrudController
                 ]
             ], 401);
         }
-        if ($user->status == 0) {
-            return response()->json([
-                'errors' => [
-                    'status' => ['Vui lòng xác thực tài khoản của bạn.']
-                ]
-            ], 401);
-        }
+
         if (!Hash::check($request->password, $user->password)) {
             return response()->json([
                 'errors' => [

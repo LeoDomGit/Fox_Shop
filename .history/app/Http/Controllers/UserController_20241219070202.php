@@ -176,124 +176,109 @@ class UserController extends BaseCrudController
 
     }
 
-    public function verify($userId)
-    {
-        $user = User::find($userId);
-        if ($user && $user->status == 0) {
-            $user->status = 1;
-            $user->save();
-            return redirect('https://foxshop.one/login');
-        }
-        return redirect('https://foxshop.one');
-    }
 
-    public function login(Request $request)
-    {
-        // Validate các trường dữ liệu trong request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
-        ], [
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Email không hợp lệ.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()->toArray()
-            ], 422);
-        }
+public function login(Request $request)
+{
+    // Validate các trường dữ liệu trong request
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required|string|min:8',
+    ], [
+        'email.required' => 'Vui lòng nhập email.',
+        'email.email' => 'Email không hợp lệ.',
+        'password.required' => 'Vui lòng nhập mật khẩu.',
+        'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+    ]);
 
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json([
-                'errors' => [
-                    'email' => ['Email này chưa được đăng ký.']
-                ]
-            ], 401);
-        }
-        if ($user->status == 0) {
-            return response()->json([
-                'errors' => [
-                    'status' => ['Vui lòng xác thực tài khoản của bạn.']
-                ]
-            ], 401);
-        }
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'errors' => [
-                    'password' => ['Mật khẩu không chính xác.']
-                ]
-            ], 401);
-        }
-
-        $token = $user->createToken('YourAppName')->plainTextToken;
-
-        // Nếu có cờ "remember" thì lưu token vào cookie
-        if ($request->has('remember') && $request->remember) {
-            Cookie::queue('remember_token', $token, 60 * 24 * 30); // Lưu trong 30 ngày
-        }
-
+    if ($validator->fails()) {
         return response()->json([
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'avatar' => asset($user->avatar),
-                'phone' => $user->phone
-            ]
-        ], 200);
+            'errors' => $validator->errors()->toArray()
+        ], 422);
     }
 
+    $user = User::where('email', $request->email)->first();
+    if (!$user) {
+        return response()->json([
+            'errors' => [
+                'email' => ['Email này chưa được đăng ký.']
+            ]
+        ], 401);
+    }
 
-    public function handleGoogleCallback()
-    {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+    if (!Hash::check($request->password, $user->password)) {
+        return response()->json([
+            'errors' => [
+                'password' => ['Mật khẩu không chính xác.']
+            ]
+        ], 401);
+    }
 
-        $user = User::where('email', $googleUser->email)->first();
+    $token = $user->createToken('YourAppName')->plainTextToken;
 
-        if ($user) {
-            if (!$user->google_id) {
-                $user->update([
-                    'google_id' => $googleUser->id,
-                    'avatar' => $googleUser->avatar,
-                ]);
-            }
-        } else {
-            // Nếu người dùng chưa tồn tại, tạo tài khoản mới
-            $user = User::create([
-                'google_id' => $googleUser->id,
-                'name' => $googleUser->name,
-                'email' => $googleUser->email,
-                'avatar' => $googleUser->avatar,
-                'password' => bcrypt(Str::random(12)),
-                'idRole' => 2,
-            ]);
-        }
+    // Nếu có cờ "remember" thì lưu token vào cookie
+    if ($request->has('remember') && $request->remember) {
+        Cookie::queue('remember_token', $token, 60 * 24 * 30); // Lưu trong 30 ngày
+    }
 
-        // Tạo token để xác thực
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        $userInfo = [
+    return response()->json([
+        'token' => $token,
+        'user' => [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'avatar' => $user->avatar,
-            'idRole' => $user->idRole,
-        ];
+            'avatar' => asset($user->avatar),
+            'phone' => $user->phone
+        ]
+    ], 200);
+}
 
-        $redirectUrl = sprintf(
-            // 'http://localhost:3000/login?token=%s&user=%s',
-            'https://foxshop.one/login?token=%s&user=%s',
-            $token,
-            urlencode(json_encode($userInfo))
-        );
 
-        return Redirect::to($redirectUrl);
+public function handleGoogleCallback()
+{
+    $googleUser = Socialite::driver('google')->stateless()->user();
+
+    $user = User::where('email', $googleUser->email)->first();
+
+    if ($user) {
+        if (!$user->google_id) {
+            $user->update([
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->avatar,
+            ]);
+        }
+    } else {
+        // Nếu người dùng chưa tồn tại, tạo tài khoản mới
+        $user = User::create([
+            'google_id' => $googleUser->id,
+            'name' => $googleUser->name,
+            'email' => $googleUser->email,
+            'avatar' => $googleUser->avatar,
+            'password' => bcrypt(Str::random(12)), 
+            'idRole' => 2,
+        ]);
     }
+
+    // Tạo token để xác thực
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    $userInfo = [
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'avatar' => $user->avatar,
+        'idRole' => $user->idRole,
+    ];
+
+    $redirectUrl = sprintf(
+        // 'http://localhost:3000/login?token=%s&user=%s',
+        'https://foxshop.one/login?token=%s&user=%s',
+        $token,
+        urlencode(json_encode($userInfo))
+    );
+
+    return Redirect::to($redirectUrl);
+}
 
 
 
@@ -377,100 +362,100 @@ class UserController extends BaseCrudController
 
 
     public function changePassword(Request $request)
-    {
-        $userId = $request->id;
-        $user = User::find($userId);
+{
+    $userId = $request->id;
+    $user = User::find($userId);
 
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
 
+    $request->validate([
+        'currentPassword' => 'required|string',
+        'newPassword' => [
+            'required',
+            'string',
+            'min:8',
+            'regex:/[A-Z]/',
+            'regex:/[a-z]/',
+            'regex:/\d/',
+            'regex:/[@$!%*?&.]/',
+            'confirmed',
+        ],
+    ], [
+        'currentPassword.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+        'newPassword.required' => 'Vui lòng nhập mật khẩu mới.',
+        'newPassword.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+        'newPassword.regex' => 'Mật khẩu mới phải có chữ hoa, chữ thường, số và ký tự đặc biệt.',
+        'newPassword.confirmed' => 'Mật khẩu mới và xác nhận không khớp.',
+    ]);
+
+    // Xác minh mật khẩu hiện tại
+    if (!Hash::check($request->currentPassword, $user->password)) {
+        return response()->json(['errors' => ['currentPassword' => 'Mật khẩu hiện tại không đúng.']], 422);
+    }
+
+    // Kiểm tra nếu mật khẩu mới giống mật khẩu cũ
+    if (Hash::check($request->newPassword, $user->password)) {
+        return response()->json(['errors' => ['newPassword' => 'Mật khẩu mới phải khác mật khẩu hiện tại.']], 422);
+    }
+
+    // Lưu mật khẩu mới đã mã hóa
+    $user->password = Hash::make($request->newPassword);
+    $user->save();
+
+    return response()->json(['message' => 'Thay đổi mật khẩu thành công.'], 200);
+}
+
+public function updateProfile(Request $request) 
+{
+    $userId = $request->id;
+    $user = User::find($userId);
+
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    $validatedData = [];
+
+    if ($request->has('name')) {
         $request->validate([
-            'currentPassword' => 'required|string',
-            'newPassword' => [
-                'required',
-                'string',
-                'min:8',
-                'regex:/[A-Z]/',
-                'regex:/[a-z]/',
-                'regex:/\d/',
-                'regex:/[@$!%*?&.]/',
-                'confirmed',
-            ],
+            'name' => 'required|string|min:2|max:255',
         ], [
-            'currentPassword.required' => 'Vui lòng nhập mật khẩu hiện tại.',
-            'newPassword.required' => 'Vui lòng nhập mật khẩu mới.',
-            'newPassword.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
-            'newPassword.regex' => 'Mật khẩu mới phải có chữ hoa, chữ thường, số và ký tự đặc biệt.',
-            'newPassword.confirmed' => 'Mật khẩu mới và xác nhận không khớp.',
+            'name.required' => 'Vui lòng nhập họ và tên.',
+            'name.min' => 'Họ và tên phải có ít nhất 2 ký tự.',
+            'name.max' => 'Họ và tên không được quá 255 ký tự.',
         ]);
-
-        // Xác minh mật khẩu hiện tại
-        if (!Hash::check($request->currentPassword, $user->password)) {
-            return response()->json(['errors' => ['currentPassword' => 'Mật khẩu hiện tại không đúng.']], 422);
-        }
-
-        // Kiểm tra nếu mật khẩu mới giống mật khẩu cũ
-        if (Hash::check($request->newPassword, $user->password)) {
-            return response()->json(['errors' => ['newPassword' => 'Mật khẩu mới phải khác mật khẩu hiện tại.']], 422);
-        }
-
-        // Lưu mật khẩu mới đã mã hóa
-        $user->password = Hash::make($request->newPassword);
-        $user->save();
-
-        return response()->json(['message' => 'Thay đổi mật khẩu thành công.'], 200);
+        $validatedData['name'] = $request->name;
     }
 
-    public function updateProfile(Request $request)
-    {
-        $userId = $request->id;
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        $validatedData = [];
-
-        if ($request->has('name')) {
-            $request->validate([
-                'name' => 'required|string|min:2|max:255',
-            ], [
-                'name.required' => 'Vui lòng nhập họ và tên.',
-                'name.min' => 'Họ và tên phải có ít nhất 2 ký tự.',
-                'name.max' => 'Họ và tên không được quá 255 ký tự.',
-            ]);
-            $validatedData['name'] = $request->name;
-        }
-
-        if ($request->has('phone')) {
-            $request->validate([
-                'phone' => 'required|string|digits:10',
-            ], [
-                'phone.required' => 'Vui lòng nhập số điện thoại.',
-                'phone.digits' => 'Số điện thoại phải gồm 10 chữ số.',
-            ]);
-            $validatedData['phone'] = $request->phone;
-        }
-
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
-                Storage::delete($user->avatar);
-            }
-
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            $avatarUrl = url(Storage::url($avatarPath));
-            $validatedData['avatar'] = $avatarUrl;
-        }
-
-        $user->update($validatedData);
-
-        return response()->json([
-            'message' => 'Cập nhật thông tin thành công.',
-            'user' => $user,
-        ], 200);
+    if ($request->has('phone')) {
+        $request->validate([
+            'phone' => 'required|string|digits:10',
+        ], [
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.digits' => 'Số điện thoại phải gồm 10 chữ số.',
+        ]);
+        $validatedData['phone'] = $request->phone;
     }
+
+    if ($request->hasFile('avatar')) {
+        if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
+            Storage::delete($user->avatar);
+        }
+
+        $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        $avatarUrl = url(Storage::url($avatarPath));
+        $validatedData['avatar'] = $avatarUrl;
+    }
+
+    $user->update($validatedData);
+
+    return response()->json([
+        'message' => 'Cập nhật thông tin thành công.',
+        'user' => $user,
+    ], 200);
+}
 
 
     public function switchUser(Request $request, $id)
@@ -537,27 +522,27 @@ class UserController extends BaseCrudController
     }
 
 
-    public function validateEmail(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => [
-                'required',
-                'email',
-                function ($attribute, $value, $fail) {
-                    $user = User::where('email', $value)->first();
-                    if (!$user) {
-                        $fail('Email không tồn tại trong hệ thống.');
-                    }
+public function validateEmail(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => [
+            'required',
+            'email',
+            function ($attribute, $value, $fail) {
+                $user = User::where('email', $value)->first();
+                if (!$user) {
+                    $fail('Email không tồn tại trong hệ thống.');
                 }
-            ],
-        ]);
+            }
+        ],
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['valid' => false, 'errors' => $validator->errors()], 422);
-        }
-
-        return response()->json(['valid' => true]);
+    if ($validator->fails()) {
+        return response()->json(['valid' => false, 'errors' => $validator->errors()], 422);
     }
+
+    return response()->json(['valid' => true]);
+}
 
 
     public function resetPassword(Request $request)
@@ -641,30 +626,30 @@ class UserController extends BaseCrudController
     }
 
     public function destroy($id)
-    {
-        $user = User::find($id);
+{
+    $user = User::find($id);
 
-        if (!$user) {
-            return response()->json(['message' => 'Tài khoản không tồn tại'], 404);
-        }
-
-        try {
-            $user->reviews()->delete();
-
-            $orders = $user->orders;
-            foreach ($orders as $order) {
-                $order->orderDetails()->delete();
-            }
-            $user->orders()->delete();
-
-            // Delete the user
-            $user->delete();
-
-            return response()->json(['message' => 'Tài khoản và các dữ liệu liên quan đã được xóa thành công.'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Có lỗi xảy ra khi xóa tài khoản.', 'error' => $e->getMessage()], 500);
-        }
+    if (!$user) {
+        return response()->json(['message' => 'Tài khoản không tồn tại'], 404);
     }
+
+    try {
+        $user->reviews()->delete();
+
+        $orders = $user->orders;
+        foreach ($orders as $order) {
+            $order->orderDetails()->delete();
+        }
+        $user->orders()->delete();
+
+        // Delete the user
+        $user->delete();
+
+        return response()->json(['message' => 'Tài khoản và các dữ liệu liên quan đã được xóa thành công.'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Có lỗi xảy ra khi xóa tài khoản.', 'error' => $e->getMessage()], 500);
+    }
+}
 
 
 }
