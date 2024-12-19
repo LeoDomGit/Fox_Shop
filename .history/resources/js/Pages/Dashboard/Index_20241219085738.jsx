@@ -392,7 +392,7 @@ function Index(revenue) {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-12 mb-5">
+                                <div className="col-12">
                                     <div className="mt-5">
                                         <div className="card mt-5">
                                             <div className="card-header text-center">
