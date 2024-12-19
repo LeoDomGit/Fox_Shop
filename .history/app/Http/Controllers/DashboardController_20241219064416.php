@@ -69,35 +69,30 @@ class DashboardController extends Controller
     }
     public function searchDate(Request $request)
     {
-        $startDate = $request->start_date; 
+        $startDate = $request->start_date;
         $endDate = $request->end_date;
         if ($startDate && $endDate) {
-            $startDate = Carbon::parse($startDate)->startOfDay(); 
-            $endDate = Carbon::parse($endDate)->endOfDay();
-
-            // Truy vấn cơ sở dữ liệu với start_date và end_date
             $revenueNew = Orders::selectRaw('DATE(orders.order_date) as date')
-                ->join('order_details', 'orders.id', '=', 'order_details.id_order')
-                ->selectRaw('SUM(total_amount) as revenue')
-                ->groupByRaw('DATE(orders.order_date)')
-                ->whereBetween('orders.order_date', [$startDate, $endDate])
-                ->orderByRaw('DATE(orders.order_date) ASC')
-                ->get();
-
-            // Trả về kết quả dưới dạng JSON
-            return response()->json([
-                'check' => true,
-                'data' => $revenueNew,
-            ]);
-        } else {
-            return response()->json([
-                'check' => false,
-                'message' => 'Ngày không hợp lệ',
-            ]);
+            ->join('order_details', 'orders.id', '=', 'order_details.id_order')
+            ->selectRaw('SUM(total_amount) as revenue')
+            ->groupByRaw('DATE(orders.order_date)')
+            ->whereBetween('orders.order_date', [$startDate, $endDate])
+            ->orderByRaw('DATE(orders.order_date) ASC')
+            ->get();
+            dd($revenueNew);
+            if ($revenueNew->isNotEmpty()) {
+                return response()->json([
+                    'check' => true,
+                    'data' => $revenueNew,
+                ]);
+            }
         }
+        return response()->json([
+            'check' => false,
+            'data' => [],
+        ]);
+
     }
-
-
 
     /**
      * Show the form for creating a new resource.

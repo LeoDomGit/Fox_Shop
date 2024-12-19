@@ -182,9 +182,9 @@ class UserController extends BaseCrudController
         if ($user && $user->status == 0) {
             $user->status = 1;
             $user->save();
-            return redirect('https://foxshop.one/login');
+            return redirect('https://foxshop.com')->with('message', 'Tài khoản của bạn đã được xác minh!');
         }
-        return redirect('https://foxshop.one');
+        return redirect('https://foxshop.com')->with('error', 'Tài khoản không hợp lệ hoặc đã xác minh.');
     }
 
     public function login(Request $request)
@@ -214,13 +214,7 @@ class UserController extends BaseCrudController
                 ]
             ], 401);
         }
-        if ($user->status == 0) {
-            return response()->json([
-                'errors' => [
-                    'status' => ['Vui lòng xác thực tài khoản của bạn.']
-                ]
-            ], 401);
-        }
+
         if (!Hash::check($request->password, $user->password)) {
             return response()->json([
                 'errors' => [

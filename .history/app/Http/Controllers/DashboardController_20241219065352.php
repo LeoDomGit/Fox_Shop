@@ -69,10 +69,12 @@ class DashboardController extends Controller
     }
     public function searchDate(Request $request)
     {
-        $startDate = $request->start_date; 
+        // Lấy start_date và end_date từ request
+        $startDate = $request->start_date;
         $endDate = $request->end_date;
-        if ($startDate && $endDate) {
-            $startDate = Carbon::parse($startDate)->startOfDay(); 
+        dd($request->start_date);
+        if (Carbon::hasFormat($startDate, 'Y-m-d') && Carbon::hasFormat($endDate, 'Y-m-d')) {
+            $startDate = Carbon::parse($startDate)->startOfDay();
             $endDate = Carbon::parse($endDate)->endOfDay();
 
             // Truy vấn cơ sở dữ liệu với start_date và end_date
@@ -84,7 +86,6 @@ class DashboardController extends Controller
                 ->orderByRaw('DATE(orders.order_date) ASC')
                 ->get();
 
-            // Trả về kết quả dưới dạng JSON
             return response()->json([
                 'check' => true,
                 'data' => $revenueNew,

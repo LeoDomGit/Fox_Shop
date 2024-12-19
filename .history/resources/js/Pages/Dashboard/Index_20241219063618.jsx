@@ -68,16 +68,18 @@ function Index(revenue) {
     });
     const handleSubmit = async () => {
         try {
-            const response = await axios.post("/admin/dashboard/date",{
+            const response = await axios.get("/admin/dashboard/date", {
+                params: {
                     start_date: startDate,
                     end_date: endDate,
-                });
+                },
+            });
             if (response.data.check === true) {
                 notyf.open({
                     type: "success",
                     message: "Đã lọc thành công",
                 });
-                setData(response.data.data);
+                setDataNew(response.data.dataNew);
             } else {
                 notyf.open({
                     type: "error",

@@ -24,7 +24,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/',[UserController::class, 'loginForm']);
 
-Route::get('/verify/{user_id}', [UserController::class, 'verify'])->name('verify');
+Route::get('/verify', [UserController::class, 'loginForm']);
 Route::prefix('admin')->group(function () {
 Route::resource('/roles', RolesController::class);
 Route::resource('/permissions', PermissionController::class);

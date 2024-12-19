@@ -68,10 +68,12 @@ function Index(revenue) {
     });
     const handleSubmit = async () => {
         try {
-            const response = await axios.post("/admin/dashboard/date",{
+            const response = await axios.post("/admin/dashboard/date", {
+                params: {
                     start_date: startDate,
                     end_date: endDate,
-                });
+                },
+            });
             if (response.data.check === true) {
                 notyf.open({
                     type: "success",

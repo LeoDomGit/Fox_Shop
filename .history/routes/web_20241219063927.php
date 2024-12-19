@@ -23,8 +23,6 @@ use Illuminate\Support\Facades\Request;
 use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/',[UserController::class, 'loginForm']);
-
-Route::get('/verify/{user_id}', [UserController::class, 'verify'])->name('verify');
 Route::prefix('admin')->group(function () {
 Route::resource('/roles', RolesController::class);
 Route::resource('/permissions', PermissionController::class);
@@ -54,7 +52,7 @@ Route::post('/vouchers/status/{id}', [VoucherController::class, 'UploadStatus'])
 Route::post('/receive-voucher/{id}', [VoucherController::class, 'receiveVoucher']);
 Route::resource('/methods', MethodController::class);
 Route::resource('/cart',CartController::class);
-Route::post('/dashboard/date',[DashboardController::class, 'searchDate']);
+Route::get('/dashboard/date',[DashboardController::class, 'searchDate']);
 Route::resource('/dashboard', DashboardController::class);   
 Route::resource('/ordermng', OrdersMngController::class);
 Route::get('/products/detail/{slug}', [ProductController::class, 'ProDetail']);

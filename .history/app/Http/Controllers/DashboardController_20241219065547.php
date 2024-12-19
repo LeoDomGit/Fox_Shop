@@ -69,11 +69,13 @@ class DashboardController extends Controller
     }
     public function searchDate(Request $request)
     {
-        $startDate = $request->start_date; 
-        $endDate = $request->end_date;
+        $startDate = $request->query('start_date'); // Lấy start_date từ query string
+        $endDate = $request->query('end_date'); // Lấy end_date từ query string
+        dd($startDate);
+        // Kiểm tra nếu có ngày bắt đầu và kết thúc
         if ($startDate && $endDate) {
-            $startDate = Carbon::parse($startDate)->startOfDay(); 
-            $endDate = Carbon::parse($endDate)->endOfDay();
+            $startDate = Carbon::parse($startDate)->startOfDay();  // Chuyển đổi sang Carbon và đặt về đầu ngày
+            $endDate = Carbon::parse($endDate)->endOfDay();        // Chuyển đổi sang Carbon và đặt về cuối ngày
 
             // Truy vấn cơ sở dữ liệu với start_date và end_date
             $revenueNew = Orders::selectRaw('DATE(orders.order_date) as date')

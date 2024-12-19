@@ -69,13 +69,12 @@ class DashboardController extends Controller
     }
     public function searchDate(Request $request)
     {
-        $startDate = $request->start_date; 
+        $startDate = $request->start_date;
         $endDate = $request->end_date;
-        if ($startDate && $endDate) {
-            $startDate = Carbon::parse($startDate)->startOfDay(); 
-            $endDate = Carbon::parse($endDate)->endOfDay();
 
-            // Truy vấn cơ sở dữ liệu với start_date và end_date
+        // Kiểm tra xem cả hai tham số bắt buộc có tồn tại không
+        if ($startDate && $endDate) {
+            // Truy vấn dữ liệu theo khoảng thời gian
             $revenueNew = Orders::selectRaw('DATE(orders.order_date) as date')
                 ->join('order_details', 'orders.id', '=', 'order_details.id_order')
                 ->selectRaw('SUM(total_amount) as revenue')
@@ -84,19 +83,21 @@ class DashboardController extends Controller
                 ->orderByRaw('DATE(orders.order_date) ASC')
                 ->get();
 
-            // Trả về kết quả dưới dạng JSON
-            return response()->json([
-                'check' => true,
-                'data' => $revenueNew,
-            ]);
-        } else {
-            return response()->json([
-                'check' => false,
-                'message' => 'Ngày không hợp lệ',
-            ]);
+            // Kiểm tra nếu có dữ liệu trả về
+            if ($revenueNew->isNotEmpty()) {
+                return response()->json([
+                    'check' => true,
+                    'data' => $revenueNew,
+                ]);
+            }
         }
-    }
 
+        // Nếu không có dữ liệu hoặc không có tham số start_date và end_date, trả về false
+        return response()->json([
+            'check' => false,
+            'data' => [],
+        ]);
+    }
 
 
     /**

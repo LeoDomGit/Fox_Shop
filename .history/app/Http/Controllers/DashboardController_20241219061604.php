@@ -59,23 +59,10 @@ class DashboardController extends Controller
             ->take(5) // Lấy 5 bản ghi
             ->get()
             ->toArray();
-        return Inertia::render('Dashboard/Index', [
-            'revenue' => $revenue,
-            'databest' => $bestSellers,
-            'reviews' => $reviews,
-            'orders' => $orders,
-            'products' => $newProducts,
-        ]);
-    }
-    public function searchDate(Request $request)
-    {
-        $startDate = $request->start_date; 
-        $endDate = $request->end_date;
-        if ($startDate && $endDate) {
-            $startDate = Carbon::parse($startDate)->startOfDay(); 
-            $endDate = Carbon::parse($endDate)->endOfDay();
-
-            // Truy vấn cơ sở dữ liệu với start_date và end_date
+        // dd($bestSellers);
+        $startDate = Carbon::parse($request->query('start_date'))->startOfDay();
+        $endDate = Carbon::parse($request->query('end_date'))->endOfDay();
+        if ($startDate && $endDate) {   
             $revenueNew = Orders::selectRaw('DATE(orders.order_date) as date')
                 ->join('order_details', 'orders.id', '=', 'order_details.id_order')
                 ->selectRaw('SUM(total_amount) as revenue')
@@ -83,21 +70,16 @@ class DashboardController extends Controller
                 ->whereBetween('orders.order_date', [$startDate, $endDate])
                 ->orderByRaw('DATE(orders.order_date) ASC')
                 ->get();
-
-            // Trả về kết quả dưới dạng JSON
-            return response()->json([
-                'check' => true,
-                'data' => $revenueNew,
-            ]);
-        } else {
-            return response()->json([
-                'check' => false,
-                'message' => 'Ngày không hợp lệ',
-            ]);
         }
+        return Inertia::render('Dashboard/Index', [
+            'revenue' => $revenue,
+            'databest' => $bestSellers,
+            'reviews' => $reviews,
+            'orders' => $orders,
+            'products' => $newProducts,
+            'revenueNew' => $revenueNew
+        ]);
     }
-
-
 
     /**
      * Show the form for creating a new resource.
