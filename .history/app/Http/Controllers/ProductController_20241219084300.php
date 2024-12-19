@@ -8,7 +8,6 @@ use App\Models\ProductCategory;
 use App\Models\Products;
 use App\Models\Attribute;
 use App\Models\ProductsAttribute;
-use App\Models\Order_detail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
@@ -372,9 +371,10 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(['check' => false, 'msg' => 'Không tìm thấy sản phẩm']);
         }
-        $productCategory = Order_detail::where('id_product', $identifier)->first();
+        $productCategory = ProductCategory::where('id_product', $identifier)->first();
         if ($productCategory) {
-            return response()->json(['check' => false, 'msg' => 'Không thể xóa sản phẩm vì đang có đơn hàng']);
+            // Nếu có, không cho phép xóa và trả về thông báo lỗi
+            return response()->json(['check' => false, 'msg' => 'Không thể xóa sản phẩm vì vẫn đang được liên kết với danh mục']);
         }
         $images = Gallery::where('id_parent', $identifier)->select('image')->get();
         foreach ($images as $image) {

@@ -89,7 +89,7 @@ function Index({
     const formatDiscount = (params) => {
         return new Intl.NumberFormat("en-US").format(params);
     };
-    const handleDelete = (proId) => {
+    const handleDelete = (e) => {
         Swal.fire({
             icon: "question",
             text: "Xóa sản phẩm này ?",
@@ -100,7 +100,7 @@ function Index({
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                axios.delete("/admin/products/" + proId).then((res) => {
+                axios.delete("/admin/products/" + dataId).then((res) => {
                     if (res.data.check == true) {
                         setTimeout(() => {
                             notyf.success("Đã xóa thành công");
